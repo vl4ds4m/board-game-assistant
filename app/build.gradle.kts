@@ -1,15 +1,18 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.jetbrains.kotlin.compose.compiler)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
     namespace = "org.vl4ds4m.board.game.assistant"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "org.vl4ds4m.board.game.assistant"
         minSdk = 29
+        //noinspection OldTargetApi because a newer version has collisions (e.g. new java collections api <> kotlin extension funtions)
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -50,10 +53,11 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.jetbrains.kotlinx.serialization.json)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)

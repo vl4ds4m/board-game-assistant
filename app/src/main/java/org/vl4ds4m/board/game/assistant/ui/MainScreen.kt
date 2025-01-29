@@ -1,5 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -12,109 +13,119 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import org.vl4ds4m.board.game.assistant.data.Store
+import org.vl4ds4m.board.game.assistant.ui.game.NewGamePlayers
+import org.vl4ds4m.board.game.assistant.ui.game.NewGamePlayersContent
+import org.vl4ds4m.board.game.assistant.ui.game.NewGameStart
+import org.vl4ds4m.board.game.assistant.ui.game.NewGameStartContent
+import org.vl4ds4m.board.game.assistant.ui.home.Home
 import org.vl4ds4m.board.game.assistant.ui.home.HomeContent
+import org.vl4ds4m.board.game.assistant.ui.profile.Profile
 import org.vl4ds4m.board.game.assistant.ui.profile.ProfileContent
+import org.vl4ds4m.board.game.assistant.ui.results.Results
 import org.vl4ds4m.board.game.assistant.ui.results.ResultsContent
+import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
-fun MainContent() {
+internal fun MainContent() {
     val navController = rememberNavController()
-    var currentScreen by rememberSaveable(stateSaver = Route.Saver) {
-        mutableStateOf(startDestination)
+    val currentDest = navController.currentBackStackEntryAsState()
+        .value?.destination
+    val topLevelDest = topLevelDestinations.any {
+        currentDest?.hasRoute(it.route::class) ?: false
     }
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = { MainNavBar(
-            onHomeClick = { navController.navigateTo(Home); currentScreen = Home },
-            onResultsClick = { navController.navigateTo(Results); currentScreen = Results },
-            onProfileClick = { navController.navigateTo(Profile); currentScreen = Profile },
-            selected = currentScreen
-        ) }
+        bottomBar = {
+            AnimatedVisibility(topLevelDest) {
+                MainNavBar(
+                    selected = { currentDest?.hasRoute(it::class) ?: false },
+                    onClick = { navController.navigateToTop(it) }
+                )
+            }
+        }
     ) { innerPadding ->
-        MainNavHost(
+        NavHost(
             navController = navController,
             startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding)
-        )
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            // top level screens
+            composable<Home> {
+                HomeContent(
+                    sessions = Store.sessions.map { it.name },
+                    onStart = { navController.navigate(NewGameStart) }
+                )
+            }
+            composable<Results> { ResultsContent() }
+            composable<Profile> { ProfileContent() }
+
+            // new game creation
+            composable<NewGameStart> {
+                NewGameStartContent(
+                    onSetupPlayers = { navController.navigate(NewGamePlayers)}
+                )
+            }
+            composable<NewGamePlayers> { NewGamePlayersContent() }
+        }
     }
 }
 
 @Composable
-fun MainNavBar(
-    modifier: Modifier = Modifier,
-    onHomeClick: () -> Unit = {},
-    onResultsClick: () -> Unit = {},
-    onProfileClick: () -> Unit = {},
-    selected: Route = startDestination
-) {
-    NavigationBar(modifier) {
-        NavigationBarItem(
-            selected = selected is Results,
-            onClick = onResultsClick,
-            icon = { Icon(
-                imageVector = Icons.AutoMirrored.Default.List,
-                contentDescription = null
-            ) },
-            label = { Text("Results") }
-        )
-        NavigationBarItem(
-            selected = selected is Home,
-            onClick = onHomeClick,
-            icon = { Icon(
-                imageVector = Icons.Default.Home,
-                contentDescription = null
-            ) },
-            label = { Text("Home") }
-        )
-        NavigationBarItem(
-            selected = selected is Profile,
-            onClick = onProfileClick,
-            icon = { Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = null
-            ) },
-            label = { Text("Profile") }
-        )
-    }
-}
-
-@Composable
-fun MainNavHost(
-    navController: NavHostController,
-    startDestination: Route,
+internal fun MainNavBar(
+    selected: (Any) -> Boolean,
+    onClick: (Any) -> Unit,
     modifier: Modifier = Modifier
-) {
-    NavHost(
-        navController = navController,
-        startDestination = startDestination,
-        modifier = modifier.fillMaxSize()
-    ) {
-        composable<Home> {
-            HomeContent(listOf())
-        }
-        composable<Results> {
-            ResultsContent()
-        }
-        composable<Profile> {
-            ProfileContent()
-        }
+) = NavigationBar(modifier) {
+    topLevelDestinations.forEach { dest ->
+        NavigationBarItem(
+            icon = {
+                Icon(
+                    imageVector = dest.imageVector,
+                    contentDescription = null
+                )
+            },
+            label = { Text(dest.label) },
+            selected = selected(dest.route),
+            onClick = { onClick(dest.route) }
+        )
     }
 }
 
-private val startDestination: Route = Home
+@Preview
+@Composable
+private fun MainActivityViewPreview() {
+    BoardGameAssistantTheme {
+        MainContent()
+    }
+}
 
-private fun <T : Route> NavController.navigateTo(route: T) {
-    this.navigate(route) {
+private class TopLevelDestination(
+    val route: Any,
+    val imageVector: ImageVector,
+    val label: String
+)
+
+private val topLevelDestinations = listOf(
+    TopLevelDestination(Results, Icons.AutoMirrored.Default.List, "Results"),
+    TopLevelDestination(Home, Icons.Default.Home, "Home"),
+    TopLevelDestination(Profile, Icons.Default.Person, "Profile")
+)
+
+private val startDestination = Home
+
+private fun <T : Any> NavController.navigateToTop(route: T) {
+    navigate(route) {
         popUpTo(startDestination) { saveState = true }
         restoreState = true
     }

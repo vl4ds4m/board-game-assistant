@@ -9,10 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+@Serializable
+object Profile
+
 @Composable
-fun ProfileContent(modifier: Modifier = Modifier) {
+internal fun ProfileContent(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center

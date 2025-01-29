@@ -15,10 +15,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+@Serializable
+object Home
+
 @Composable
-fun HomeContent(sessions: List<String>, modifier: Modifier = Modifier) {
+internal fun HomeContent(
+    sessions: List<String>,
+    onStart: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -27,12 +35,13 @@ fun HomeContent(sessions: List<String>, modifier: Modifier = Modifier) {
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button({}) {
-                Text("Create a game")
+            Button(onStart) {
+                Text("Start a new game")
             }
         }
         LazyColumn(
-            modifier = Modifier.weight(3f)
+            modifier = Modifier
+                .weight(3f)
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp)
         ) {
@@ -46,24 +55,22 @@ fun HomeContent(sessions: List<String>, modifier: Modifier = Modifier) {
     }
 }
 
-private val previewSessions = listOf(
-    "Example session",
-    "Carcassons 234",
-    "Monopoly 645",
-    "Carcassons 785",
-    "Dice 2234",
-    "Dice 6556"
-)
-
 @Preview
 @Composable
 private fun HomeContentPreview() {
     BoardGameAssistantTheme {
         Scaffold(Modifier.fillMaxSize()) { innerPadding ->
             HomeContent(
-                sessions = previewSessions,
+                sessions = listOf(
+                    "Example session",
+                    "Carcassons 234",
+                    "Monopoly 645",
+                    "Carcassons 785",
+                    "Dice 2234",
+                    "Dice 6556"
+                ),
+                onStart = {},
                 modifier = Modifier.padding(innerPadding)
-                    .fillMaxSize()
             )
         }
     }

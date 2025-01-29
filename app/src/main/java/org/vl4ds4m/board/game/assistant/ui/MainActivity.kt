@@ -1,12 +1,9 @@
-package org.vl4ds4m.board.game.assistant
+package org.vl4ds4m.board.game.assistant.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-import org.vl4ds4m.board.game.assistant.ui.MainContent
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,13 +15,5 @@ class MainActivity : ComponentActivity() {
                 MainContent()
             }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun MainActivityViewPreview() {
-    BoardGameAssistantTheme {
-        MainContent()
     }
 }

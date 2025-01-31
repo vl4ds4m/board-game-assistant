@@ -30,9 +30,6 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 @Serializable
 object NewGameStart
 
-@Serializable
-object NewGamePlayers
-
 @Composable
 internal fun NewGameStartContent(
     onSetupPlayers: () -> Unit,
@@ -78,17 +75,6 @@ internal fun NewGameStartContent(
     }
 }
 
-@Composable
-internal fun NewGamePlayersContent(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.padding(48.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("TBA")
-    }
-}
-
 @Preview
 @Composable
 private fun NewGameStartPreview() {
@@ -96,20 +82,8 @@ private fun NewGameStartPreview() {
         Scaffold(Modifier.fillMaxSize()) { innerPadding ->
             NewGameStartContent(
                 onSetupPlayers = {},
-                modifier = Modifier.padding(innerPadding)
-                    .fillMaxSize()
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun NewGamePlayersPreview() {
-    BoardGameAssistantTheme {
-        Scaffold(Modifier.fillMaxSize()) { innerPadding ->
-            NewGamePlayersContent(
-                Modifier.padding(innerPadding)
+                modifier = Modifier
+                    .padding(innerPadding)
                     .fillMaxSize()
             )
         }

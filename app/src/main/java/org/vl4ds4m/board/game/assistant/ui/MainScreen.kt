@@ -23,10 +23,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import org.vl4ds4m.board.game.assistant.data.Store
-import org.vl4ds4m.board.game.assistant.ui.game.NewGamePlayers
-import org.vl4ds4m.board.game.assistant.ui.game.NewGamePlayersContent
 import org.vl4ds4m.board.game.assistant.ui.game.NewGameStart
-import org.vl4ds4m.board.game.assistant.ui.game.NewGameStartContent
+import org.vl4ds4m.board.game.assistant.ui.game.gameNavigation
 import org.vl4ds4m.board.game.assistant.ui.home.Home
 import org.vl4ds4m.board.game.assistant.ui.home.HomeContent
 import org.vl4ds4m.board.game.assistant.ui.profile.Profile
@@ -36,7 +34,7 @@ import org.vl4ds4m.board.game.assistant.ui.results.ResultsContent
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
-internal fun MainContent() {
+fun MainContent() {
     val navController = rememberNavController()
     val currentDest = navController.currentBackStackEntryAsState()
         .value?.destination
@@ -67,22 +65,21 @@ internal fun MainContent() {
                     onStart = { navController.navigate(NewGameStart) }
                 )
             }
-            composable<Results> { ResultsContent() }
-            composable<Profile> { ProfileContent() }
-
-            // new game creation
-            composable<NewGameStart> {
-                NewGameStartContent(
-                    onSetupPlayers = { navController.navigate(NewGamePlayers)}
-                )
+            composable<Results> {
+                ResultsContent()
             }
-            composable<NewGamePlayers> { NewGamePlayersContent() }
+            composable<Profile> {
+                ProfileContent()
+            }
+
+            // game screens
+            gameNavigation(navController)
         }
     }
 }
 
 @Composable
-internal fun MainNavBar(
+fun MainNavBar(
     selected: (Any) -> Boolean,
     onClick: (Any) -> Unit,
     modifier: Modifier = Modifier

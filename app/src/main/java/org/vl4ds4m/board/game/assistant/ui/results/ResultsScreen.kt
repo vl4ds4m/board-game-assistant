@@ -16,7 +16,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 object Results
 
 @Composable
-internal fun ResultsContent(modifier: Modifier = Modifier) {
+fun ResultsContent(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center

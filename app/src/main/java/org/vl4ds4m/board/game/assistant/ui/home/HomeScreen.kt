@@ -22,7 +22,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 object Home
 
 @Composable
-internal fun HomeContent(
+fun HomeContent(
     sessions: List<String>,
     onStart: () -> Unit,
     modifier: Modifier = Modifier

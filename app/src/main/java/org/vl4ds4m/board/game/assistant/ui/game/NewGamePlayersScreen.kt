@@ -3,11 +3,13 @@ package org.vl4ds4m.board.game.assistant.ui.game
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -21,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
@@ -30,11 +33,13 @@ object NewGamePlayers
 @Composable
 fun NewGamePlayersContent(
     modifier: Modifier = Modifier,
+    viewModel: GameSetupViewModel = viewModel()
 ) {
+    val players = viewModel.players
     Column(
         modifier = modifier.padding(
-            horizontal = 24.dp,
-            vertical = 36.dp
+            horizontal = 16.dp,
+            vertical = 32.dp
         )
     ) {
         Row(
@@ -48,14 +53,16 @@ fun NewGamePlayersContent(
                     .padding(end = 16.dp),
                 style = MaterialTheme.typography.titleLarge
             )
-            FloatingActionButton({}) {
+            FloatingActionButton(
+                onClick = { players.add("Player ${players.size + 1}") }
+            ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = null
                 )
             }
         }
-        if (false) {
+        if (players.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -69,12 +76,15 @@ fun NewGamePlayersContent(
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(vertical = 24.dp)
+                    .padding(vertical = 24.dp),
+                contentPadding = PaddingValues(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(10) {
+                itemsIndexed(players) { index, player ->
                     PlayerCard(
-                        player = Player(0, "Player ${it + 1}"),
-                        modifier = Modifier.padding(vertical = 4.dp)
+                        playerName = player,
+                        onPlayerNameEdited = { players[index] = it },
+                        onCloseClick = { players.removeAt(index) }
                     )
                 }
             }
@@ -101,7 +111,8 @@ private fun NewGamePlayersPreview() {
     BoardGameAssistantTheme {
         Scaffold(Modifier.fillMaxSize()) { innerPadding ->
             NewGamePlayersContent(
-                Modifier.padding(innerPadding)
+                modifier = Modifier
+                    .padding(innerPadding)
                     .fillMaxSize()
             )
         }

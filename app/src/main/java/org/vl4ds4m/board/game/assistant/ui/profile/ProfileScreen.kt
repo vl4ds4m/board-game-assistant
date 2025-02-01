@@ -16,7 +16,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 object Profile
 
 @Composable
-internal fun ProfileContent(modifier: Modifier = Modifier) {
+fun ProfileContent(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center

@@ -17,26 +17,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.serialization.Serializable
-import org.vl4ds4m.board.game.assistant.data.GameType
+import org.vl4ds4m.board.game.assistant.domain.game.GameType
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Serializable
 object NewGameStart
 
 @Composable
-internal fun NewGameStartContent(
-    onSetupPlayers: () -> Unit,
-    modifier: Modifier = Modifier
+fun NewGameStartContent(
+    modifier: Modifier = Modifier,
+    viewModel: GameSetupViewModel = viewModel(),
+    onSetupPlayers: () -> Unit = {},
 ) {
-    val (name, onNameChanged) = rememberSaveable { mutableStateOf("") }
-    val (game, onGameChanged) = rememberSaveable { mutableStateOf<String?>(null) }
+    val (type, onTypeChanged) = viewModel.type
+    val (name, onNameChanged) = viewModel.name
     var expanded by remember { mutableStateOf(false) }
     Column(
         modifier = modifier.padding(48.dp),
@@ -51,24 +52,24 @@ internal fun NewGameStartContent(
         )
         Spacer(Modifier.height(48.dp))
         FilledTonalButton({ expanded = true }) {
-            Text(game ?: "Select game")
+            Text(type?.title ?: "Select game")
             DropdownMenu(expanded, { expanded = false }) {
-                val freeGame = GameType.FREE.title
-                val orderedGame = GameType.ORDERED.title
+                val freeGame = GameType.FREE
+                val orderedGame = GameType.ORDERED
                 DropdownMenuItem(
-                    { Text(freeGame) },
-                    { onGameChanged(freeGame); expanded = false }
+                    text = { Text(freeGame.title) },
+                    onClick = { onTypeChanged(freeGame); expanded = false }
                 )
                 DropdownMenuItem(
-                    { Text(orderedGame) },
-                    { onGameChanged(orderedGame); expanded = false }
+                    text = { Text(orderedGame.title) },
+                    onClick = { onTypeChanged(orderedGame); expanded = false }
                 )
             }
         }
         Spacer(Modifier.height(48.dp))
         Button(
             onClick = onSetupPlayers,
-            enabled = name.isNotBlank() && game != null
+            enabled = name.isNotBlank() && type != null
         ) {
             Text("Continue")
         }
@@ -81,7 +82,6 @@ private fun NewGameStartPreview() {
     BoardGameAssistantTheme {
         Scaffold(Modifier.fillMaxSize()) { innerPadding ->
             NewGameStartContent(
-                onSetupPlayers = {},
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()

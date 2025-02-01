@@ -22,14 +22,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
-import org.vl4ds4m.board.game.assistant.data.Player
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Serializable
 object NewGamePlayers
 
 @Composable
-internal fun NewGamePlayersContent(modifier: Modifier = Modifier) {
+fun NewGamePlayersContent(
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier.padding(
             horizontal = 24.dp,

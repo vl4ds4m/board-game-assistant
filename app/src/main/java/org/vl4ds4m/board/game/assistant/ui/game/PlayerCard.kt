@@ -18,11 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.vl4ds4m.board.game.assistant.data.Player
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
-internal fun PlayerCard(player: Player, modifier: Modifier = Modifier) {
+fun PlayerCard(player: Player, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
             .height(80.dp)
@@ -41,7 +40,7 @@ internal fun PlayerCard(player: Player, modifier: Modifier = Modifier) {
                 modifier = Modifier.size(40.dp)
             )
             Text(
-                text = player.name,
+                text = player.second,
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = betweenPadding),
@@ -63,3 +62,4 @@ private fun PlayerCardPreview() {
         PlayerCard(Player(0, "Abc"))
     }
 }
+typealias Player = Pair<Long, String>

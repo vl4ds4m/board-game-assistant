@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.data
+package org.vl4ds4m.board.game.assistant.domain.game
 
 enum class GameType {
     FREE,

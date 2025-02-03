@@ -2,7 +2,6 @@ package org.vl4ds4m.board.game.assistant.ui.home
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,22 +10,20 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.Serializable
+import org.vl4ds4m.board.game.assistant.data.Store
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
-@Serializable
-object Home
-
 @Composable
-fun HomeContent(
-    sessions: List<String>,
-    onStart: () -> Unit,
+fun HomeScreen(
+    onStartNewGame: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val sessions = remember { Store.sessions }
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -35,7 +32,7 @@ fun HomeContent(
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onStart) {
+            Button(onStartNewGame) {
                 Text("Start a new game")
             }
         }
@@ -45,9 +42,12 @@ fun HomeContent(
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp)
         ) {
-            items(sessions) {
+            items(
+                items = sessions,
+                key = { it.id }
+            ) {
                 Text(
-                    text = it,
+                    text = "${it.name} ${it.id}",
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
             }
@@ -57,19 +57,11 @@ fun HomeContent(
 
 @Preview
 @Composable
-private fun HomeContentPreview() {
+private fun HomeScreenPreview() {
     BoardGameAssistantTheme {
-        Scaffold(Modifier.fillMaxSize()) { innerPadding ->
-            HomeContent(
-                sessions = listOf(
-                    "Example session",
-                    "Carcassons 234",
-                    "Monopoly 645",
-                    "Carcassons 785",
-                    "Dice 2234",
-                    "Dice 6556"
-                ),
-                onStart = {},
+        Scaffold { innerPadding ->
+            HomeScreen(
+                onStartNewGame = {},
                 modifier = Modifier.padding(innerPadding)
             )
         }

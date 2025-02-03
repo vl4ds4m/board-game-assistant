@@ -1,10 +1,19 @@
 package org.vl4ds4m.board.game.assistant.data
 
-class Session(
+import org.vl4ds4m.board.game.assistant.domain.game.GameType
+
+data class Session(
+    val id: Long,
     val name: String,
-    /*val players: List<Player>,
     val type: GameType,
-    val startTime: Instant,
-    val stopTime: Instant,
-    val completed: Boolean*/
-)
+    val players: List<String>
+) {
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return this === other ||
+                other is Session && this.id == other.id
+    }
+}

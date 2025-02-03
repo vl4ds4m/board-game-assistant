@@ -10,7 +10,7 @@ class OrderedGame : BaseOrderedGameEnv(), PlayerStateResolver<Score> {
     private val stateResolver = SimplePlayerStateResolver(playersStates)
 
     override fun getPlayers(): List<Player> {
-        TODO("Not yet implemented")
+        return orderedPlayers
     }
 
     override fun completeGame() {

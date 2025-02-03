@@ -1,5 +1,7 @@
 package org.vl4ds4m.board.game.assistant.ui
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,39 +15,54 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import org.vl4ds4m.board.game.assistant.data.Store
-import org.vl4ds4m.board.game.assistant.ui.game.NewGameStart
-import org.vl4ds4m.board.game.assistant.ui.game.gameNavigation
-import org.vl4ds4m.board.game.assistant.ui.home.Home
-import org.vl4ds4m.board.game.assistant.ui.home.HomeContent
-import org.vl4ds4m.board.game.assistant.ui.profile.Profile
-import org.vl4ds4m.board.game.assistant.ui.profile.ProfileContent
-import org.vl4ds4m.board.game.assistant.ui.results.Results
-import org.vl4ds4m.board.game.assistant.ui.results.ResultsContent
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
-fun MainContent() {
+fun MainScreen() {
     val navController = rememberNavController()
-    val currentDest = navController.currentBackStackEntryAsState()
-        .value?.destination
-    val topLevelDest = topLevelDestinations.any {
-        currentDest?.hasRoute(it.route::class) ?: false
+    LaunchedEffect(Unit) { logCurrentBackStack(navController) }
+    val currentEntry = navController.currentBackStackEntryAsState()
+    val isNavItemSelected: (Any) -> Boolean = {
+        currentEntry.value?.destination?.hasRoute(it::class) ?: false
     }
+    val visibleNavBar: State<Boolean> = remember {
+        derivedStateOf {
+            topLevelDestinations.any {
+                currentEntry.value?.destination?.hasRoute(it.route::class) ?: false
+            }
+        }
+    }
+    MainScreenContent(
+        navController = navController,
+        visibleNavBar = visibleNavBar,
+        isNavItemSelected = isNavItemSelected
+    )
+}
+
+@Composable
+fun MainScreenContent(
+    navController: NavHostController,
+    visibleNavBar: State<Boolean>,
+    isNavItemSelected: (Any) -> Boolean,
+) {
     Scaffold(
         bottomBar = {
-            AnimatedVisibility(topLevelDest) {
+            AnimatedVisibility(visibleNavBar.value) {
                 MainNavBar(
-                    selected = { currentDest?.hasRoute(it::class) ?: false },
+                    selected = isNavItemSelected,
                     onClick = { navController.navigateToTop(it) }
                 )
             }
@@ -58,22 +75,7 @@ fun MainContent() {
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            // top level screens
-            composable<Home> {
-                HomeContent(
-                    sessions = Store.sessions.map { it.name },
-                    onStart = { navController.navigate(NewGameStart) }
-                )
-            }
-            composable<Results> {
-                ResultsContent()
-            }
-            composable<Profile> {
-                ProfileContent()
-            }
-
-            // game screens
-            gameNavigation(navController)
+            mainNavigation(navController)
         }
     }
 }
@@ -83,27 +85,29 @@ fun MainNavBar(
     selected: (Any) -> Boolean,
     onClick: (Any) -> Unit,
     modifier: Modifier = Modifier
-) = NavigationBar(modifier) {
-    topLevelDestinations.forEach { dest ->
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    imageVector = dest.imageVector,
-                    contentDescription = null
-                )
-            },
-            label = { Text(dest.label) },
-            selected = selected(dest.route),
-            onClick = { onClick(dest.route) }
-        )
+) {
+    NavigationBar(modifier) {
+        topLevelDestinations.forEach { dest ->
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        imageVector = dest.imageVector,
+                        contentDescription = null
+                    )
+                },
+                label = { Text(dest.label) },
+                selected = selected(dest.route),
+                onClick = { onClick(dest.route) }
+            )
+        }
     }
 }
 
 @Preview
 @Composable
-private fun MainActivityViewPreview() {
+private fun MainScreenPreview() {
     BoardGameAssistantTheme {
-        MainContent()
+        MainScreen()
     }
 }
 
@@ -125,5 +129,21 @@ private fun <T : Any> NavController.navigateToTop(route: T) {
     navigate(route) {
         popUpTo(startDestination) { saveState = true }
         restoreState = true
+    }
+}
+
+@SuppressLint("RestrictedApi")
+private suspend fun logCurrentBackStack(navController: NavHostController) {
+    navController.currentBackStack.collect { stack ->
+        val msg = buildString {
+            append("Current back stack")
+            if (stack.isEmpty()) {
+                append(" is empty")
+            } else {
+                append(":\n")
+                stack.forEach { append(it); append("\n") }
+            }
+        }
+        Log.d("Navigation", msg)
     }
 }

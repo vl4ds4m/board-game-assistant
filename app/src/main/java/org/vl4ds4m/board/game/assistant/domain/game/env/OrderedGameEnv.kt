@@ -1,9 +1,14 @@
 package org.vl4ds4m.board.game.assistant.domain.game.env
 
+import kotlinx.coroutines.flow.StateFlow
 import org.vl4ds4m.board.game.assistant.domain.player.Player
 
 interface OrderedGameEnv : GameEnv {
-    var order: Int
+    val order: StateFlow<Int?>
 
-    fun changePlayerOrder(player: Player, newOrder: Int)
+    fun nextOrder()
+
+    fun changeOrderByPlayer(player: Player)
+
+    fun changePlayerOrder(player: Player, order: Int)
 }

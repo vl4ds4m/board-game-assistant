@@ -1,31 +1,80 @@
 package org.vl4ds4m.board.game.assistant.domain.game.env
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import org.vl4ds4m.board.game.assistant.domain.player.Player
-import org.vl4ds4m.board.game.assistant.domain.player.state.Score
 
-abstract class BaseGameEnv : GameEnv {
-    protected val playersStates = mutableMapOf<Player, Score>()
+open class BaseGameEnv : GameEnv {
+    protected val mPlayers: MutableStateFlow<List<Player>> = MutableStateFlow(listOf())
+    override val players: StateFlow<List<Player>> = mPlayers.asStateFlow()
 
-    // Must be used in a single thread
+    override var name: MutableStateFlow<String?> = MutableStateFlow(null)
+
     private var nextPlayerId: Long = 0
 
-    override var name: String? = null
+    override fun addPlayer(playerName: String) {
+        val playerId = ++nextPlayerId
+        val newPlayer = Player(
+            id = playerId,
+            name = playerName,
+            active = true
+        )
+        updatePlayers {
+            add(newPlayer)
+        }
+    }
 
-    override fun addPlayer(newPlayer: Player) {
-        newPlayer.id = nextPlayerId++
-        playersStates[newPlayer] = Score(0)
+    override fun changePlayerName(player: Player, name: String) {
+        if (player.name == name) {
+            return
+        }
+        val index = players.value.indexOf(player)
+        if (index == -1) {
+            return
+        }
+        val renamedPlayer = player.copy(name = name)
+        updatePlayers {
+            removeAt(index)
+            add(index, renamedPlayer)
+        }
     }
 
     override fun removePlayer(player: Player) {
-        playersStates.remove(player)
+        updatePlayers {
+            remove(player)
+        }
     }
 
     override fun freezePlayer(player: Player) {
-        player.active = false
+        updatePlayerActivity(player, false)
     }
 
     override fun unfreezePlayer(player: Player) {
-        player.active = true
+        updatePlayerActivity(player, true)
+    }
+
+    private fun updatePlayerActivity(player: Player, active: Boolean) {
+        if (player.active == active) {
+            return
+        }
+        val updatedPlayer = player.copy(active = active)
+        updatePlayers {
+            val exists = remove(player)
+            if (exists) {
+                add(updatedPlayer)
+            }
+        }
+    }
+
+    protected inline fun updatePlayers(action: MutableList<Player>.() -> Unit) {
+        mPlayers.update {
+            buildList {
+                addAll(it)
+                action()
+            }
+        }
     }
 
     /*fun save() {

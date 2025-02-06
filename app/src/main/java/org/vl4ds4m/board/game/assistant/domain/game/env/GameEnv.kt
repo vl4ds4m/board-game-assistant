@@ -1,19 +1,21 @@
 package org.vl4ds4m.board.game.assistant.domain.game.env
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.vl4ds4m.board.game.assistant.domain.player.Player
 
 interface GameEnv {
-    var name: String?
+    val players: StateFlow<List<Player>>
 
-    fun getPlayers(): List<Player>
+    val name: MutableStateFlow<String?>
 
-    fun addPlayer(newPlayer: Player)
+    fun addPlayer(playerName: String)
+
+    fun changePlayerName(player: Player, name: String)
 
     fun removePlayer(player: Player)
 
     fun freezePlayer(player: Player)
 
     fun unfreezePlayer(player: Player)
-
-    fun completeGame()
 }

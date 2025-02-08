@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import org.vl4ds4m.board.game.assistant.domain.player.Player
+import java.util.concurrent.atomic.AtomicLong
 
 open class BaseGameEnv : GameEnv {
     protected val mPlayers: MutableStateFlow<List<Player>> = MutableStateFlow(listOf())
@@ -12,10 +13,10 @@ open class BaseGameEnv : GameEnv {
 
     override var name: MutableStateFlow<String?> = MutableStateFlow(null)
 
-    private var nextPlayerId: Long = 0
+    private var nextPlayerId: AtomicLong = AtomicLong(0)
 
     override fun addPlayer(playerName: String) {
-        val playerId = ++nextPlayerId
+        val playerId = nextPlayerId.incrementAndGet()
         val newPlayer = Player(
             id = playerId,
             name = playerName,

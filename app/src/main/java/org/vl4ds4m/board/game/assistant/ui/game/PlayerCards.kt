@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -80,12 +81,19 @@ fun PlayerInGameCard(
     rating: Int,
     name: String,
     score: Int,
+    current: Boolean,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .height(80.dp)
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = with(MaterialTheme.colorScheme) {
+                if (current) surfaceContainerHigh
+                else surfaceContainerLow
+            }
+        )
     ) {
         Row(
             modifier = Modifier
@@ -120,8 +128,24 @@ fun PlayerInGameCard(
 
 @Preview
 @Composable
-private fun PlayerInGameCardPreview() {
+private fun SimplePlayerInGameCardPreview() {
+    PlayerInGameCardPreview(false)
+}
+
+@Preview
+@Composable
+private fun CurrentPlayerInGameCardPreview() {
+    PlayerInGameCardPreview(true)
+}
+
+@Composable
+private fun PlayerInGameCardPreview(current: Boolean) {
     BoardGameAssistantTheme {
-        PlayerInGameCard(1, "Fedya", 1234)
+        PlayerInGameCard(
+            rating = 1,
+            name = "Fedya",
+            score = 1234,
+            current = current
+        )
     }
 }

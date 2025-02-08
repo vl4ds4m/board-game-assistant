@@ -4,8 +4,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import org.vl4ds4m.board.game.assistant.domain.game.env.BaseOrderedGameEnv
 import org.vl4ds4m.board.game.assistant.domain.game.env.OrderedGameEnv
 import org.vl4ds4m.board.game.assistant.domain.player.state.Score
@@ -13,30 +14,31 @@ import org.vl4ds4m.board.game.assistant.domain.player.state.resolver.PlayerState
 import org.vl4ds4m.board.game.assistant.domain.player.state.resolver.SimpleScoreResolver
 
 class OrderedGame private constructor(
-    private val gameEnv: BaseOrderedGameEnv,
-    private val mPlayerScores: MutableStateFlow<Map<Long, Score>>
+    scope: CoroutineScope,
+    gameEnv: BaseOrderedGameEnv,
+    mPlayerScores: MutableStateFlow<Map<Long, Score>>
 ) : OrderedGameEnv by gameEnv,
     PlayerStateResolver<Score> by SimpleScoreResolver(mPlayerScores)
 {
-    constructor() : this(
+    constructor(scope: CoroutineScope) : this(
+        scope = scope,
         gameEnv = BaseOrderedGameEnv(),
         mPlayerScores = MutableStateFlow(mapOf())
     )
 
-    fun start(scope: CoroutineScope) {
-        scope.launch {
-            players.collect { players ->
-                mPlayerScores.update { map ->
-                    buildMap {
-                        for (player in players) {
-                            val id = player.id
-                            val score = map[id] ?: Score(0)
-                            put(id, score)
-                        }
+    init {
+        players.onEach { players ->
+            mPlayerScores.update { map ->
+                buildMap {
+                    for (player in players) {
+                        val id = player.id
+                        val score = map[id] ?: Score(0)
+                        put(id, score)
                     }
                 }
             }
         }
+            .launchIn(scope)
     }
 
     val playerScores: StateFlow<Map<Long, Score>> =

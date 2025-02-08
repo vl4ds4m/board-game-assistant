@@ -39,6 +39,7 @@ fun GameScreen(
         name = viewModel.name,
         playersState = viewModel.players.collectAsState(),
         playerScoresState = viewModel.playerScores.collectAsState(),
+        currentPlayerIdState = viewModel.currentPlayerId.collectAsState(),
         onAddScore = { viewModel.addScore(it) },
         modifier = modifier
     )
@@ -49,12 +50,14 @@ fun GameScreenContent(
     name: String,
     playersState: State<List<Player>>,
     playerScoresState: State<Map<Long, Score>>,
+    currentPlayerIdState: State<Long?>,
     onAddScore: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val (score, onScoreChanged) = rememberSaveable { mutableStateOf("") }
     val players by playersState
     val playerScores by playerScoresState
+    val currentPlayerId by currentPlayerIdState
     Column(
         modifier = modifier.padding(16.dp)
     ) {
@@ -70,7 +73,8 @@ fun GameScreenContent(
                 PlayerInGameCard(
                     rating = i + 1,
                     name = player.name,
-                    score = playerScores[player.id]!!.value
+                    score = playerScores[player.id]?.value ?: -1,
+                    current = player.id == currentPlayerId
                 )
             }
         }
@@ -113,6 +117,7 @@ private fun GameScreenPreview() {
             name = "Simple game",
             playersState = mutableStateOf(listOf()),
             playerScoresState = mutableStateOf(mapOf()),
+            currentPlayerIdState = mutableStateOf(null),
             onAddScore = {}
         )
     }

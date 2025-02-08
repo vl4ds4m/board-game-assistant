@@ -1,51 +1,49 @@
 package org.vl4ds4m.board.game.assistant.domain.game
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
+import org.vl4ds4m.board.game.assistant.domain.Initializable
 import org.vl4ds4m.board.game.assistant.domain.game.env.BaseOrderedGameEnv
 import org.vl4ds4m.board.game.assistant.domain.game.env.OrderedGameEnv
 import org.vl4ds4m.board.game.assistant.domain.player.state.Score
+import org.vl4ds4m.board.game.assistant.domain.player.state.holder.PlayerStatesHolder
+import org.vl4ds4m.board.game.assistant.domain.player.state.holder.ScoresHolder
 import org.vl4ds4m.board.game.assistant.domain.player.state.resolver.PlayerStateResolver
 import org.vl4ds4m.board.game.assistant.domain.player.state.resolver.SimpleScoreResolver
 
 class OrderedGame private constructor(
-    scope: CoroutineScope,
-    gameEnv: BaseOrderedGameEnv,
-    mPlayerScores: MutableStateFlow<Map<Long, Score>>
-) : OrderedGameEnv by gameEnv,
-    PlayerStateResolver<Score> by SimpleScoreResolver(mPlayerScores)
+    gameEnv: OrderedGameEnv,
+    playerScores: MutableStateFlow<Map<Long, Score>>,
+    private val scoresHolder: ScoresHolder
+) : Game<Score>,
+    OrderedGameEnv by gameEnv,
+    PlayerStatesHolder<Score> by scoresHolder,
+    PlayerStateResolver<Score> by SimpleScoreResolver(playerScores)
 {
-    constructor(scope: CoroutineScope) : this(
-        scope = scope,
-        gameEnv = BaseOrderedGameEnv(),
-        mPlayerScores = MutableStateFlow(mapOf())
+    constructor(
+        gameEnv: OrderedGameEnv,
+        playerScores: MutableStateFlow<Map<Long, Score>>
+    ) : this(
+        gameEnv = gameEnv,
+        playerScores = playerScores,
+        scoresHolder = ScoresHolder(
+            players = gameEnv.players,
+            playerScores = playerScores
+        )
     )
 
-    init {
-        players.onEach { players ->
-            mPlayerScores.update { map ->
-                buildMap {
-                    for (player in players) {
-                        val id = player.id
-                        val score = map[id] ?: Score(0)
-                        put(id, score)
-                    }
-                }
-            }
-        }
-            .launchIn(scope)
-    }
+    constructor() : this(
+        gameEnv = BaseOrderedGameEnv(),
+        playerScores = MutableStateFlow(mapOf())
+    )
 
-    val playerScores: StateFlow<Map<Long, Score>> =
-        mPlayerScores.asStateFlow()
+    override val initializables: Array<Initializable> = arrayOf(scoresHolder)
 
-    fun addScore(score: Score) {
-        resolve(players.value[order.value!!].id, score)
+    fun addPoints(points: Int) {
+        val score = Score(points)
+        val playerId = order.value?.let {
+            players.value[it].id
+        } ?: -1
+        resolve(playerId, score)
         nextOrder()
     }
 }

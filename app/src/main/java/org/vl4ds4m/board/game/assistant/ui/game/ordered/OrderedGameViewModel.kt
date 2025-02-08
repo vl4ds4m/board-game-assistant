@@ -1,6 +1,5 @@
-package org.vl4ds4m.board.game.assistant.ui.game
+package org.vl4ds4m.board.game.assistant.ui.game.ordered
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
@@ -13,44 +12,29 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import org.vl4ds4m.board.game.assistant.domain.game.OrderedGame
-import org.vl4ds4m.board.game.assistant.domain.player.Player
 import org.vl4ds4m.board.game.assistant.domain.player.state.Score
+import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 
-class OrderedGameViewModel(
-    val name: String,
-    players: List<String>
-) : ViewModel() {
-    private val game: OrderedGame = OrderedGame(viewModelScope)
-
-    private val mPlayers: MutableStateFlow<List<Player>> = MutableStateFlow(listOf())
-    val players: StateFlow<List<Player>> = mPlayers.asStateFlow()
+class OrderedGameViewModel private constructor(
+    name: String,
+    playerNames: List<String>,
+    private val game: OrderedGame
+) : GameViewModel(
+    name = name,
+    playerNames = playerNames,
+    game = game
+) {
+    constructor(name: String, playerNames: List<String>) : this(
+        name = name,
+        playerNames = playerNames,
+        game = OrderedGame()
+    )
 
     private val mCurrentPlayerId: MutableStateFlow<Long?> = MutableStateFlow(null)
     val currentPlayerId: StateFlow<Long?> = mCurrentPlayerId.asStateFlow()
 
     init {
-        players.forEach {
-            game.addPlayer(it)
-        }
-        launchPlayersUpdate()
         launchCurrentPlayerIdUpdate()
-    }
-
-    private fun launchPlayersUpdate() {
-        game.playerScores.combine(game.players) { map, players -> map to players }
-            .onEach { (map, players) ->
-                mPlayers.update {
-                    buildList {
-                        map.toList()
-                            .sortedByDescending { (_, score) -> score.value }
-                            .forEach { (id, _) ->
-                                players.find { it.id == id }
-                                    ?.let { add(it) }
-                            }
-                    }
-                }
-            }
-            .launchIn(viewModelScope)
     }
 
     private fun launchCurrentPlayerIdUpdate() {
@@ -63,10 +47,10 @@ class OrderedGameViewModel(
             .launchIn(viewModelScope)
     }
 
-    val playerScores: StateFlow<Map<Long, Score>> = game.playerScores
+    val playerScores: StateFlow<Map<Long, Score>> = game.playerStates
 
-    fun addScore(changing: Int) {
-        game.addScore(Score(changing))
+    fun addScore(points: Int) {
+        game.addPoints(points)
     }
 
     companion object {

@@ -81,16 +81,21 @@ fun PlayerInGameCard(
     rating: Int,
     name: String,
     score: Int,
-    current: Boolean,
+    selected: Boolean,
+    onSelect: (() -> Unit)?,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .height(80.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable(
+                enabled = onSelect != null,
+                onClick = onSelect ?: {}
+            ),
         colors = CardDefaults.cardColors(
             containerColor = with(MaterialTheme.colorScheme) {
-                if (current) surfaceContainerHigh
+                if (selected) surfaceContainerHigh
                 else surfaceContainerLow
             }
         )
@@ -145,7 +150,8 @@ private fun PlayerInGameCardPreview(current: Boolean) {
             rating = 1,
             name = "Fedya",
             score = 1234,
-            current = current
+            selected = current,
+            onSelect = null
         )
     }
 }

@@ -10,7 +10,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.data.Store
+import org.vl4ds4m.board.game.assistant.domain.game.GameType
 import org.vl4ds4m.board.game.assistant.ui.Home
+import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameScreen
+import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameScreen
+import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.start.NewGamePlayersScreen
 import org.vl4ds4m.board.game.assistant.ui.game.start.NewGameStartScreen
 
@@ -45,14 +50,25 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
     }
     composable<Game> {
         val session = Store.sessions[0]
-        GameScreen(
-            viewModel = viewModel(
-                factory = OrderedGameViewModel.getFactory(
-                    gameName = session.name,
-                    players = session.players
+        when (session.type) {
+            GameType.FREE -> FreeGameScreen(
+                viewModel = viewModel(
+                    factory = FreeGameViewModel.getFactory(
+                        gameName = "${session.name} (free)",
+                        players = session.players
+                    )
                 )
             )
-        )
+            GameType.ORDERED -> OrderedGameScreen(
+                viewModel = viewModel(
+                    factory = OrderedGameViewModel.getFactory(
+                        gameName = "${session.name} (ordered)",
+                        players = session.players
+                    )
+                )
+            )
+            else -> {}
+        }
     }
 }
 

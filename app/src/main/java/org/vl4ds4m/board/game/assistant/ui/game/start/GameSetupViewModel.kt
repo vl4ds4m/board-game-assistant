@@ -7,8 +7,8 @@ import org.vl4ds4m.board.game.assistant.data.Store
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
 
 class GameSetupViewModel : ViewModel() {
-    var type = mutableStateOf<GameType?>(null)
-    var name = mutableStateOf("")
+    val type = mutableStateOf<GameType?>(null)
+    val name = mutableStateOf("")
 
     private val _players = mutableStateListOf<String>()
 

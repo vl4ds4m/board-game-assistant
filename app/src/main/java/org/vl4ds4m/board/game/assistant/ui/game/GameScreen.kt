@@ -1,6 +1,5 @@
 package org.vl4ds4m.board.game.assistant.ui.game
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,32 +17,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.domain.player.Player
 import org.vl4ds4m.board.game.assistant.domain.player.state.Score
-import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
-
-@Composable
-fun GameScreen(
-    viewModel: OrderedGameViewModel,
-    modifier: Modifier = Modifier,
-) {
-    GameScreenContent(
-        name = viewModel.name,
-        playersState = viewModel.players.collectAsState(),
-        playerScoresState = viewModel.playerScores.collectAsState(),
-        currentPlayerIdState = viewModel.currentPlayerId.collectAsState(),
-        onAddScore = { viewModel.addScore(it) },
-        modifier = modifier
-    )
-}
 
 @Composable
 fun GameScreenContent(
@@ -51,6 +32,7 @@ fun GameScreenContent(
     playersState: State<List<Player>>,
     playerScoresState: State<Map<Long, Score>>,
     currentPlayerIdState: State<Long?>,
+    onSelectPlayer: ((Player) -> Unit)?,
     onAddScore: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -69,12 +51,16 @@ fun GameScreenContent(
         LazyColumn(
             modifier = Modifier.weight(1f)
         ) {
-            itemsIndexed(players) { i, player ->
+            itemsIndexed(
+                items = players,
+                key = { _, player -> player.id }
+            ) { i, player ->
                 PlayerInGameCard(
                     rating = i + 1,
                     name = player.name,
                     score = playerScores[player.id]?.value ?: -1,
-                    current = player.id == currentPlayerId
+                    selected = player.id == currentPlayerId,
+                    onSelect = onSelectPlayer?.let { f -> { f(player) } }
                 )
             }
         }
@@ -105,20 +91,5 @@ fun GameScreenContent(
                 Text("Apply")
             }
         }
-    }
-}
-
-@SuppressLint("UnrememberedMutableState")
-@Preview
-@Composable
-private fun GameScreenPreview() {
-    BoardGameAssistantTheme {
-        GameScreenContent(
-            name = "Simple game",
-            playersState = mutableStateOf(listOf()),
-            playerScoresState = mutableStateOf(mapOf()),
-            currentPlayerIdState = mutableStateOf(null),
-            onAddScore = {}
-        )
     }
 }

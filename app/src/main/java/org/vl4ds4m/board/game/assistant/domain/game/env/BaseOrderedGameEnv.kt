@@ -4,11 +4,22 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.domain.player.Player
 
 class BaseOrderedGameEnv : BaseGameEnv(), OrderedGameEnv {
     private val mOrder: MutableStateFlow<Int?> = MutableStateFlow(null)
     override val order: StateFlow<Int?> = mOrder.asStateFlow()
+
+    override fun saveIn(session: GameSession) {
+        super.saveIn(session)
+        session.order = order.value
+    }
+
+    override fun loadFrom(session: GameSession) {
+        super.loadFrom(session)
+        mOrder.value = session.order
+    }
 
     override fun nextOrder() {
         mOrder.update {

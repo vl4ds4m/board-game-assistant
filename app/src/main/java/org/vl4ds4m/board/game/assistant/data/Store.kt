@@ -1,33 +1,38 @@
 package org.vl4ds4m.board.game.assistant.data
 
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
+import org.vl4ds4m.board.game.assistant.domain.game.Game
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
+import java.util.concurrent.atomic.AtomicLong
 
 object Store {
-    private val _sessions = mutableStateListOf<Session>()
-    private var nextId: Long = 1
+    private val mSessions = mutableStateMapOf<Long, GameSession>()
+    private var nextSessionId: AtomicLong = AtomicLong(0)
 
     init {
         defaultGames.forEach { (name, type) ->
-            addSession(name, type, listOf())
+            val session = GameSession(type = type, name = name, fake = true)
+            save(session)
         }
     }
 
-    val sessions: List<Session> = _sessions
+    var currentGame: Game<*>? = null
 
-    fun addSession(
-        name: String,
-        type: GameType,
-        players: List<String>
-    ) {
-        val newSession = Session(
-            id = nextId,
-            name = name,
-            type = type,
-            players = players
-        )
-        nextId++
-        _sessions.add(0, newSession)
+    val sessions: Map<Long, GameSession> = mSessions
+
+    fun save(session: GameSession, id: Long? = null){
+        val sessionId: Long = when (id) {
+            null -> {
+                this.nextSessionId.incrementAndGet()
+            }
+            in mSessions -> { id }
+            else -> { return }
+        }
+        mSessions[sessionId] = session
+    }
+
+    fun load(sessionId: Long): GameSession? {
+        return sessions[sessionId]?.takeUnless { it.fake }
     }
 }
 

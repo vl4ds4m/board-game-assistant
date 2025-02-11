@@ -4,6 +4,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
+import org.vl4ds4m.board.game.assistant.data.Store
+import org.vl4ds4m.board.game.assistant.ui.game.Game
 import org.vl4ds4m.board.game.assistant.ui.game.NewGameStart
 import org.vl4ds4m.board.game.assistant.ui.game.gameNavigation
 import org.vl4ds4m.board.game.assistant.ui.home.HomeScreen
@@ -18,7 +20,14 @@ fun NavGraphBuilder.mainNavigation(navController: NavController) {
     // top level screens
     composable<Home> {
         HomeScreen(
-            onStartNewGame = { navController.navigate(NewGameStart) }
+            sessions = Store.sessions,
+            onStartNewGame = { navController.navigate(NewGameStart) },
+            onSessionClick = { sessionId ->
+                Store.load(sessionId)?.type?.let { type ->
+                    val game = Game(type, sessionId)
+                    navController.navigate(game)
+                }
+            }
         )
     }
     composable<Results> {

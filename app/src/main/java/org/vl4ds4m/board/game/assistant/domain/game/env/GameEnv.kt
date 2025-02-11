@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.vl4ds4m.board.game.assistant.domain.player.Player
 
-interface GameEnv {
+interface GameEnv : GameState {
     val players: StateFlow<List<Player>>
 
     val name: MutableStateFlow<String?>

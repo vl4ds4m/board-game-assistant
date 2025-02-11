@@ -19,8 +19,8 @@ fun FreeGameScreen(
         playersState = viewModel.players.collectAsState(),
         playerScoresState = viewModel.playerScores.collectAsState(),
         currentPlayerIdState = viewModel.currentPlayerId,
-        onAddScore = { viewModel.addScore(it) },
         onSelectPlayer = { viewModel.selectCurrentPlayer(it) },
+        onAddScore = { viewModel.addScore(it) },
         modifier = modifier
     )
 }
@@ -31,7 +31,7 @@ fun FreeGameScreen(
 private fun FreeGameScreenPreview() {
     BoardGameAssistantTheme {
         GameScreenContent(
-            name = "Simple game",
+            name = "Free game",
             playersState = mutableStateOf(listOf()),
             playerScoresState = mutableStateOf(mapOf()),
             currentPlayerIdState = mutableStateOf(null),

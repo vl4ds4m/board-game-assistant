@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.domain.player.Player
 import java.util.concurrent.atomic.AtomicLong
 
@@ -11,9 +12,29 @@ open class BaseGameEnv : GameEnv {
     protected val mPlayers: MutableStateFlow<List<Player>> = MutableStateFlow(listOf())
     override val players: StateFlow<List<Player>> = mPlayers.asStateFlow()
 
-    override var name: MutableStateFlow<String?> = MutableStateFlow(null)
+    override val name: MutableStateFlow<String?> = MutableStateFlow(null)
 
     private var nextPlayerId: AtomicLong = AtomicLong(0)
+
+    override fun saveIn(session: GameSession) {
+        session.let {
+            it.name = name.value
+            it.players = players.value
+            it.nextPlayerId = nextPlayerId.get()
+        }
+    }
+
+    override fun loadFrom(session: GameSession) {
+        session.let {
+            name.value = it.name
+            it.players?.let { list ->
+                mPlayers.value = list
+            }
+            it.nextPlayerId?.let { nextId ->
+                nextPlayerId.set(nextId)
+            }
+        }
+    }
 
     override fun addPlayer(playerName: String) {
         val playerId = nextPlayerId.incrementAndGet()
@@ -37,8 +58,7 @@ open class BaseGameEnv : GameEnv {
         }
         val renamedPlayer = player.copy(name = name)
         updatePlayers {
-            removeAt(index)
-            add(index, renamedPlayer)
+            set(index, renamedPlayer)
         }
     }
 
@@ -77,23 +97,4 @@ open class BaseGameEnv : GameEnv {
             }
         }
     }
-
-    /*fun save() {
-        val session = Session(
-            name = name!!,
-            type = GameType.ORDERED,
-            players = getPlayers(),
-            startTime = Instant.now(),
-            stopTime = Instant.now(),
-            completed = false
-        )
-        Store.sessions.add(session)
-    }
-
-    fun restore(sessionIndex: Int) {
-        val session = Store.sessions[sessionIndex]
-        this.name = session.name
-        this.players.clear()
-        this.players.addAll(session.players)
-    }*/
 }

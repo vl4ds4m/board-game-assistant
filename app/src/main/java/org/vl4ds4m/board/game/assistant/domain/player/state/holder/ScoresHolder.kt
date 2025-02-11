@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.domain.Initializable
 import org.vl4ds4m.board.game.assistant.domain.player.Player
 import org.vl4ds4m.board.game.assistant.domain.player.state.Score
@@ -18,6 +19,17 @@ class ScoresHolder(
 ) : PlayerStatesHolder<Score>, Initializable {
     override val playerStates: StateFlow<Map<Long, Score>> =
         playerScores.asStateFlow()
+
+    override fun saveIn(session: GameSession) {
+        session.playerStates = playerStates.value
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun loadFrom(session: GameSession) {
+        session.playerStates?.let {
+            playerScores.value = it as Map<Long, Score>
+        }
+    }
 
     private var job: Job? = null
 

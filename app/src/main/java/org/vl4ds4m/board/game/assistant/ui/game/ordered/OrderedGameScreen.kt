@@ -31,7 +31,7 @@ fun OrderedGameScreen(
 private fun OrderedGameScreenPreview() {
     BoardGameAssistantTheme {
         GameScreenContent(
-            name = "Simple game",
+            name = "Ordered game",
             playersState = mutableStateOf(listOf()),
             playerScoresState = mutableStateOf(mapOf()),
             currentPlayerIdState = mutableStateOf(null),

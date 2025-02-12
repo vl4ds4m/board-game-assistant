@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import org.vl4ds4m.board.game.assistant.data.Store
-import org.vl4ds4m.board.game.assistant.domain.game.CarcassonneGame
+import org.vl4ds4m.board.game.assistant.domain.game.carcassonne.CarcassonneGame
 import org.vl4ds4m.board.game.assistant.domain.game.DiceGame
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
 import org.vl4ds4m.board.game.assistant.domain.game.MonopolyGame

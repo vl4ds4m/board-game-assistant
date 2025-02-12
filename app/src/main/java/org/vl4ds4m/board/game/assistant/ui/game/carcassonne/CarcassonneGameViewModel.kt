@@ -1,7 +1,8 @@
 package org.vl4ds4m.board.game.assistant.ui.game.carcassonne
 
+import android.util.Log
 import org.vl4ds4m.board.game.assistant.data.Store
-import org.vl4ds4m.board.game.assistant.domain.game.CarcassonneGame
+import org.vl4ds4m.board.game.assistant.domain.game.carcassonne.CarcassonneGame
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 import org.vl4ds4m.board.game.assistant.ui.game.vm.OrderedGameViewModel
 
@@ -12,7 +13,13 @@ class CarcassonneGameViewModel(
     game = game,
     sessionId = sessionId
 ) {
-    override fun addPoints(points: Int) {}
+    override fun addPoints(points: Int) {
+        if (points <= 0) {
+            Log.i(TAG, "Skip")
+        } else {
+            Log.i(TAG, "Add $points point(s)")
+        }
+    }
 
     companion object : GameViewModelFactory<CarcassonneGameViewModel> {
         override fun create(sessionId: Long?): CarcassonneGameViewModel {
@@ -25,3 +32,5 @@ class CarcassonneGameViewModel(
         }
     }
 }
+
+private const val TAG = "Carcassonne"

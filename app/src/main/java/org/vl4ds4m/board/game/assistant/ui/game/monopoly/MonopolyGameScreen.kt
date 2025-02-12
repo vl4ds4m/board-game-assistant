@@ -1,13 +1,10 @@
 package org.vl4ds4m.board.game.assistant.ui.game.monopoly
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreenContent
-import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
+import org.vl4ds4m.board.game.assistant.ui.game.ScoreCounter
 
 @Composable
 fun MonopolyGameScreen(
@@ -16,25 +13,14 @@ fun MonopolyGameScreen(
 ) {
     GameScreenContent(
         name = viewModel.name,
-        playersState = viewModel.players.collectAsState(),
-        currentPlayerIdState = viewModel.currentPlayerId.collectAsState(),
+        players = viewModel.players.collectAsState(),
+        currentPlayerId = viewModel.currentPlayerId.collectAsState(),
         onSelectPlayer = null,
-        onAddPoints = { viewModel.addPoints(it) },
+        masterActions = {
+            ScoreCounter(
+                onAddPoints = { viewModel.addPoints(it) }
+            )
+        },
         modifier = modifier
     )
-}
-
-@SuppressLint("UnrememberedMutableState")
-@Preview
-@Composable
-private fun MonopolyGameScreenPreview() {
-    BoardGameAssistantTheme {
-        GameScreenContent(
-            name = "Monopoly",
-            playersState = mutableStateOf(listOf()),
-            currentPlayerIdState = mutableStateOf(null),
-            onSelectPlayer = null,
-            onAddPoints = {}
-        )
-    }
 }

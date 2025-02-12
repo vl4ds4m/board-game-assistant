@@ -16,8 +16,10 @@ import org.vl4ds4m.board.game.assistant.data.Store
 import org.vl4ds4m.board.game.assistant.domain.game.Game
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
 import org.vl4ds4m.board.game.assistant.domain.player.Player
+import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.SimpleOrderedGameViewModel
 
 abstract class GameViewModel(
@@ -67,7 +69,12 @@ abstract class GameViewModel(
                     GameType.DICE -> {
                         initializer { DiceGameViewModel.create(sessionId) }
                     }
-                    else -> TODO()
+                    GameType.CARCASSONNE -> {
+                        initializer { CarcassonneGameViewModel.create(sessionId) }
+                    }
+                    GameType.MONOPOLY -> {
+                        initializer { MonopolyGameViewModel.create(sessionId) }
+                    }
                 }
             }
     }

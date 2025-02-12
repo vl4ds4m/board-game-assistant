@@ -12,9 +12,10 @@ import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
 import org.vl4ds4m.board.game.assistant.ui.Home
+import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.start.NewGamePlayersScreen
 import org.vl4ds4m.board.game.assistant.ui.game.start.NewGameStartScreen
@@ -55,7 +56,7 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
             when (type) {
                 GameType.FREE -> {
                     FreeGameScreen(
-                        viewModel = viewModel<FreeGameViewModel>(
+                        viewModel = viewModel(
                             factory = viewModelFactory
                         )
                     )
@@ -74,7 +75,20 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
                         )
                     )
                 }
-                else -> {}
+                GameType.CARCASSONNE -> {
+                    CarcassonneGameScreen(
+                        viewModel = viewModel(
+                            factory = viewModelFactory
+                        )
+                    )
+                }
+                GameType.MONOPOLY -> {
+                    MonopolyGameScreen(
+                        viewModel = viewModel(
+                            factory = viewModelFactory
+                        )
+                    )
+                }
             }
         }
     }

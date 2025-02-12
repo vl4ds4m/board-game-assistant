@@ -4,8 +4,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import org.vl4ds4m.board.game.assistant.data.Store
+import org.vl4ds4m.board.game.assistant.domain.game.CarcassonneGame
 import org.vl4ds4m.board.game.assistant.domain.game.DiceGame
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
+import org.vl4ds4m.board.game.assistant.domain.game.MonopolyGame
 import org.vl4ds4m.board.game.assistant.domain.game.simple.FreeGame
 import org.vl4ds4m.board.game.assistant.domain.game.simple.SimpleOrderedGame
 
@@ -43,10 +45,19 @@ class GameSetupViewModel : ViewModel() {
             }
             GameType.DICE -> {
                 DiceGame().also {
-                    it.name.value = "Dice 1000"
+                    it.name.value = "Dice '${name.value}'"
                 }
             }
-            else -> TODO()
+            GameType.CARCASSONNE -> {
+                CarcassonneGame().also {
+                    it.name.value = "Carcassonne '${name.value}'"
+                }
+            }
+            GameType.MONOPOLY -> {
+                MonopolyGame().also {
+                    it.name.value = "Monopoly '${name.value}'"
+                }
+            }
         }
         players.forEach { game.addPlayer(it) }
         Store.currentGame = game

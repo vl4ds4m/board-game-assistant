@@ -64,21 +64,12 @@ fun NewGameStartScreenContent(
         FilledTonalButton({ expanded = true }) {
             Text(type?.title ?: "Select game")
             DropdownMenu(expanded, { expanded = false }) {
-                val freeGame = GameType.FREE
-                val orderedGame = GameType.ORDERED
-                val diceGame = GameType.DICE
-                DropdownMenuItem(
-                    text = { Text(freeGame.title) },
-                    onClick = { onTypeChanged(freeGame); expanded = false }
-                )
-                DropdownMenuItem(
-                    text = { Text(orderedGame.title) },
-                    onClick = { onTypeChanged(orderedGame); expanded = false }
-                )
-                DropdownMenuItem(
-                    text = { Text(diceGame.title) },
-                    onClick = { onTypeChanged(diceGame); expanded = false }
-                )
+                for (entry in GameType.entries) {
+                    DropdownMenuItem(
+                        text = { Text(entry.title) },
+                        onClick = { onTypeChanged(entry); expanded = false }
+                    )
+                }
             }
         }
         Spacer(Modifier.height(48.dp))

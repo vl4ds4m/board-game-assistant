@@ -3,11 +3,9 @@ package org.vl4ds4m.board.game.assistant.ui.game.free
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import kotlinx.coroutines.flow.StateFlow
 import org.vl4ds4m.board.game.assistant.data.Store
 import org.vl4ds4m.board.game.assistant.domain.game.FreeGame
 import org.vl4ds4m.board.game.assistant.domain.player.Player
-import org.vl4ds4m.board.game.assistant.domain.player.state.Score
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 
 class FreeGameViewModel private constructor(
@@ -24,10 +22,10 @@ class FreeGameViewModel private constructor(
         mCurrentPlayerId.value = player.id
     }
 
-    val playerScores: StateFlow<Map<Long, Score>> = game.playerStates
-
     fun addScore(points: Int) {
-        game.addPoints(currentPlayerId.value ?: -1, points)
+        mCurrentPlayerId.value?.let {
+            game.addPoints(it, points)
+        }
     }
 
     companion object {

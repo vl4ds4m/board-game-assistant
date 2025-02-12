@@ -41,14 +41,15 @@ open class BaseGameEnv : GameEnv {
         val newPlayer = Player(
             id = playerId,
             name = playerName,
-            active = true
+            active = true,
+            score = 0
         )
         updatePlayers {
             add(newPlayer)
         }
     }
 
-    override fun changePlayerName(player: Player, name: String) {
+    override fun renamePlayer(player: Player, name: String) {
         if (player.name == name) {
             return
         }
@@ -59,6 +60,20 @@ open class BaseGameEnv : GameEnv {
         val renamedPlayer = player.copy(name = name)
         updatePlayers {
             set(index, renamedPlayer)
+        }
+    }
+
+    override fun changePlayerScore(player: Player, score: Int) {
+        if (player.score == score || score < 0) {
+            return
+        }
+        val index = players.value.indexOf(player)
+        if (index == -1) {
+            return
+        }
+        val updated = player.copy(score = score)
+        updatePlayers {
+            set(index, updated)
         }
     }
 

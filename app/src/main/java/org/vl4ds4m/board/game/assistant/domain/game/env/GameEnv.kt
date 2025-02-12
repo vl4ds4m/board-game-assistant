@@ -11,7 +11,9 @@ interface GameEnv : GameState {
 
     fun addPlayer(playerName: String)
 
-    fun changePlayerName(player: Player, name: String)
+    fun renamePlayer(player: Player, name: String)
+
+    fun changePlayerScore(player: Player, score: Int)
 
     fun removePlayer(player: Player)
 

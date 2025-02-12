@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import org.vl4ds4m.board.game.assistant.data.Store
 import org.vl4ds4m.board.game.assistant.domain.game.OrderedGame
-import org.vl4ds4m.board.game.assistant.domain.player.state.Score
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 
 class OrderedGameViewModel(
@@ -36,8 +35,6 @@ class OrderedGameViewModel(
             }
             .launchIn(viewModelScope)
     }
-
-    val playerScores: StateFlow<Map<Long, Score>> = game.playerStates
 
     fun addScore(points: Int) {
         game.addPoints(points)

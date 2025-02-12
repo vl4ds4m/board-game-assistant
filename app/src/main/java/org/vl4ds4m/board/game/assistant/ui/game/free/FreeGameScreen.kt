@@ -17,7 +17,6 @@ fun FreeGameScreen(
     GameScreenContent(
         name = viewModel.name,
         playersState = viewModel.players.collectAsState(),
-        playerScoresState = viewModel.playerScores.collectAsState(),
         currentPlayerIdState = viewModel.currentPlayerId,
         onSelectPlayer = { viewModel.selectCurrentPlayer(it) },
         onAddScore = { viewModel.addScore(it) },
@@ -33,7 +32,6 @@ private fun FreeGameScreenPreview() {
         GameScreenContent(
             name = "Free game",
             playersState = mutableStateOf(listOf()),
-            playerScoresState = mutableStateOf(mapOf()),
             currentPlayerIdState = mutableStateOf(null),
             onSelectPlayer = null,
             onAddScore = {}

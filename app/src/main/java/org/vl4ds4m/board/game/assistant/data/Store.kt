@@ -16,7 +16,7 @@ object Store {
         }
     }
 
-    var currentGame: Game<*>? = null
+    var currentGame: Game? = null
 
     val sessions: Map<Long, GameSession> = mSessions
 

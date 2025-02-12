@@ -17,7 +17,6 @@ fun OrderedGameScreen(
     GameScreenContent(
         name = viewModel.name,
         playersState = viewModel.players.collectAsState(),
-        playerScoresState = viewModel.playerScores.collectAsState(),
         currentPlayerIdState = viewModel.currentPlayerId.collectAsState(),
         onSelectPlayer = null,
         onAddScore = { viewModel.addScore(it) },
@@ -33,7 +32,6 @@ private fun OrderedGameScreenPreview() {
         GameScreenContent(
             name = "Ordered game",
             playersState = mutableStateOf(listOf()),
-            playerScoresState = mutableStateOf(mapOf()),
             currentPlayerIdState = mutableStateOf(null),
             onSelectPlayer = null,
             onAddScore = {}

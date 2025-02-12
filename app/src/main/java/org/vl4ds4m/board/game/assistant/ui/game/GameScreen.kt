@@ -24,13 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.domain.player.Player
-import org.vl4ds4m.board.game.assistant.domain.player.state.Score
 
 @Composable
 fun GameScreenContent(
     name: String,
     playersState: State<List<Player>>,
-    playerScoresState: State<Map<Long, Score>>,
     currentPlayerIdState: State<Long?>,
     onSelectPlayer: ((Player) -> Unit)?,
     onAddScore: (Int) -> Unit,
@@ -38,7 +36,6 @@ fun GameScreenContent(
 ) {
     val (score, onScoreChanged) = rememberSaveable { mutableStateOf("") }
     val players by playersState
-    val playerScores by playerScoresState
     val currentPlayerId by currentPlayerIdState
     Column(
         modifier = modifier.padding(16.dp)
@@ -58,7 +55,7 @@ fun GameScreenContent(
                 PlayerInGameCard(
                     rating = i + 1,
                     name = player.name,
-                    score = playerScores[player.id]?.value ?: -1,
+                    score = player.score,
                     selected = player.id == currentPlayerId,
                     onSelect = onSelectPlayer?.let { f -> { f(player) } }
                 )
@@ -84,8 +81,7 @@ fun GameScreenContent(
             Spacer(Modifier.width(24.dp))
             Button(
                 onClick = {
-                    val changing = score.toInt()
-                    onAddScore(changing)
+                    score.toIntOrNull()?.let(onAddScore)
                 }
             ) {
                 Text("Apply")

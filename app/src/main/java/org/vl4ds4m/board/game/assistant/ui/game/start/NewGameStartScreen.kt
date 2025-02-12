@@ -66,6 +66,7 @@ fun NewGameStartScreenContent(
             DropdownMenu(expanded, { expanded = false }) {
                 val freeGame = GameType.FREE
                 val orderedGame = GameType.ORDERED
+                val diceGame = GameType.DICE
                 DropdownMenuItem(
                     text = { Text(freeGame.title) },
                     onClick = { onTypeChanged(freeGame); expanded = false }
@@ -73,6 +74,10 @@ fun NewGameStartScreenContent(
                 DropdownMenuItem(
                     text = { Text(orderedGame.title) },
                     onClick = { onTypeChanged(orderedGame); expanded = false }
+                )
+                DropdownMenuItem(
+                    text = { Text(diceGame.title) },
+                    onClick = { onTypeChanged(diceGame); expanded = false }
                 )
             }
         }

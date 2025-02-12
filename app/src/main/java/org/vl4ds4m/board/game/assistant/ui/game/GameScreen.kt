@@ -31,7 +31,7 @@ fun GameScreenContent(
     playersState: State<List<Player>>,
     currentPlayerIdState: State<Long?>,
     onSelectPlayer: ((Player) -> Unit)?,
-    onAddScore: (Int) -> Unit,
+    onAddPoints: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val (score, onScoreChanged) = rememberSaveable { mutableStateOf("") }
@@ -81,7 +81,7 @@ fun GameScreenContent(
             Spacer(Modifier.width(24.dp))
             Button(
                 onClick = {
-                    score.toIntOrNull()?.let(onAddScore)
+                    score.toIntOrNull()?.let(onAddPoints)
                 }
             ) {
                 Text("Apply")

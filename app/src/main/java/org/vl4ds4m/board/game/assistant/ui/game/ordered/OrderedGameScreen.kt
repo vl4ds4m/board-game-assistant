@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreenContent
+import org.vl4ds4m.board.game.assistant.ui.game.vm.OrderedGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -19,7 +20,7 @@ fun OrderedGameScreen(
         playersState = viewModel.players.collectAsState(),
         currentPlayerIdState = viewModel.currentPlayerId.collectAsState(),
         onSelectPlayer = null,
-        onAddScore = { viewModel.addScore(it) },
+        onAddPoints = { viewModel.addPoints(it) },
         modifier = modifier
     )
 }
@@ -34,7 +35,7 @@ private fun OrderedGameScreenPreview() {
             playersState = mutableStateOf(listOf()),
             currentPlayerIdState = mutableStateOf(null),
             onSelectPlayer = null,
-            onAddScore = {}
+            onAddPoints = {}
         )
     }
 }

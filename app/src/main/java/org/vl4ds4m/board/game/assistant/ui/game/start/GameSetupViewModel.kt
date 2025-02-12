@@ -4,9 +4,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import org.vl4ds4m.board.game.assistant.data.Store
-import org.vl4ds4m.board.game.assistant.domain.game.FreeGame
+import org.vl4ds4m.board.game.assistant.domain.game.DiceGame
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
-import org.vl4ds4m.board.game.assistant.domain.game.OrderedGame
+import org.vl4ds4m.board.game.assistant.domain.game.simple.FreeGame
+import org.vl4ds4m.board.game.assistant.domain.game.simple.SimpleOrderedGame
 
 class GameSetupViewModel : ViewModel() {
     val type = mutableStateOf<GameType?>(null)
@@ -36,8 +37,13 @@ class GameSetupViewModel : ViewModel() {
                 }
             }
             GameType.ORDERED -> {
-                OrderedGame().also {
+                SimpleOrderedGame().also {
                     it.name.value = "${name.value} (ordered)"
+                }
+            }
+            GameType.DICE -> {
+                DiceGame().also {
+                    it.name.value = "Dice 1000"
                 }
             }
             else -> TODO()

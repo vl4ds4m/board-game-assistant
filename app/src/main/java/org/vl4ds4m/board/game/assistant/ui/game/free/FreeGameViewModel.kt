@@ -4,9 +4,10 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import org.vl4ds4m.board.game.assistant.data.Store
-import org.vl4ds4m.board.game.assistant.domain.game.FreeGame
+import org.vl4ds4m.board.game.assistant.domain.game.simple.FreeGame
 import org.vl4ds4m.board.game.assistant.domain.player.Player
-import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 
 class FreeGameViewModel private constructor(
     private val game: FreeGame = FreeGame(),
@@ -22,14 +23,14 @@ class FreeGameViewModel private constructor(
         mCurrentPlayerId.value = player.id
     }
 
-    fun addScore(points: Int) {
+    override fun addPoints(points: Int) {
         mCurrentPlayerId.value?.let {
             game.addPoints(it, points)
         }
     }
 
-    companion object {
-        fun create(sessionId: Long?): FreeGameViewModel {
+    companion object : GameViewModelFactory<FreeGameViewModel> {
+        override fun create(sessionId: Long?): FreeGameViewModel {
             return if (sessionId == null) {
                 val game = Store.currentGame as FreeGame
                 FreeGameViewModel(game = game)

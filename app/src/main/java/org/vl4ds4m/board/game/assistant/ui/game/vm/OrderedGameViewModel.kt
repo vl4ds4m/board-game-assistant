@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.ui.game.ordered
+package org.vl4ds4m.board.game.assistant.ui.game.vm
 
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,12 +8,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import org.vl4ds4m.board.game.assistant.data.Store
 import org.vl4ds4m.board.game.assistant.domain.game.OrderedGame
-import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 
-class OrderedGameViewModel(
-    private val game: OrderedGame = OrderedGame(),
+abstract class OrderedGameViewModel(
+    game: OrderedGame,
     sessionId: Long? = null
 ) : GameViewModel(
     game = game,
@@ -23,10 +21,6 @@ class OrderedGameViewModel(
     val currentPlayerId: StateFlow<Long?> = mCurrentPlayerId.asStateFlow()
 
     init {
-        launchCurrentPlayerIdUpdate()
-    }
-
-    private fun launchCurrentPlayerIdUpdate() {
         game.players.combine(game.order) { players, order -> players to order }
             .onEach { (players, order) ->
                 mCurrentPlayerId.update {
@@ -34,20 +28,5 @@ class OrderedGameViewModel(
                 }
             }
             .launchIn(viewModelScope)
-    }
-
-    fun addScore(points: Int) {
-        game.addPoints(points)
-    }
-
-    companion object {
-        fun create(sessionId: Long?): OrderedGameViewModel {
-            return if (sessionId == null) {
-                val game = Store.currentGame as OrderedGame
-                OrderedGameViewModel(game = game)
-            } else {
-                OrderedGameViewModel(sessionId = sessionId)
-            }
-        }
     }
 }

@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.ui.game.free
+package org.vl4ds4m.board.game.assistant.ui.game.dice
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
@@ -10,15 +10,15 @@ import org.vl4ds4m.board.game.assistant.ui.game.GameScreenContent
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
-fun FreeGameScreen(
-    viewModel: FreeGameViewModel,
+fun DiceGameScreen(
+    viewModel: DiceGameViewModel,
     modifier: Modifier = Modifier,
 ) {
     GameScreenContent(
         name = viewModel.name,
         playersState = viewModel.players.collectAsState(),
-        currentPlayerIdState = viewModel.currentPlayerId,
-        onSelectPlayer = { viewModel.selectCurrentPlayer(it) },
+        currentPlayerIdState = viewModel.currentPlayerId.collectAsState(),
+        onSelectPlayer = null,
         onAddPoints = { viewModel.addPoints(it) },
         modifier = modifier
     )
@@ -27,10 +27,10 @@ fun FreeGameScreen(
 @SuppressLint("UnrememberedMutableState")
 @Preview
 @Composable
-private fun FreeGameScreenPreview() {
+private fun DiceGameScreenPreview() {
     BoardGameAssistantTheme {
         GameScreenContent(
-            name = "Free game",
+            name = "Dice",
             playersState = mutableStateOf(listOf()),
             currentPlayerIdState = mutableStateOf(null),
             onSelectPlayer = null,

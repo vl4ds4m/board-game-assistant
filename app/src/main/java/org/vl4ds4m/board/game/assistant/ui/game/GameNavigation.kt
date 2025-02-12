@@ -12,11 +12,13 @@ import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
 import org.vl4ds4m.board.game.assistant.ui.Home
+import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.start.NewGamePlayersScreen
 import org.vl4ds4m.board.game.assistant.ui.game.start.NewGameStartScreen
+import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 
 @Serializable
 object NewGameStart
@@ -60,6 +62,13 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
                 }
                 GameType.ORDERED -> {
                     OrderedGameScreen(
+                        viewModel = viewModel(
+                            factory = viewModelFactory
+                        )
+                    )
+                }
+                GameType.DICE -> {
+                    DiceGameScreen(
                         viewModel = viewModel(
                             factory = viewModelFactory
                         )

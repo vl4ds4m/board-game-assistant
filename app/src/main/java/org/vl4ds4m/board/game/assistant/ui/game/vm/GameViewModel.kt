@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.ui.game
+package org.vl4ds4m.board.game.assistant.ui.game.vm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -16,8 +16,9 @@ import org.vl4ds4m.board.game.assistant.data.Store
 import org.vl4ds4m.board.game.assistant.domain.game.Game
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
 import org.vl4ds4m.board.game.assistant.domain.player.Player
+import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.ordered.SimpleOrderedGameViewModel
 
 abstract class GameViewModel(
     private val game: Game,
@@ -44,6 +45,8 @@ abstract class GameViewModel(
         }
     }
 
+    abstract fun addPoints(points: Int)
+
     override fun onCleared() {
         super.onCleared()
         val session = GameSession()
@@ -59,7 +62,10 @@ abstract class GameViewModel(
                         initializer { FreeGameViewModel.create(sessionId) }
                     }
                     GameType.ORDERED -> {
-                        initializer { OrderedGameViewModel.create(sessionId) }
+                        initializer { SimpleOrderedGameViewModel.create(sessionId) }
+                    }
+                    GameType.DICE -> {
+                        initializer { DiceGameViewModel.create(sessionId) }
                     }
                     else -> TODO()
                 }

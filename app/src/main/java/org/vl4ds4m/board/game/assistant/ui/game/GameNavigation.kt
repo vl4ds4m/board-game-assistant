@@ -10,23 +10,21 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import org.vl4ds4m.board.game.assistant.domain.game.GameType
 import org.vl4ds4m.board.game.assistant.ui.Home
-import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.start.NewGamePlayersScreen
 import org.vl4ds4m.board.game.assistant.ui.game.start.NewGameStartScreen
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 
 @Serializable
 object NewGameStart
+
 @Serializable
 object NewGamePlayers
+
 @Serializable
-data class Game(val type: GameType, val sessionId: Long? = null)
+data class Game(val type: String, val sessionId: Long? = null)
+
+@Serializable
+object End
 
 fun NavGraphBuilder.gameNavigation(navController: NavController) {
     composable<NewGameStart> {
@@ -44,53 +42,20 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
                 viewModelStoreOwner = backStackEntry
             ),
             onStartGame = { type ->
-                navController.navigate(Game(type)) {
+                val game = Game(type.title)
+                navController.navigate(game) {
                     popUpTo<Home>()
                 }
             }
         )
     }
-    composable<Game> { entry ->
-        entry.toRoute<Game>().let { (type, sessionId) ->
-            val viewModelFactory = GameViewModel.getFactory(type, sessionId)
-            when (type) {
-                GameType.FREE -> {
-                    FreeGameScreen(
-                        viewModel = viewModel(
-                            factory = viewModelFactory
-                        )
-                    )
-                }
-                GameType.ORDERED -> {
-                    OrderedGameScreen(
-                        viewModel = viewModel(
-                            factory = viewModelFactory
-                        )
-                    )
-                }
-                GameType.DICE -> {
-                    DiceGameScreen(
-                        viewModel = viewModel(
-                            factory = viewModelFactory
-                        )
-                    )
-                }
-                GameType.CARCASSONNE -> {
-                    CarcassonneGameScreen(
-                        viewModel = viewModel(
-                            factory = viewModelFactory
-                        )
-                    )
-                }
-                GameType.MONOPOLY -> {
-                    MonopolyGameScreen(
-                        viewModel = viewModel(
-                            factory = viewModelFactory
-                        )
-                    )
-                }
-            }
-        }
+    composable<Game> {
+        GameScreen(
+            game = it.toRoute<Game>(),
+            onGameComplete = {}
+        )
+    }
+    composable<End> {
     }
 }
 

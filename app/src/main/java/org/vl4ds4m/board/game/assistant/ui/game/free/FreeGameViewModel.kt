@@ -1,9 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui.game.free
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import org.vl4ds4m.board.game.assistant.data.Store
+import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.domain.game.simple.FreeGame
 import org.vl4ds4m.board.game.assistant.domain.player.Player
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
@@ -16,12 +13,7 @@ class FreeGameViewModel private constructor(
     game = game,
     sessionId = sessionId
 ) {
-    private val mCurrentPlayerId: MutableState<Long?> = mutableStateOf(null)
-    val currentPlayerId: State<Long?> = mCurrentPlayerId
-
-    fun selectCurrentPlayer(player: Player) {
-        mCurrentPlayerId.value = player.id
-    }
+    override val name: String = "${game.name.value} (free)"
 
     override fun addPoints(points: Int) {
         mCurrentPlayerId.value?.let {
@@ -29,14 +21,17 @@ class FreeGameViewModel private constructor(
         }
     }
 
+    fun selectCurrentPlayer(player: Player) {
+        mCurrentPlayerId.value = player.id
+    }
+
     companion object : GameViewModelFactory<FreeGameViewModel> {
-        override fun create(sessionId: Long?): FreeGameViewModel {
-            return if (sessionId == null) {
-                val game = Store.currentGame as FreeGame
-                FreeGameViewModel(game = game)
-            } else {
-                FreeGameViewModel(sessionId = sessionId)
-            }
+        override fun createFrom(gameEnv: GameEnv): FreeGameViewModel {
+            return FreeGameViewModel(game = gameEnv as FreeGame)
+        }
+
+        override fun createFrom(sessionId: Long): FreeGameViewModel {
+            return FreeGameViewModel(sessionId = sessionId)
         }
     }
 }

@@ -24,7 +24,7 @@ fun NavGraphBuilder.mainNavigation(navController: NavController) {
             onStartNewGame = { navController.navigate(NewGameStart) },
             onSessionClick = { sessionId ->
                 Store.load(sessionId)?.type?.let { type ->
-                    val game = Game(type, sessionId)
+                    val game = Game(type.title, sessionId)
                     navController.navigate(game)
                 }
             }

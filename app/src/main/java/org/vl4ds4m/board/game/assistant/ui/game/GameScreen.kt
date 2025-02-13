@@ -1,33 +1,84 @@
 package org.vl4ds4m.board.game.assistant.ui.game
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import org.vl4ds4m.board.game.assistant.domain.game.Free
+import org.vl4ds4m.board.game.assistant.domain.game.GameType
+import org.vl4ds4m.board.game.assistant.domain.game.OrderedGameType
 import org.vl4ds4m.board.game.assistant.domain.player.Player
+import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
+import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreCounter
+import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameScreen
+import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
+
+@Composable
+fun GameScreen(
+    game: Game,
+    onGameComplete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val type = GameType.valueOf(game.type)
+    val viewModelFactory = GameViewModelFactory.create(
+        type = type,
+        sessionId = game.sessionId
+    )
+    when (type) {
+        is Free -> {
+            FreeGameScreen(
+                viewModel = viewModel(
+                    factory = viewModelFactory
+                ),
+                onGameComplete = onGameComplete,
+                modifier = modifier
+            )
+        }
+        is OrderedGameType -> {
+            OrderedGameScreen(
+                type = type,
+                viewModelFactory = viewModelFactory,
+                onGameComplete = onGameComplete,
+                modifier = modifier
+            )
+        }
+    }
+}
+
+@Composable
+fun GameScreen(
+    viewModel: GameViewModel,
+    onGameComplete: () -> Unit,
+    onSelectPlayer: ((Player) -> Unit)?,
+    masterActions: @Composable () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    GameScreenContent(
+        name = viewModel.name,
+        players = viewModel.players.collectAsState(),
+        currentPlayerId = viewModel.currentPlayerId.collectAsState(),
+        onSelectPlayer = onSelectPlayer,
+        masterActions = masterActions,
+        onGameComplete = onGameComplete,
+        modifier = modifier
+    )
+}
 
 @Composable
 fun GameScreenContent(
@@ -36,6 +87,7 @@ fun GameScreenContent(
     currentPlayerId: State<Long?>,
     onSelectPlayer: ((Player) -> Unit)?,
     masterActions: @Composable () -> Unit,
+    onGameComplete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -64,80 +116,35 @@ fun GameScreenContent(
     }
 }
 
+@Preview
 @Composable
-fun PlayersRating(
-    players: State<List<Player>>,
-    currentPlayerId: State<Long?>,
-    onSelectPlayer: ((Player) -> Unit)?,
-    modifier: Modifier = Modifier
-) {
-    LazyColumn(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        itemsIndexed(
-            items = players.value,
-            key = { _, player -> player.id }
-        ) { i, player ->
-            PlayerInGameCard(
-                rating = i + 1,
-                name = player.name,
-                score = player.score,
-                selected = player.id == currentPlayerId.value,
-                onSelect = onSelectPlayer?.let { f -> { f(player) } }
+private fun SimpleGameScreenPreview() {
+    GameScreenPreview(
+        name = "Simple game",
+        masterActions = {
+            ScoreCounter(
+                onPointsAdd = {}
             )
         }
-    }
-}
-
-@Composable
-fun ScoreCounter(
-    onAddPoints: (Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val (score, onScoreChanged) = rememberSaveable { mutableStateOf("") }
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        TextField(
-            value = score,
-            onValueChange = onScoreChanged,
-            modifier = Modifier.width(150.dp),
-            singleLine = true,
-            suffix = { Text(" score(s)") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number
-            )
-        )
-        Spacer(Modifier.width(24.dp))
-        Button(
-            onClick = {
-                score.toIntOrNull()?.let(onAddPoints)
-            },
-            modifier = Modifier.width(90.dp)
-        ) {
-            Text("Apply")
-        }
-    }
+    )
 }
 
 @SuppressLint("UnrememberedMutableState")
-@Preview
 @Composable
-private fun GameScreenPreview() {
+internal fun GameScreenPreview(
+    name: String,
+    masterActions: @Composable () -> Unit,
+    modifier: Modifier = Modifier
+) {
     BoardGameAssistantTheme {
         GameScreenContent(
-            name = "Some game",
+            name = name,
             players = mutableStateOf(fakePlayers),
             currentPlayerId = mutableStateOf(null),
             onSelectPlayer = null,
-            masterActions = {
-                ScoreCounter(
-                    onAddPoints = {}
-                )
-            }
+            masterActions = masterActions,
+            onGameComplete = {},
+            modifier = modifier
         )
     }
 }

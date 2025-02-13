@@ -1,7 +1,12 @@
 package org.vl4ds4m.board.game.assistant.data
 
 import androidx.compose.runtime.mutableStateMapOf
+import org.vl4ds4m.board.game.assistant.domain.game.Carcassonne
+import org.vl4ds4m.board.game.assistant.domain.game.Dice
+import org.vl4ds4m.board.game.assistant.domain.game.Free
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
+import org.vl4ds4m.board.game.assistant.domain.game.Monopoly
+import org.vl4ds4m.board.game.assistant.domain.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
 import java.util.concurrent.atomic.AtomicLong
 
@@ -37,12 +42,12 @@ object Store {
 }
 
 private val defaultGames: List<Pair<String, GameType>> = listOf(
-    "Imaginarium" to GameType.ORDERED,
-    GameType.MONOPOLY.title to GameType.MONOPOLY,
-    "Poker Counts" to GameType.FREE,
-    GameType.DICE.title to GameType.DICE,
-    "Uno" to GameType.ORDERED,
-    GameType.CARCASSONNE.title to GameType.CARCASSONNE
+    "Imaginarium" to SimpleOrdered,
+    Monopoly.title to Monopoly,
+    "Poker Counts" to Free,
+    Dice.title to Dice,
+    "Uno" to SimpleOrdered,
+    Carcassonne.title to Carcassonne
 )
 
 /*private val initialTime = Instant.parse("2025-01-24T10:15:34.00Z")

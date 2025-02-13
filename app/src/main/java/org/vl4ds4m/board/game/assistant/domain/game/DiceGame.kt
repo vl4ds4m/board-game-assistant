@@ -4,7 +4,7 @@ import org.vl4ds4m.board.game.assistant.domain.game.env.BaseOrderedGameEnv
 import org.vl4ds4m.board.game.assistant.domain.game.env.OrderedGameEnv
 
 class DiceGame(
-    private val gameEnv: OrderedGameEnv = BaseOrderedGameEnv(GameType.DICE)
+    private val gameEnv: OrderedGameEnv = BaseOrderedGameEnv(Dice)
 ) : OrderedGameEnv by gameEnv
 {
     fun addPoints(points: Int) {

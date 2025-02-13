@@ -15,7 +15,6 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.domain.game.carcassonne.CarcassonneProperty
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreenContent
+import org.vl4ds4m.board.game.assistant.ui.game.OrderedGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.fakePlayers
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 import org.vl4ds4m.board.game.assistant.util.title
@@ -36,13 +36,12 @@ import org.vl4ds4m.board.game.assistant.util.title
 @Composable
 fun CarcassonneGameScreen(
     viewModel: CarcassonneGameViewModel,
+    onGameComplete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    GameScreenContent(
-        name = viewModel.name,
-        players = viewModel.players.collectAsState(),
-        currentPlayerId = viewModel.currentPlayerId.collectAsState(),
-        onSelectPlayer = null,
+    OrderedGameScreen(
+        viewModel = viewModel,
+        onGameComplete = onGameComplete,
         masterActions = {
             CarcassonneCounter(
                 onAddPoints = { viewModel.addPoints(it) }
@@ -159,7 +158,8 @@ private fun CarcassonneGameScreenPreview() {
                 CarcassonneCounter(
                     onAddPoints = {}
                 )
-            }
+            },
+            onGameComplete = {}
         )
     }
 }

@@ -1,7 +1,7 @@
 package org.vl4ds4m.board.game.assistant.ui.game.dice
 
-import org.vl4ds4m.board.game.assistant.data.Store
 import org.vl4ds4m.board.game.assistant.domain.game.DiceGame
+import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 import org.vl4ds4m.board.game.assistant.ui.game.vm.OrderedGameViewModel
 
@@ -12,18 +12,19 @@ class DiceGameViewModel private constructor(
     game = game,
     sessionId = sessionId
 ) {
+    override val name: String = "Dice '${game.name.value}'"
+
     override fun addPoints(points: Int) {
         game.addPoints(points)
     }
 
     companion object : GameViewModelFactory<DiceGameViewModel> {
-        override fun create(sessionId: Long?): DiceGameViewModel {
-            return if (sessionId == null) {
-                val game = Store.currentGame as DiceGame
-                DiceGameViewModel(game = game)
-            } else {
-                DiceGameViewModel(sessionId = sessionId)
-            }
+        override fun createFrom(gameEnv: GameEnv): DiceGameViewModel {
+            return DiceGameViewModel(game = gameEnv as DiceGame)
+        }
+
+        override fun createFrom(sessionId: Long): DiceGameViewModel {
+            return DiceGameViewModel(sessionId = sessionId)
         }
     }
 }

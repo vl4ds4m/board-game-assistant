@@ -145,7 +145,9 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
         if (startTime == null) {
             startTime = System.currentTimeMillis()
         }
-        timer.start(mSecondsToEnd, mCompleted)
+        if (timeout.value) {
+            timer.start(mSecondsToEnd, mCompleted)
+        }
     }
 
     override fun stop() {

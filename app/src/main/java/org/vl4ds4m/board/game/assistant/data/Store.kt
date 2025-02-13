@@ -1,8 +1,8 @@
 package org.vl4ds4m.board.game.assistant.data
 
 import androidx.compose.runtime.mutableStateMapOf
-import org.vl4ds4m.board.game.assistant.domain.game.Game
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
+import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
 import java.util.concurrent.atomic.AtomicLong
 
 object Store {
@@ -16,7 +16,7 @@ object Store {
         }
     }
 
-    var currentGame: Game? = null
+    var currentGame: GameEnv? = null
 
     val sessions: Map<Long, GameSession> = mSessions
 

@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.data.Store
-import org.vl4ds4m.board.game.assistant.domain.game.Game
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
+import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.domain.player.Player
 import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameViewModel
@@ -23,7 +23,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.SimpleOrderedGameViewModel
 
 abstract class GameViewModel(
-    private val game: Game,
+    private val game: GameEnv,
     private val sessionId: Long? = null
 ) : ViewModel(*game.initializables) {
     val name: String
@@ -35,13 +35,12 @@ abstract class GameViewModel(
         sessionId?.let { id ->
             Store.load(id)?.let { game.loadFrom(it) }
         }
-        name = game.name.value ?: "no name"
+        name = game.name.value
         game.players.onEach { list ->
-                mPlayers.update {
-                    list.sortedByDescending { it.score }
-                }
+            mPlayers.update {
+                list.sortedByDescending { it.score }
             }
-            .launchIn(viewModelScope)
+        }.launchIn(viewModelScope)
         game.initializables.forEach {
             it.init(viewModelScope)
         }

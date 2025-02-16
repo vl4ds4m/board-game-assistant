@@ -5,16 +5,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,7 +48,10 @@ fun CarcassonneGameScreen(
         onGameComplete = onGameComplete,
         masterActions = {
             CarcassonneCounter(
-                onAddPoints = { viewModel.addPoints(it) }
+                onPointsAdd = viewModel::addPoints,
+                onSkip = viewModel::skip,
+                onFinal = viewModel.onFinal.collectAsState(),
+                onFinalChange = { viewModel.onFinal.value = it }
             )
         },
         modifier = modifier
@@ -53,7 +60,10 @@ fun CarcassonneGameScreen(
 
 @Composable
 fun CarcassonneCounter(
-    onAddPoints: (Int) -> Unit,
+    onPointsAdd: (CarcassonneProperty, Int) -> Unit,
+    onSkip: () -> Unit,
+    onFinal: State<Boolean>,
+    onFinalChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val count = rememberSaveable { mutableStateOf<Int?>(null) }
@@ -71,6 +81,20 @@ fun CarcassonneCounter(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Checkbox(
+                checked = onFinal.value,
+                onCheckedChange = onFinalChange
+            )
+            Text(
+                text = "Final stage"
+            )
+        }
+        Spacer(Modifier.height(24.dp))
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
@@ -126,9 +150,9 @@ fun CarcassonneCounter(
         Button(
             onClick = {
                 if (skippable.value) {
-                    onAddPoints(0)
+                    onSkip()
                 } else {
-                    onAddPoints(count.value!!)
+                    onPointsAdd(property!!, count.value!!)
                 }
             },
             modifier = Modifier.width(90.dp)
@@ -156,7 +180,10 @@ private fun CarcassonneGameScreenPreview() {
             onSelectPlayer = null,
             masterActions = {
                 CarcassonneCounter(
-                    onAddPoints = {}
+                    onPointsAdd = { _, _ -> },
+                    onSkip = {},
+                    onFinal = mutableStateOf(false),
+                    onFinalChange = {}
                 )
             },
             onGameComplete = {}

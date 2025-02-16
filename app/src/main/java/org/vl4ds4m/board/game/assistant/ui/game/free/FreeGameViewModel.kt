@@ -15,7 +15,7 @@ class FreeGameViewModel private constructor(
 ) {
     override val name: String = "${game.name.value} (free)"
 
-    override fun addPoints(points: Int) {
+    fun addPoints(points: Int) {
         mCurrentPlayerId.value?.let {
             game.addPoints(it, points)
         }

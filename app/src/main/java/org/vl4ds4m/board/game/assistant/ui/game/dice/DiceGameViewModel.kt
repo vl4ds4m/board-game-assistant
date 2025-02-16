@@ -14,7 +14,7 @@ class DiceGameViewModel private constructor(
 ) {
     override val name: String = "Dice '${game.name.value}'"
 
-    override fun addPoints(points: Int) {
+    fun addPoints(points: Int) {
         game.addPoints(points)
     }
 

@@ -14,8 +14,6 @@ class MonopolyGameViewModel(
 ) {
     override val name: String = "Monopoly '${game.name.value}'"
 
-    override fun addPoints(points: Int) {}
-
     companion object : GameViewModelFactory<MonopolyGameViewModel> {
         override fun createFrom(gameEnv: GameEnv): MonopolyGameViewModel {
             return MonopolyGameViewModel(game = gameEnv as MonopolyGame)

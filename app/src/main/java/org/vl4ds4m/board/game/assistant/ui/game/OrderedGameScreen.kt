@@ -31,7 +31,11 @@ fun OrderedGameScreen(
             OrderedGameScreen(
                 viewModel = viewModel,
                 onGameComplete = onGameComplete,
-                masterActions = { ScoreCounter(viewModel) },
+                masterActions = {
+                    ScoreCounter(
+                        onPointsAdd = viewModel::addPoints
+                    )
+                },
                 modifier = modifier
             )
         }
@@ -42,7 +46,11 @@ fun OrderedGameScreen(
             OrderedGameScreen(
                 viewModel = viewModel,
                 onGameComplete = onGameComplete,
-                masterActions = { ScoreCounter(viewModel) },
+                masterActions = {
+                    ScoreCounter(
+                        onPointsAdd = viewModel::addPoints
+                    )
+                },
                 modifier = modifier
             )
         }

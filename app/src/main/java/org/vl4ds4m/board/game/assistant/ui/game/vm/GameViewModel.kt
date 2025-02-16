@@ -43,8 +43,6 @@ abstract class GameViewModel(
     protected val mCurrentPlayerId: MutableStateFlow<Long?> = MutableStateFlow(null)
     val currentPlayerId: StateFlow<Long?> = mCurrentPlayerId.asStateFlow()
 
-    abstract fun addPoints(points: Int)
-
     override fun onCleared() {
         Log.d(TAG, "Clear ${this::class.simpleName}")
         super.onCleared()

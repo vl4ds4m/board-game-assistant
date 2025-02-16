@@ -15,7 +15,11 @@ fun FreeGameScreen(
         viewModel = viewModel,
         onGameComplete = onGameComplete,
         onSelectPlayer = { viewModel.selectCurrentPlayer(it) },
-        masterActions = { ScoreCounter(viewModel) },
+        masterActions = {
+            ScoreCounter(
+                onPointsAdd = viewModel::addPoints
+            )
+        },
         modifier = modifier
     )
 }

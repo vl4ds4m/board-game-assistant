@@ -1,13 +1,14 @@
 package org.vl4ds4m.board.game.assistant.ui.game.carcassonne
 
-import android.util.Log
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.vl4ds4m.board.game.assistant.domain.game.carcassonne.CarcassonneGame
+import org.vl4ds4m.board.game.assistant.domain.game.carcassonne.CarcassonneProperty
 import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 import org.vl4ds4m.board.game.assistant.ui.game.vm.OrderedGameViewModel
 
 class CarcassonneGameViewModel(
-    game: CarcassonneGame = CarcassonneGame(),
+    private val game: CarcassonneGame = CarcassonneGame(),
     sessionId: Long? = null
 ) : OrderedGameViewModel(
     game = game,
@@ -15,12 +16,14 @@ class CarcassonneGameViewModel(
 ) {
     override val name: String = "Carcassonne '${game.name.value}'"
 
-    override fun addPoints(points: Int) {
-        if (points <= 0) {
-            Log.i(TAG, "Skip")
-        } else {
-            Log.i(TAG, "Add $points point(s)")
-        }
+    val onFinal: MutableStateFlow<Boolean> = game.onFinal
+
+    fun addPoints(property: CarcassonneProperty, count: Int) {
+        game.addPoints(property, count)
+    }
+
+    fun skip() {
+        game.nextOrder()
     }
 
     companion object : GameViewModelFactory<CarcassonneGameViewModel> {
@@ -33,5 +36,3 @@ class CarcassonneGameViewModel(
         }
     }
 }
-
-private const val TAG = "Carcassonne"

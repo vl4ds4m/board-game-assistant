@@ -15,11 +15,11 @@ class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
 
     override fun saveIn(session: GameSession) {
         super.saveIn(session)
-        val state = session.state
-            ?.let { it as? OrderedGameState }
-            ?: OrderedGameState()
-        state.order = this.order.value
-        session.state = state
+        session.state = session.state.let {
+            it as? OrderedGameState ?: OrderedGameState()
+        }.also {
+            it.order = this.order.value
+        }
     }
 
     override fun loadFrom(session: GameSession) {

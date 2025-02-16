@@ -11,7 +11,7 @@ class DiceGame(
         if (points < 0 || points % 5 != 0) {
             return
         }
-        val player = order.value?.let { players.value[it] } ?: return
+        val player = currentPlayer ?: return
         val oldScore = player.score
         if (oldScore == 1000) {
             return

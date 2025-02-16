@@ -15,19 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
-
-@Composable
-fun ScoreCounter(
-    viewModel: GameViewModel,
-    modifier: Modifier = Modifier
-
-) {
-    ScoreCounter(
-        onPointsAdd = viewModel::addPoints,
-        modifier = modifier
-    )
-}
 
 @Composable
 fun ScoreCounter(

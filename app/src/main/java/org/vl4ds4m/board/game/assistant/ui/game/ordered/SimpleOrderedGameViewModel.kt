@@ -14,7 +14,7 @@ class SimpleOrderedGameViewModel private constructor(
 ) {
     override val name: String = "${game.name.value} (ordered)"
 
-    override fun addPoints(points: Int) {
+    fun addPoints(points: Int) {
         game.addPoints(points)
     }
 

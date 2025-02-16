@@ -1,6 +1,7 @@
 package org.vl4ds4m.board.game.assistant.ui.game
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -95,7 +96,8 @@ fun GameScreenContent(
     ) {
         Text(
             text = name,
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.clickable { onGameComplete() }
         )
         Spacer(Modifier.height(24.dp))
         PlayersRating(

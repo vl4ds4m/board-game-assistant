@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.ui.Home
+import org.vl4ds4m.board.game.assistant.ui.game.end.EndGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.start.NewGamePlayersScreen
 import org.vl4ds4m.board.game.assistant.ui.game.start.NewGameStartScreen
 
@@ -35,8 +36,8 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
             }
         )
     }
-    composable<NewGamePlayers> {
-        val backStackEntry = rememberNavBackStackEntry<NewGameStart>(navController, it)
+    composable<NewGamePlayers> { entry ->
+        val backStackEntry = navController.rememberTopmost<NewGameStart>(entry)
         NewGamePlayersScreen(
             viewModel = viewModel(
                 viewModelStoreOwner = backStackEntry
@@ -52,18 +53,27 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
     composable<Game> {
         GameScreen(
             game = it.toRoute<Game>(),
-            onGameComplete = {}
+            onGameComplete = {
+                navController.navigate(End)
+            }
         )
     }
     composable<End> {
+        EndGameScreen(
+            onHomeNavigate = {
+                navController.navigate(Home) {
+                    popUpTo<Home>()
+                    launchSingleTop = true
+                }
+            }
+        )
     }
 }
 
 @Composable
-private inline fun <reified T : Any> rememberNavBackStackEntry(
-    navController: NavController,
-    currentBackStackEntry: NavBackStackEntry
-): NavBackStackEntry = remember(currentBackStackEntry) {
-    Log.d("GameNavigation", "Calculate ${T::class.simpleName} navBackStackEntry")
-    navController.getBackStackEntry<T>()
+private inline fun <reified T : Any> NavController.rememberTopmost(
+    key: NavBackStackEntry
+): NavBackStackEntry = remember(key) {
+    Log.d("GameNavigation", "Remember ${T::class.simpleName} navBackStackEntry")
+    getBackStackEntry<T>()
 }

@@ -2,6 +2,7 @@ package org.vl4ds4m.board.game.assistant.domain.game
 
 import org.vl4ds4m.board.game.assistant.domain.game.carcassonne.CarcassonneGame
 import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
+import org.vl4ds4m.board.game.assistant.domain.game.monopoly.MonopolyGame
 import org.vl4ds4m.board.game.assistant.domain.game.simple.FreeGame
 import org.vl4ds4m.board.game.assistant.domain.game.simple.SimpleOrderedGame
 

@@ -1,0 +1,11 @@
+package org.vl4ds4m.board.game.assistant.domain.game.monopoly
+
+import org.vl4ds4m.board.game.assistant.domain.game.monopoly.entity.MonopolyEntity
+import org.vl4ds4m.board.game.assistant.domain.game.monopoly.entity.MonopolyProperty
+
+class MonopolyPlayerState(
+    var position: Int = 1,
+    var entities: List<MonopolyEntity> = listOf(),
+    var propertyLevel: Map<MonopolyProperty, Int> = mapOf(),
+    var mercyCount: Int = 0
+)

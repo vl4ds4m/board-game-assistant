@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.update
 import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
 import org.vl4ds4m.board.game.assistant.domain.game.state.OrderedGameState
-import org.vl4ds4m.board.game.assistant.domain.player.Player
+import org.vl4ds4m.board.game.assistant.domain.Player
 
 class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
     private val mOrder: MutableStateFlow<Int?> = MutableStateFlow(null)

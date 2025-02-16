@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.domain.player
+package org.vl4ds4m.board.game.assistant.domain
 
 data class Player(
     val id: Long,

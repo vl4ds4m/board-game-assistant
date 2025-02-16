@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.update
 import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.domain.Initializable
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
-import org.vl4ds4m.board.game.assistant.domain.player.Player
+import org.vl4ds4m.board.game.assistant.domain.Player
 import java.util.concurrent.atomic.AtomicLong
 
 open class BaseGameEnv(private val type: GameType) : GameEnv {

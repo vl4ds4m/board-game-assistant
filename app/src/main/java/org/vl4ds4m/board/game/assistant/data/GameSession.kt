@@ -2,7 +2,7 @@ package org.vl4ds4m.board.game.assistant.data
 
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
 import org.vl4ds4m.board.game.assistant.domain.game.state.GameState
-import org.vl4ds4m.board.game.assistant.domain.player.Player
+import org.vl4ds4m.board.game.assistant.domain.Player
 
 class GameSession(
     var type: GameType? = null,

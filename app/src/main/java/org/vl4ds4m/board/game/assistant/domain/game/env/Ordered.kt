@@ -1,7 +1,7 @@
 package org.vl4ds4m.board.game.assistant.domain.game.env
 
 import kotlinx.coroutines.flow.StateFlow
-import org.vl4ds4m.board.game.assistant.domain.player.Player
+import org.vl4ds4m.board.game.assistant.domain.Player
 
 interface Ordered {
     val order: StateFlow<Int?>

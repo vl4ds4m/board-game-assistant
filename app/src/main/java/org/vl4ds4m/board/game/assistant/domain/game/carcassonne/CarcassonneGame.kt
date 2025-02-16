@@ -23,9 +23,11 @@ class CarcassonneGame(
 
     override fun loadFrom(session: GameSession) {
         gameEnv.loadFrom(session)
-        onFinal.value = session.state
-            .let { it as? CarcassonneGameState }
-            ?.onFinal ?: false
+        session.state.let {
+            it as? CarcassonneGameState
+        }?.let {
+            this.onFinal.value = it.onFinal
+        }
     }
 
     fun addPoints(property: CarcassonneProperty, count: Int) {

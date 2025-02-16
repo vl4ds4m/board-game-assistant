@@ -2,10 +2,15 @@ package org.vl4ds4m.board.game.assistant.domain.game.env
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.domain.Initializable
 import org.vl4ds4m.board.game.assistant.domain.player.Player
 
-interface GameEnv : GameState {
+interface GameEnv {
+    fun saveIn(session: GameSession)
+
+    fun loadFrom(session: GameSession)
+
     val players: StateFlow<List<Player>>
 
     val name: MutableStateFlow<String>

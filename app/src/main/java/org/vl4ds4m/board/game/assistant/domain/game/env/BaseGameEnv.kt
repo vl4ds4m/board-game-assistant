@@ -38,6 +38,7 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
             it.startTime = startTime
             it.timeout = timeout.value
             it.secondsToEnd = secondsToEnd.value
+            it.state = null
         }
     }
 

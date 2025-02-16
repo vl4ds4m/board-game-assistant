@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
+import org.vl4ds4m.board.game.assistant.domain.game.state.OrderedGameState
 import org.vl4ds4m.board.game.assistant.domain.player.Player
 
 class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
@@ -14,12 +15,18 @@ class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
 
     override fun saveIn(session: GameSession) {
         super.saveIn(session)
-        session.order = order.value
+        val state = session.state
+            ?.let { it as? OrderedGameState }
+            ?: OrderedGameState()
+        state.order = this.order.value
+        session.state = state
     }
 
     override fun loadFrom(session: GameSession) {
         super.loadFrom(session)
-        mOrder.value = session.order
+        mOrder.value = session.state
+            .let { it as? OrderedGameState }
+            ?.order
     }
 
     override fun nextOrder() {

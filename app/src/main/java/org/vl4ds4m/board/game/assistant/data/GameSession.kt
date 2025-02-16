@@ -1,6 +1,7 @@
 package org.vl4ds4m.board.game.assistant.data
 
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
+import org.vl4ds4m.board.game.assistant.domain.game.state.GameState
 import org.vl4ds4m.board.game.assistant.domain.player.Player
 
 class GameSession(
@@ -12,6 +13,6 @@ class GameSession(
     var startTime: Long? = null,
     var timeout: Boolean = false,
     var secondsToEnd: Int = 0,
-    var order: Int? = null,
+    var state: GameState? = null,
     var fake: Boolean = false
 )

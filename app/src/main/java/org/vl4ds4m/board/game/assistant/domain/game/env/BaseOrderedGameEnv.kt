@@ -8,6 +8,7 @@ import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
 import org.vl4ds4m.board.game.assistant.domain.game.state.OrderedGameState
 import org.vl4ds4m.board.game.assistant.domain.Player
+import org.vl4ds4m.board.game.assistant.util.updateList
 
 class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
     private val mOrder: MutableStateFlow<Int?> = MutableStateFlow(null)
@@ -64,7 +65,7 @@ class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
                 mOrder.update { gameOrder + 1 }
             }
         }
-        updatePlayers {
+        mPlayers.updateList {
             removeAt(index)
             add(order, player)
         }
@@ -100,7 +101,7 @@ class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
                 mOrder.update { order }
             }
         }
-        updatePlayers {
+        mPlayers.updateList {
             removeAt(index)
         }
     }
@@ -121,7 +122,7 @@ class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
             mOrder.update { order }
         }
         val frozenPlayer = player.copy(active = false)
-        updatePlayers {
+        mPlayers.updateList {
             removeAt(index)
             add(index, frozenPlayer)
         }
@@ -139,7 +140,7 @@ class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
             mOrder.update { index }
         }
         val activePlayer = player.copy(active = true)
-        updatePlayers {
+        mPlayers.updateList {
             removeAt(index)
             add(index, activePlayer)
         }

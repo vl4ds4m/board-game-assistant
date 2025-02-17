@@ -6,5 +6,7 @@ import org.vl4ds4m.board.game.assistant.domain.game.state.OrderedGameState
 class MonopolyGameState(
     order: Int? = null,
     var entityOwner: Map<MonopolyEntity, Long> = mapOf(),
-    var playerState: Map<Long, MonopolyPlayerState> = mapOf()
+    var playerState: Map<Long, MonopolyPlayerState> = mapOf(),
+    var repeatCount: Int = 0,
+    var afterStepField: MonopolyField? = null
 ) : OrderedGameState(order)

@@ -3,11 +3,11 @@ package org.vl4ds4m.board.game.assistant.domain.game.env
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.domain.Initializable
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
 import org.vl4ds4m.board.game.assistant.domain.Player
+import org.vl4ds4m.board.game.assistant.util.updateList
 import java.util.concurrent.atomic.AtomicLong
 
 open class BaseGameEnv(private val type: GameType) : GameEnv {
@@ -69,7 +69,7 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
             active = true,
             score = 0
         )
-        updatePlayers {
+        mPlayers.updateList {
             add(newPlayer)
         }
     }
@@ -83,7 +83,7 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
             return
         }
         val renamedPlayer = player.copy(name = name)
-        updatePlayers {
+        mPlayers.updateList {
             set(index, renamedPlayer)
         }
     }
@@ -97,13 +97,13 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
             return
         }
         val updated = player.copy(score = score)
-        updatePlayers {
+        mPlayers.updateList {
             set(index, updated)
         }
     }
 
     override fun removePlayer(player: Player) {
-        updatePlayers {
+        mPlayers.updateList {
             remove(player)
         }
     }
@@ -121,19 +121,10 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
             return
         }
         val updatedPlayer = player.copy(active = active)
-        updatePlayers {
+        mPlayers.updateList {
             val exists = remove(player)
             if (exists) {
                 add(updatedPlayer)
-            }
-        }
-    }
-
-    protected inline fun updatePlayers(action: MutableList<Player>.() -> Unit) {
-        mPlayers.update {
-            buildList {
-                addAll(it)
-                action()
             }
         }
     }

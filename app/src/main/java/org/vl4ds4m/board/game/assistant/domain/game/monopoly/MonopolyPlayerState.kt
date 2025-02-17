@@ -5,7 +5,8 @@ import org.vl4ds4m.board.game.assistant.domain.game.monopoly.entity.MonopolyProp
 
 class MonopolyPlayerState(
     var position: Int = 1,
-    var entities: List<MonopolyEntity> = listOf(),
+    var entities: Set<MonopolyEntity> = setOf(),
     var propertyLevel: Map<MonopolyProperty, Int> = mapOf(),
+    var inPrison: Boolean = false,
     var mercyCount: Int = 0
 )

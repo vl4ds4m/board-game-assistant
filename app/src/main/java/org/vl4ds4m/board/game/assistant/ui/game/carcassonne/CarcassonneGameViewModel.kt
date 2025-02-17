@@ -23,7 +23,7 @@ class CarcassonneGameViewModel(
     }
 
     fun skip() {
-        game.nextOrder()
+        game.selectNextPlayerId()
     }
 
     companion object : GameViewModelFactory<CarcassonneGameViewModel> {

@@ -7,12 +7,12 @@ import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.domain.Initializable
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
 import org.vl4ds4m.board.game.assistant.domain.Player
-import org.vl4ds4m.board.game.assistant.util.updateList
+import org.vl4ds4m.board.game.assistant.util.updateMap
 import java.util.concurrent.atomic.AtomicLong
 
 open class BaseGameEnv(private val type: GameType) : GameEnv {
-    protected val mPlayers: MutableStateFlow<List<Player>> = MutableStateFlow(listOf())
-    override val players: StateFlow<List<Player>> = mPlayers.asStateFlow()
+    private val mPlayers: MutableStateFlow<Map<Long, Player>> = MutableStateFlow(mapOf())
+    override val players: StateFlow<Map<Long, Player>> = mPlayers.asStateFlow()
 
     override val name: MutableStateFlow<String> = MutableStateFlow("")
 
@@ -28,6 +28,19 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
     private val mCompleted: MutableStateFlow<Boolean> = MutableStateFlow(false)
     override val completed: StateFlow<Boolean> = mCompleted.asStateFlow()
 
+    override fun loadFrom(session: GameSession) {
+        session.let { s ->
+            name.value = s.name
+            mPlayers.value = s.players
+            s.nextPlayerId?.let {
+                nextPlayerId.set(it)
+            }
+            startTime = s.startTime
+            timeout.value = s.timeout
+            mSecondsToEnd.value = s.secondsToEnd
+        }
+    }
+
     override fun saveIn(session: GameSession) {
         session.let {
             it.type = type
@@ -42,90 +55,53 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
         }
     }
 
-    override fun loadFrom(session: GameSession) {
-        session.let { s ->
-            name.value = s.name
-            mPlayers.value = s.players
-            s.nextPlayerId?.let {
-                nextPlayerId.set(it)
-            }
-            startTime = s.startTime
-            timeout.value = s.timeout
-            mSecondsToEnd.value = s.secondsToEnd
-        }
-    }
-
     override fun setSecondsToEnd(time: Int) {
         if (time >= 0) {
             mSecondsToEnd.value = time
         }
     }
 
-    override fun addPlayer(playerName: String) {
-        val playerId = nextPlayerId.incrementAndGet()
-        val newPlayer = Player(
-            id = playerId,
-            name = playerName,
+    override fun addPlayer(name: String): Long {
+        val id = nextPlayerId.incrementAndGet()
+        val player = Player(
+            name = name,
             active = true,
             score = 0
         )
-        mPlayers.updateList {
-            add(newPlayer)
+        mPlayers.updateMap { put(id, player) }
+        return id
+    }
+
+    override fun removePlayer(id: Long) {
+        mPlayers.updateMap { remove(id) }
+    }
+
+    override fun renamePlayer(id: Long, name: String) {
+        mPlayers.updateMap {
+            val player = get(id) ?: return
+            put(id, player.copy(name = name))
         }
     }
 
-    override fun renamePlayer(player: Player, name: String) {
-        if (player.name == name) {
-            return
-        }
-        val index = players.value.indexOf(player)
-        if (index == -1) {
-            return
-        }
-        val renamedPlayer = player.copy(name = name)
-        mPlayers.updateList {
-            set(index, renamedPlayer)
+    override fun freezePlayer(id: Long) {
+        updatePlayerActivity(id, false)
+    }
+
+    override fun unfreezePlayer(id: Long) {
+        updatePlayerActivity(id, true)
+    }
+
+    private fun updatePlayerActivity(id: Long, active: Boolean) {
+        mPlayers.updateMap {
+            val player = get(id) ?: return
+            put(id, player.copy(active = active))
         }
     }
 
-    override fun changePlayerScore(player: Player, score: Int) {
-        if (player.score == score || score < 0) {
-            return
-        }
-        val index = players.value.indexOf(player)
-        if (index == -1) {
-            return
-        }
-        val updated = player.copy(score = score)
-        mPlayers.updateList {
-            set(index, updated)
-        }
-    }
-
-    override fun removePlayer(player: Player) {
-        mPlayers.updateList {
-            remove(player)
-        }
-    }
-
-    override fun freezePlayer(player: Player) {
-        updatePlayerActivity(player, false)
-    }
-
-    override fun unfreezePlayer(player: Player) {
-        updatePlayerActivity(player, true)
-    }
-
-    private fun updatePlayerActivity(player: Player, active: Boolean) {
-        if (player.active == active) {
-            return
-        }
-        val updatedPlayer = player.copy(active = active)
-        mPlayers.updateList {
-            val exists = remove(player)
-            if (exists) {
-                add(updatedPlayer)
-            }
+    override fun changePlayerScore(id: Long, score: Int) {
+        mPlayers.updateMap {
+            val player = get(id) ?: return
+            put(id, player.copy(score = score))
         }
     }
 

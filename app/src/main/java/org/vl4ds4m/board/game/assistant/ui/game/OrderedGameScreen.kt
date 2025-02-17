@@ -1,6 +1,7 @@
 package org.vl4ds4m.board.game.assistant.ui.game
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -85,6 +86,7 @@ fun OrderedGameScreen(
     GameScreen(
         viewModel = viewModel,
         onGameComplete = onGameComplete,
+        currentPlayerId = viewModel.currentPlayerId.collectAsState(),
         onSelectPlayer = null,
         masterActions = masterActions,
         modifier = modifier

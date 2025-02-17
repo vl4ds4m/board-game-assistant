@@ -3,10 +3,7 @@ package org.vl4ds4m.board.game.assistant.domain.game
 import org.vl4ds4m.board.game.assistant.domain.game.env.BaseOrderedGameEnv
 import org.vl4ds4m.board.game.assistant.domain.game.env.OrderedGameEnv
 
-class DiceGame(
-    private val gameEnv: OrderedGameEnv = BaseOrderedGameEnv(Dice)
-) : OrderedGameEnv by gameEnv
-{
+class DiceGame(gameEnv: OrderedGameEnv = BaseOrderedGameEnv(Dice)) : OrderedGameEnv by gameEnv {
     fun addPoints(points: Int) {
         if (points < 0 || points % 5 != 0) {
             return
@@ -20,8 +17,9 @@ class DiceGame(
             if (it > 1000) { oldScore - 100 }
             else { it }
         }
-        changePlayerScore(player, newScore)
-        nextOrder()
+        val id = currentPlayerId.value ?: return
+        changePlayerScore(id, newScore)
+        selectNextPlayerId()
     }
 }
 

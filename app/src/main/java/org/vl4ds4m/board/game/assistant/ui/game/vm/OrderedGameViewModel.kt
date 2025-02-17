@@ -1,10 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui.game.vm
 
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.StateFlow
 import org.vl4ds4m.board.game.assistant.domain.game.env.OrderedGameEnv
 
 abstract class OrderedGameViewModel(
@@ -14,13 +10,5 @@ abstract class OrderedGameViewModel(
     game = game,
     sessionId = sessionId
 ) {
-    init {
-        game.players.combine(game.order) { players, order -> players to order }
-            .onEach { (players, order) ->
-                mCurrentPlayerId.update {
-                    order?.let { players[it].id }
-                }
-            }
-            .launchIn(viewModelScope)
-    }
+    val currentPlayerId: StateFlow<Long?> = game.currentPlayerId
 }

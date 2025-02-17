@@ -6,18 +6,6 @@ import kotlinx.coroutines.flow.update
 val Enum<*>.title: String get() = this.name
     .replaceFirstChar { it.uppercaseChar() }
 
-inline fun <reified T> MutableStateFlow<List<T>>.updateList(
-    action: MutableList<T>.() -> Unit
-) {
-    this.update { oldList ->
-        val newList = buildList {
-            addAll(oldList)
-            action()
-        }
-        return@update newList
-    }
-}
-
 inline fun <reified K, V> MutableStateFlow<Map<K, V>>.updateMap(
     action: MutableMap<K, V>.() -> Unit
 ) {
@@ -27,5 +15,17 @@ inline fun <reified K, V> MutableStateFlow<Map<K, V>>.updateMap(
             action()
         }
         return@update newMap
+    }
+}
+
+inline fun <reified T> MutableStateFlow<List<T>>.updateList(
+    action: MutableList<T>.() -> Unit
+) {
+    this.update { oldList ->
+        val newList = buildList {
+            addAll(oldList)
+            action()
+        }
+        return@update newList
     }
 }

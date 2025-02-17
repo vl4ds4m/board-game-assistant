@@ -4,12 +4,10 @@ import org.vl4ds4m.board.game.assistant.domain.game.Free
 import org.vl4ds4m.board.game.assistant.domain.game.env.BaseGameEnv
 import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
 
-class FreeGame(
-    private val gameEnv: GameEnv = BaseGameEnv(Free)
-) : GameEnv by SimpleGame(gameEnv)
-{
+class FreeGame(gameEnv: GameEnv = BaseGameEnv(Free)) : GameEnv by gameEnv {
+    private val scoreAdder = SimpleScoreAdder(gameEnv)
+
     fun addPoints(playerId: Long, points: Int) {
-        players.value.find { it.id == playerId }
-            ?.let { changePlayerScore(it, points) }
+        scoreAdder.addPoints(playerId, points)
     }
 }

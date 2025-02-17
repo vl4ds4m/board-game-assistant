@@ -8,7 +8,7 @@ class GameSession(
     var type: GameType? = null,
     var completed: Boolean = false,
     var name: String = "",
-    var players: List<Player> = listOf(),
+    var players: Map<Long, Player> = mapOf(),
     var nextPlayerId: Long? = null,
     var startTime: Long? = null,
     var timeout: Boolean = false,

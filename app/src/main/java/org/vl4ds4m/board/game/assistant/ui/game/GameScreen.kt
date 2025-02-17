@@ -66,14 +66,15 @@ fun GameScreen(
 fun GameScreen(
     viewModel: GameViewModel,
     onGameComplete: () -> Unit,
-    onSelectPlayer: ((Player) -> Unit)?,
+    currentPlayerId: State<Long?>,
+    onSelectPlayer: ((Long) -> Unit)?,
     masterActions: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
     GameScreenContent(
         name = viewModel.name,
         players = viewModel.players.collectAsState(),
-        currentPlayerId = viewModel.currentPlayerId.collectAsState(),
+        currentPlayerId = currentPlayerId,
         onSelectPlayer = onSelectPlayer,
         masterActions = masterActions,
         onGameComplete = onGameComplete,
@@ -84,9 +85,9 @@ fun GameScreen(
 @Composable
 fun GameScreenContent(
     name: String,
-    players: State<List<Player>>,
+    players: State<Map<Long, Player>>,
     currentPlayerId: State<Long?>,
-    onSelectPlayer: ((Player) -> Unit)?,
+    onSelectPlayer: ((Long) -> Unit)?,
     masterActions: @Composable () -> Unit,
     onGameComplete: () -> Unit,
     modifier: Modifier = Modifier
@@ -158,10 +159,9 @@ internal val fakePlayers = sequence {
     yield("Bar" to 4)
     repeat(10) { yield("Copy" to 111) }
 }.mapIndexed { i, (name, score) ->
-    Player(
-        id = i.toLong() + 1,
+    (i + 1L) to Player(
         name = name,
         active = true,
         score = score
     )
-}.toList()
+}.toMap()

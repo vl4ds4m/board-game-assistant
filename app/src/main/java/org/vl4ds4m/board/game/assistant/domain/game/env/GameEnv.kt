@@ -7,11 +7,11 @@ import org.vl4ds4m.board.game.assistant.domain.Initializable
 import org.vl4ds4m.board.game.assistant.domain.Player
 
 interface GameEnv {
-    fun saveIn(session: GameSession)
-
     fun loadFrom(session: GameSession)
 
-    val players: StateFlow<List<Player>>
+    fun saveIn(session: GameSession)
+
+    val players: StateFlow<Map<Long, Player>>
 
     val name: MutableStateFlow<String>
 
@@ -23,17 +23,17 @@ interface GameEnv {
 
     val completed: StateFlow<Boolean>
 
-    fun addPlayer(playerName: String)
+    fun addPlayer(name: String): Long
 
-    fun renamePlayer(player: Player, name: String)
+    fun removePlayer(id: Long)
 
-    fun changePlayerScore(player: Player, score: Int)
+    fun renamePlayer(id: Long, name: String)
 
-    fun removePlayer(player: Player)
+    fun freezePlayer(id: Long)
 
-    fun freezePlayer(player: Player)
+    fun unfreezePlayer(id: Long)
 
-    fun unfreezePlayer(player: Player)
+    fun changePlayerScore(id: Long, score: Int)
 
     val initializables: Array<Initializable>
 

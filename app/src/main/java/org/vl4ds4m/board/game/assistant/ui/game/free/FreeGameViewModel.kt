@@ -2,7 +2,6 @@ package org.vl4ds4m.board.game.assistant.ui.game.free
 
 import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.domain.game.simple.FreeGame
-import org.vl4ds4m.board.game.assistant.domain.Player
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 
@@ -15,14 +14,8 @@ class FreeGameViewModel private constructor(
 ) {
     override val name: String = "${game.name.value} (free)"
 
-    fun addPoints(points: Int) {
-        mCurrentPlayerId.value?.let {
-            game.addPoints(it, points)
-        }
-    }
-
-    fun selectCurrentPlayer(player: Player) {
-        mCurrentPlayerId.value = player.id
+    fun addPoints(playerId: Long?, points: Int) {
+        playerId?.let { game.addPoints(it, points) }
     }
 
     companion object : GameViewModelFactory<FreeGameViewModel> {

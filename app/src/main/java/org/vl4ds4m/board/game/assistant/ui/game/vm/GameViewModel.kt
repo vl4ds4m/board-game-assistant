@@ -3,16 +3,11 @@ package org.vl4ds4m.board.game.assistant.ui.game.vm
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
 import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.data.Store
-import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.domain.Player
+import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
 
 abstract class GameViewModel(
     private val game: GameEnv,
@@ -22,26 +17,17 @@ abstract class GameViewModel(
 ) {
     open val name: String = game.name.value
 
-    private val mPlayers: MutableStateFlow<List<Player>> = MutableStateFlow(listOf())
-    val players: StateFlow<List<Player>> = mPlayers.asStateFlow()
+    val players: StateFlow<Map<Long, Player>> = game.players
 
     init {
         Log.d(TAG, "Initiate ${this::class.simpleName}")
         sessionId?.let { id ->
             Store.load(id)?.let { game.loadFrom(it) }
         }
-        game.players.onEach { list ->
-            mPlayers.update {
-                list.sortedByDescending { it.score }
-            }
-        }.launchIn(viewModelScope)
         game.initializables.forEach {
             it.init(viewModelScope)
         }
     }
-
-    protected val mCurrentPlayerId: MutableStateFlow<Long?> = MutableStateFlow(null)
-    val currentPlayerId: StateFlow<Long?> = mCurrentPlayerId.asStateFlow()
 
     override fun onCleared() {
         Log.d(TAG, "Clear ${this::class.simpleName}")

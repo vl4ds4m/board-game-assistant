@@ -11,152 +11,118 @@ import org.vl4ds4m.board.game.assistant.domain.Player
 import org.vl4ds4m.board.game.assistant.util.updateList
 
 class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
-    private val mOrder: MutableStateFlow<Int?> = MutableStateFlow(null)
-    override val order: StateFlow<Int?> = mOrder.asStateFlow()
+    private val mOrderedPlayerIds: MutableStateFlow<List<Long>> = MutableStateFlow(listOf())
+    override val orderedPlayerIds: StateFlow<List<Long>> = mOrderedPlayerIds.asStateFlow()
+
+    private val mCurrentPlayerId: MutableStateFlow<Long?> = MutableStateFlow(null)
+    override val currentPlayerId: StateFlow<Long?> = mCurrentPlayerId.asStateFlow()
+
+    override fun loadFrom(session: GameSession) {
+        super.loadFrom(session)
+        mCurrentPlayerId.value = session.state
+            .let { it as? OrderedGameState }
+            ?.currentPlayerId
+    }
 
     override fun saveIn(session: GameSession) {
         super.saveIn(session)
         session.state = session.state.let {
             it as? OrderedGameState ?: OrderedGameState()
         }.also {
-            it.order = this.order.value
+            it.currentPlayerId = this.currentPlayerId.value
         }
     }
 
-    override fun loadFrom(session: GameSession) {
-        super.loadFrom(session)
-        mOrder.value = session.state
-            .let { it as? OrderedGameState }
-            ?.order
-    }
-
-    override fun nextOrder() {
-        mOrder.update {
-            it?.let { nextActive(players.value, it) }
-        }
-    }
-
-    override fun changeOrderByPlayer(player: Player) {
-        if (!player.active) {
-            return
-        }
-        val index = players.value.indexOf(player)
-        if (index == -1) {
-            return
-        }
-        mOrder.update { index }
-    }
-
-    override fun changePlayerOrder(player: Player, order: Int) {
-        if (order !in players.value.indices) {
-            return
-        }
-        val index = players.value.indexOf(player)
-        if (index == -1 || index == order) {
-            return
-        }
-        val gameOrder = this.order.value
-        if (gameOrder != null) {
-            if (index == gameOrder) {
-                mOrder.update { order }
-            } else if (index < gameOrder && order >= gameOrder) {
-                mOrder.update { gameOrder - 1 }
-            } else if (index > gameOrder && order <= gameOrder) {
-                mOrder.update { gameOrder + 1 }
+    override fun selectNextPlayerId() {
+        mCurrentPlayerId.update { currentId ->
+            currentId?.let {
+                nextActive(
+                    ids = this.orderedPlayerIds.value,
+                    players = this.players.value,
+                    currentId = it
+                )
             }
         }
-        mPlayers.updateList {
+    }
+
+    private fun nextActive(ids: List<Long>, players: Map<Long, Player>, currentId: Long): Long? {
+        val startIndex = ids.indexOf(currentId)
+        if (startIndex == -1) return null
+        var index = startIndex
+        while (true) {
+            index = (index + 1) % ids.size
+            val id = ids[index]
+            if (players[id]?.active == true) break
+            if (index == startIndex) return null
+        }
+        return ids[index]
+    }
+
+    override fun changeCurrentPlayerId(id: Long) {
+        val player = players.value[id] ?: return
+        if (!player.active) return
+        mCurrentPlayerId.value = id
+    }
+
+    override fun changePlayerOrder(id: Long, order: Int) {
+        mOrderedPlayerIds.updateList {
+            if (order !in indices) return
+            val index = indexOf(id)
+            if (index == -1 || index == order) return
             removeAt(index)
-            add(order, player)
+            add(order, id)
         }
     }
 
-    override fun addPlayer(playerName: String) {
-        val hasActive = this.hasActive
-        super.addPlayer(playerName)
-        if (!hasActive) {
-            mOrder.update { players.value.lastIndex }
-        }
+    override fun addPlayer(name: String): Long {
+        val id = super.addPlayer(name)
+        mOrderedPlayerIds.updateList { add(id) }
+        mCurrentPlayerId.update { it ?: id }
+        return id
     }
 
-    private val hasActive: Boolean
-        get() = players.value.any { it.active }
-
-    override fun removePlayer(player: Player) {
-        val index = players.value.indexOf(player)
-        if (index == -1) {
-            return
-        }
-        val gameOrder = this.order.value
-        if (gameOrder != null) {
-            if (index < gameOrder) {
-                mOrder.update { gameOrder - 1 }
-            } else if (index == gameOrder) {
-                val order = nextActive(players.value, gameOrder)
-                    .takeUnless { it == gameOrder }
-                    ?.let {
-                        if (it < gameOrder) { it }
-                        else { it - 1 }
+    override fun removePlayer(id: Long) {
+        val gameEnv = this
+        mOrderedPlayerIds.updateList {
+            val ids = this
+            val removed = remove(id)
+            if (removed) {
+                mCurrentPlayerId.update { currentId ->
+                    if (id == currentId) {
+                        nextActive(
+                            ids = ids,
+                            players = gameEnv.players.value,
+                            currentId = currentId
+                        )?.takeUnless { it == id }
+                    } else {
+                        currentId
                     }
-                mOrder.update { order }
+                }
             }
         }
-        mPlayers.updateList {
-            removeAt(index)
+        super.removePlayer(id)
+    }
+
+    override fun freezePlayer(id: Long) {
+        super.freezePlayer(id)
+        mCurrentPlayerId.update { currentId ->
+            if (id == currentId) {
+                nextActive(
+                    ids = this.orderedPlayerIds.value,
+                    players = this.players.value,
+                    currentId = currentId
+                )?.takeUnless { it == id }
+            } else {
+                currentId
+            }
         }
     }
 
-    override fun freezePlayer(player: Player) {
-        if (!player.active) {
-            return
-        }
-        val index = players.value.indexOf(player)
-        if (index == -1) {
-            return
-        }
-        val gameOrder = this.order.value
-            ?: throw IllegalStateException("existed player is active => order must not be null")
-        if (index == gameOrder) {
-            val order = nextActive(players.value, gameOrder)
-                .takeUnless { it == gameOrder }
-            mOrder.update { order }
-        }
-        val frozenPlayer = player.copy(active = false)
-        mPlayers.updateList {
-            removeAt(index)
-            add(index, frozenPlayer)
+    override fun unfreezePlayer(id: Long) {
+        super.unfreezePlayer(id)
+        mCurrentPlayerId.update {
+            if (it == null && id in orderedPlayerIds.value) id
+            else it
         }
     }
-
-    override fun unfreezePlayer(player: Player) {
-        if (player.active) {
-            return
-        }
-        val index = players.value.indexOf(player)
-        if (index == -1) {
-            return
-        }
-        if (this.order.value == null) {
-            mOrder.update { index }
-        }
-        val activePlayer = player.copy(active = true)
-        mPlayers.updateList {
-            removeAt(index)
-            add(index, activePlayer)
-        }
-    }
-}
-
-internal fun nextActive(players: List<Player>, current: Int): Int? {
-    if (current !in players.indices) {
-        return null
-    }
-    var index = (current + 1) % players.size
-    while (!players[index].active) {
-        if (index == current) {
-            return null
-        }
-        index = (index + 1) % players.size
-    }
-    return index
 }

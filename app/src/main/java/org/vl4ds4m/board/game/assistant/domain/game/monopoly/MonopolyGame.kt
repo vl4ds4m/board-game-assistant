@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.vl4ds4m.board.game.assistant.data.GameSession
-import org.vl4ds4m.board.game.assistant.domain.Player
 import org.vl4ds4m.board.game.assistant.domain.game.Monopoly
 import org.vl4ds4m.board.game.assistant.domain.game.env.BaseOrderedGameEnv
 import org.vl4ds4m.board.game.assistant.domain.game.env.OrderedGameEnv
@@ -62,8 +61,7 @@ class MonopolyGame(
         sequenceOf(step1, step2).forEach {
             if (it !in 1..6) return
         }
-        val player = currentPlayer ?: return
-        val id = player.id
+        val id = currentPlayerId.value ?: return
         val state = playerState.value[id] ?: return
         val equalSteps = step1 == step2
         if (state.inPrison) {
@@ -79,10 +77,13 @@ class MonopolyGame(
         val step = step1 + step2
         val pos = (state.position + step).let {
             if (it > MonopolyField.COUNT) {
+                val player = currentPlayer ?: return
                 val score = player.score + Ahead.MONEY
-                changePlayerScore(player, score)
+                changePlayerScore(id, score)
                 it % MonopolyField.COUNT
-            } else it
+            } else {
+                it
+            }
         }
         state.position = pos
         val field = MonopolyFields[pos]!!
@@ -95,52 +96,54 @@ class MonopolyGame(
     private fun moveToPrison(state: MonopolyPlayerState) {
         state.position = GoToPrison.POSITION
         state.inPrison = true
-        nextOrder()
+        selectNextPlayerId()
     }
 
-    override fun nextOrder() {
+    override fun selectNextPlayerId() {
         repeatCount = 0
         mAfterStepField.value = null
-        gameEnv.nextOrder()
+        gameEnv.selectNextPlayerId()
     }
 
     fun buyCurrentEntity() {
         val entity = afterStepField.value as? MonopolyEntity ?: return
-        val player = currentPlayer ?: return
-        buyEntity(player, entity, entity.cost)
+        val id = currentPlayerId.value ?: return
+        buyEntity(id, entity, entity.cost)
     }
 
-    fun buyEntity(player: Player, entity: MonopolyEntity, cost: Int) {
+    fun buyEntity(playerId: Long, entity: MonopolyEntity, cost: Int) {
         if (cost <= 0) return
         if (entity in entityOwner.value) return
-        if (player !in players.value) return
-        val state = playerState.value[player.id] ?: return
-        if (player.score >= cost) {
-            changePlayerScore(player, player.score - cost)
+        if (playerId !in players.value) return
+        val state = playerState.value[playerId] ?: return
+        val score = players.value[playerId]?.score ?: return
+        if (score >= cost) {
+            changePlayerScore(playerId, score - cost)
             state.entities += entity
             mEntityOwner.updateMap {
-                put(entity, player.id)
+                put(entity, playerId)
             }
         }
     }
 
     fun payRent(factor: Int? = null) {
-        val payer = currentPlayer ?: return
+        val payerId = currentPlayerId.value ?: return
         val entity = afterStepField.value as? MonopolyEntity ?: return
         if (entity is Supplier) {
             factor ?: return
             if (factor !in 2..12) return
         }
         val ownerId = entityOwner.value[entity] ?: return
-        if (ownerId == payer.id) return
-        val payee = players.value.find { it.id == ownerId } ?: return
+        if (ownerId == payerId) return
+        val payee = players.value[ownerId] ?: return
         val cost = when (entity) {
             is Supplier -> entity.rent * factor!!
             else -> entity.rent
         }
+        val payer = players.value[payerId] ?: return
         if (payer.score >= cost) {
-            changePlayerScore(payer, payer.score - cost)
-            changePlayerScore(payee, payee.score + cost)
+            changePlayerScore(payerId, payer.score - cost)
+            changePlayerScore(ownerId, payee.score + cost)
         }
     }
 

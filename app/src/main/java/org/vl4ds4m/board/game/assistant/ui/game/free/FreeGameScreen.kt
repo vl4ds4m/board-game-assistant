@@ -1,6 +1,8 @@
 package org.vl4ds4m.board.game.assistant.ui.game.free
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreCounter
@@ -11,13 +13,18 @@ fun FreeGameScreen(
     onGameComplete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val currentPlayerId = rememberSaveable { mutableStateOf<Long?>(null) }
     GameScreen(
         viewModel = viewModel,
         onGameComplete = onGameComplete,
-        onSelectPlayer = { viewModel.selectCurrentPlayer(it) },
+        currentPlayerId = currentPlayerId,
+        onSelectPlayer = { currentPlayerId.value = it },
         masterActions = {
             ScoreCounter(
-                onPointsAdd = viewModel::addPoints
+                onPointsAdd = {
+                    val id = currentPlayerId.value
+                    viewModel.addPoints(id, it)
+                }
             )
         },
         modifier = modifier

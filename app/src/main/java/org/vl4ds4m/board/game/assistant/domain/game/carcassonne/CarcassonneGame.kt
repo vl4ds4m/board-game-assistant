@@ -42,8 +42,9 @@ class CarcassonneGame(
         if (points > 0) {
             val player = currentPlayer ?: return
             val score = player.score + points
-            gameEnv.changePlayerScore(player, score)
-            gameEnv.nextOrder()
+            val id = currentPlayerId.value ?: return
+            gameEnv.changePlayerScore(id, score)
+            gameEnv.selectNextPlayerId()
         }
     }
 }

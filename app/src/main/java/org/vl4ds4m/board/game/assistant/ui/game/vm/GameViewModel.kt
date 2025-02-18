@@ -42,6 +42,24 @@ abstract class GameViewModel(
         game.changeSecondsToEnd(seconds)
     }
 
+    val completed: StateFlow<Boolean> = game.completed
+
+    fun start() {
+        game.start()
+    }
+
+    fun stop() {
+        game.stop()
+    }
+
+    fun complete() {
+        game.complete()
+    }
+
+    fun returnGame() {
+        game.returnGame()
+    }
+
     override fun onCleared() {
         Log.d(TAG, "Clear ${this::class.simpleName}")
         super.onCleared()

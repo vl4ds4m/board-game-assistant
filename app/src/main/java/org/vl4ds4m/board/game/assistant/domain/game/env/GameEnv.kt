@@ -39,6 +39,8 @@ interface GameEnv {
 
     fun complete()
 
+    fun returnGame()
+
     fun loadFrom(session: GameSession)
 
     fun saveIn(session: GameSession)

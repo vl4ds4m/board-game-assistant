@@ -11,10 +11,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
+import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun EndGameScreen(
+    viewModel: GameViewModel,
+    onBackClick: () -> Unit,
+    onHomeNavigate: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    GameScreen(
+        topBarTitle = "Game end",
+        onBackClick = {
+            viewModel.returnGame()
+            onBackClick()
+        },
+        modifier = modifier
+    ) { innerModifier ->
+        EndGameScreenContent(
+            onHomeNavigate = onHomeNavigate,
+            modifier = innerModifier
+        )
+    }
+}
+
+@Composable
+fun EndGameScreenContent(
     onHomeNavigate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -44,7 +68,7 @@ fun EndGameScreen(
 @Composable
 private fun EndGameScreenPreview() {
     BoardGameAssistantTheme {
-        EndGameScreen(
+        EndGameScreenContent(
             onHomeNavigate = {},
             modifier = Modifier.fillMaxSize()
         )

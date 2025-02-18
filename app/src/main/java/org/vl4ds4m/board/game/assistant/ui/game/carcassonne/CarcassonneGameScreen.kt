@@ -31,8 +31,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.domain.game.carcassonne.CarcassonneProperty
-import org.vl4ds4m.board.game.assistant.ui.game.GameModifier
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreenPreview
+import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenuActions
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameScreen
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 import org.vl4ds4m.board.game.assistant.util.title
@@ -40,7 +40,7 @@ import org.vl4ds4m.board.game.assistant.util.title
 @Composable
 fun CarcassonneGameScreen(
     viewModel: CarcassonneGameViewModel,
-    gameModifier: GameModifier,
+    menuActions: GameMenuActions,
     modifier: Modifier = Modifier,
 ) {
     OrderedGameScreen(
@@ -54,7 +54,7 @@ fun CarcassonneGameScreen(
                 onFinalChange = { viewModel.onFinal.value = it }
             )
         },
-        gameModifier = gameModifier,
+        menuActions = menuActions,
         modifier = modifier
     )
 }

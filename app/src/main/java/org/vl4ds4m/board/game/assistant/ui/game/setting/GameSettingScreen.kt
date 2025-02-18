@@ -21,30 +21,37 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.map
+import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun GameSettingScreen(
     viewModel: GameViewModel,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    GameSettingScreenContent(
-        name = viewModel.name.collectAsState(""),
-        onNameChange = { viewModel.name.value = it },
-        timeout = viewModel.timeout.collectAsState(),
-        onTimeoutChange = viewModel::changeTimeout,
-        secondsToEnd = viewModel.secondsToEnd.map {
-            if (it <= 0) ""
-            else it.toString()
-        }.collectAsState(""),
-        onSecondsToEndChange = { text ->
-            val seconds = text.toIntOrNull()
-                ?.takeIf { it > 0 } ?: 0
-            viewModel.changeSecondsToEnd(seconds)
-        },
+    GameScreen(
+        topBarTitle = "Game settings",
+        onBackClick = onBackClick,
         modifier = modifier
-    )
+    ) { innerModifier ->
+        GameSettingScreenContent(
+            name = viewModel.name.collectAsState(""),
+            onNameChange = { viewModel.name.value = it },
+            timeout = viewModel.timeout.collectAsState(),
+            onTimeoutChange = viewModel::changeTimeout,
+            secondsToEnd = viewModel.secondsToEnd.map {
+                if (it <= 0) ""
+                else it.toString()
+            }.collectAsState(""),
+            onSecondsToEndChange = { text ->
+                val seconds = text.toIntOrNull() ?: 0
+                viewModel.changeSecondsToEnd(seconds)
+            },
+            modifier = innerModifier
+        )
+    }
 }
 
 @Composable

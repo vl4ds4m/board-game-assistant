@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -18,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavBackStackEntry
 import org.vl4ds4m.board.game.assistant.domain.Player
 import org.vl4ds4m.board.game.assistant.domain.game.Free
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
@@ -35,12 +35,11 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun GameScreen(
-    entry: NavBackStackEntry,
-    topBarTitle: State<String>,
+    topBarTitle: String,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     menuActions: GameMenuActions? = null,
-    content: @Composable (NavBackStackEntry, Modifier) -> Unit
+    content: @Composable (Modifier) -> Unit
 ) {
     Scaffold(
         modifier = modifier,
@@ -55,14 +54,14 @@ fun GameScreen(
         val m = Modifier
             .padding(innerPadding)
             .fillMaxSize()
-        content(entry, m)
+        content(m)
     }
 }
 
 @Composable
 fun GameScreen(
     game: Game,
-    gameModifier: GameModifier,
+    menuActions: GameMenuActions,
     modifier: Modifier = Modifier
 ) {
     val type = GameType.valueOf(game.type)
@@ -77,7 +76,7 @@ fun GameScreen(
         is Free -> {
             FreeGameScreen(
                 viewModel = viewModel as FreeGameViewModel,
-                gameModifier = gameModifier,
+                menuActions = menuActions,
                 modifier = modifier
             )
         }
@@ -86,7 +85,7 @@ fun GameScreen(
             OrderedGameScreen(
                 type = type,
                 viewModel = viewModel,
-                gameModifier = gameModifier,
+                menuActions = menuActions,
                 modifier = modifier
             )
         }
@@ -100,21 +99,37 @@ fun GameScreen(
     currentPlayerId: State<Long?>,
     onSelectPlayer: ((Long) -> Unit)?,
     masterActions: @Composable () -> Unit,
-    gameModifier: GameModifier,
+    menuActions: GameMenuActions,
     modifier: Modifier = Modifier
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.name.collect {
-            gameModifier.topBarTitle.value = onNameFormat(it)
+    DisposableEffect(Unit) {
+        viewModel.start()
+        onDispose {
+            viewModel.stop()
         }
     }
-    GameScreenContent(
-        players = viewModel.players.collectAsState(),
-        currentPlayerId = currentPlayerId,
-        onSelectPlayer = onSelectPlayer,
-        masterActions = masterActions,
-        modifier = modifier
-    )
+    LaunchedEffect(Unit) {
+        viewModel.completed.collect { completed ->
+            if (completed) menuActions.onGameComplete()
+        }
+    }
+    val name = viewModel.name.collectAsState()
+    GameScreen(
+        topBarTitle = onNameFormat(name.value),
+        onBackClick = menuActions.onBackClick,
+        modifier = modifier,
+        menuActions = menuActions.copy(
+            onGameComplete = viewModel::complete
+        )
+    ) { innerModifier ->
+        GameScreenContent(
+            players = viewModel.players.collectAsState(),
+            currentPlayerId = currentPlayerId,
+            onSelectPlayer = onSelectPlayer,
+            masterActions = masterActions,
+            modifier = innerModifier
+        )
+    }
 }
 
 @Composable

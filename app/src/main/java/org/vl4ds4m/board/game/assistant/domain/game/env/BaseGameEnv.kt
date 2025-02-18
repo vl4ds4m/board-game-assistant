@@ -73,7 +73,7 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
     override val completed: StateFlow<Boolean> = mCompleted.asStateFlow()
 
     override fun changeSecondsToEnd(seconds: Int) {
-        if (seconds >= 0) {
+        if (seconds > 0) {
             mSecondsToEnd.value = seconds
         }
     }
@@ -99,8 +99,14 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
         mCompleted.value = true
     }
 
+    override fun returnGame() {
+        timeout.value = false
+        mCompleted.value = false
+    }
+
     override fun loadFrom(session: GameSession) {
         session.let { s ->
+            mCompleted.value = s.completed
             name.value = s.name
             mPlayers.value = s.players
             s.nextPlayerId?.let {

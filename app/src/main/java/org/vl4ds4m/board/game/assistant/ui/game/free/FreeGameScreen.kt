@@ -5,15 +5,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import org.vl4ds4m.board.game.assistant.ui.game.GameModifier
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreenPreview
+import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenuActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreCounter
 
 @Composable
 fun FreeGameScreen(
     viewModel: FreeGameViewModel,
-    gameModifier: GameModifier,
+    menuActions: GameMenuActions,
     modifier: Modifier = Modifier,
 ) {
     val currentPlayerId = rememberSaveable { mutableStateOf<Long?>(null) }
@@ -30,7 +30,7 @@ fun FreeGameScreen(
                 }
             )
         },
-        gameModifier = gameModifier,
+        menuActions = menuActions,
         modifier = modifier
     )
 }

@@ -28,7 +28,7 @@ class Timer : Initializable {
         secondsToEnd: MutableStateFlow<Int>,
         completed: MutableStateFlow<Boolean>
     ) {
-        job?.cancel()
+        stop()
         job = scope?.launch {
             var timeout = false
             while (!timeout) {

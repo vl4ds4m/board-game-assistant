@@ -23,26 +23,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
+import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayerCard
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun NewGamePlayersScreen(
     viewModel: GameSetupViewModel,
+    onBackClick: () -> Unit,
     onStartGame: (GameType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    NewGamePlayersScreenContent(
-        players = viewModel.players,
-        onAddPlayer = viewModel::addPlayer,
-        onRenamePlayer = viewModel::renamePlayer,
-        onRemovePlayer = viewModel::removePlayerAt,
-        onStartGame = {
-            viewModel.createGame()
-            onStartGame(viewModel.type.value!!)
-        },
+    GameScreen(
+        topBarTitle = "New game",
+        onBackClick = onBackClick,
         modifier = modifier
-    )
+    ) { innerModifier ->
+        NewGamePlayersScreenContent(
+            players = viewModel.players,
+            onAddPlayer = viewModel::addPlayer,
+            onRenamePlayer = viewModel::renamePlayer,
+            onRemovePlayer = viewModel::removePlayerAt,
+            onStartGame = {
+                viewModel.createGame()
+                onStartGame(viewModel.type.value!!)
+            },
+            modifier = innerModifier
+        )
+    }
 }
 
 @Composable

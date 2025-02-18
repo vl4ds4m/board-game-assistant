@@ -2,10 +2,7 @@ package org.vl4ds4m.board.game.assistant.ui.game
 
 import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -41,94 +38,57 @@ data object PlayerSetting : GameRoute*/
 data object End : GameRoute
 
 fun NavGraphBuilder.gameNavigation(navController: NavController) {
-    gameComposable<NewGameStart>(
-        navController = navController,
-        topBarTitle = mutableStateOf("New game")
-    ) { _, modifier ->
+    val onBackClick: () -> Unit = { navController.navigateUp() }
+    composable<NewGameStart> {
         NewGameStartScreen(
             viewModel = viewModel(),
+            onBackClick = onBackClick,
             onSetupPlayers = {
                 navController.navigate(NewGamePlayers)
-            },
-            modifier = modifier
+            }
         )
     }
-    gameComposable<NewGamePlayers>(
-        navController = navController,
-        topBarTitle = mutableStateOf("New game")
-    ) { entry, modifier ->
-        val backStackEntry = navController.rememberTopmost<NewGameStart>(entry)
+    composable<NewGamePlayers> { entry ->
+        val gameStartEntry = navController.rememberTopmost<NewGameStart>(entry)
         NewGamePlayersScreen(
-            viewModel = viewModel(
-                viewModelStoreOwner = backStackEntry
-            ),
+            viewModel = viewModel(gameStartEntry),
+            onBackClick = onBackClick,
             onStartGame = { type ->
                 val game = Game(type.title)
                 navController.navigate(game) {
                     popUpTo<Home>()
                 }
-            },
-            modifier = modifier
+            }
         )
     }
-    val gameModifier = GameModifier(
-        topBarTitle = mutableStateOf(""),
-    )
-    gameComposable<Game>(
-        navController = navController,
-        topBarTitle = gameModifier.topBarTitle,
-        gameMenuActions = GameMenuActions(
-            onGameSettingOpen = { navController.navigate(GameSetting) },
-            onGameComplete = { navController.navigate(End) }
-        )
-    ) { entry, modifier ->
+    composable<Game> { entry ->
         GameScreen(
             game = entry.toRoute<Game>(),
-            gameModifier = gameModifier,
-            modifier = modifier
+            menuActions = GameMenuActions(
+                onBackClick = onBackClick,
+                onGameSettingOpen = { navController.navigate(GameSetting) },
+                onGameComplete = { navController.navigate(End) },
+            )
         )
     }
-    gameComposable<GameSetting>(
-        navController = navController,
-        topBarTitle = mutableStateOf("Game settings")
-    ) { entry, modifier ->
-        val backStackEntry = navController.rememberTopmost<Game>(entry)
+    composable<GameSetting> { entry ->
+        val gameEntry = navController.rememberTopmost<Game>(entry)
         GameSettingScreen(
-            viewModel = viewModel(
-                viewModelStoreOwner = backStackEntry
-            ),
-            modifier = modifier
+            viewModel = viewModel(gameEntry),
+            onBackClick = onBackClick
         )
     }
-    gameComposable<End>(
-        navController = navController,
-        topBarTitle = mutableStateOf("Game end")
-    ) { _, modifier ->
+    composable<End> { entry ->
+        val gameEntry = navController.rememberTopmost<Game>(entry)
         EndGameScreen(
+            viewModel = viewModel(gameEntry),
+            onBackClick = onBackClick,
             onHomeNavigate = {
                 navController.navigate(Home) {
                     popUpTo<Home>()
                     launchSingleTop = true
                 }
-            },
-            modifier = modifier
-        )
-    }
-}
-
-private inline fun <reified T : GameRoute> NavGraphBuilder.gameComposable(
-    navController: NavController,
-    topBarTitle: State<String>,
-    gameMenuActions: GameMenuActions? = null,
-    noinline content: @Composable (NavBackStackEntry, Modifier) -> Unit
-) {
-    composable<T>{ navBackStackEntry ->
-        GameScreen(
-            entry = navBackStackEntry,
-            topBarTitle = topBarTitle,
-            onBackClick = { navController.navigateUp() },
-            menuActions = gameMenuActions,
-            content = content
+            }
         )
     }
 }

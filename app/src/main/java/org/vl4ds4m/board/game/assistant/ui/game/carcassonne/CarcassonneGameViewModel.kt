@@ -14,8 +14,6 @@ class CarcassonneGameViewModel(
     game = game,
     sessionId = sessionId
 ) {
-    override val name: String = "Carcassonne '${game.name.value}'"
-
     val onFinal: MutableStateFlow<Boolean> = game.onFinal
 
     fun addPoints(property: CarcassonneProperty, count: Int) {
@@ -26,7 +24,7 @@ class CarcassonneGameViewModel(
         game.selectNextPlayerId()
     }
 
-    companion object : GameViewModelFactory<CarcassonneGameViewModel> {
+    companion object : GameViewModelFactory {
         override fun createFrom(gameEnv: GameEnv): CarcassonneGameViewModel {
             return CarcassonneGameViewModel(game = gameEnv as CarcassonneGame)
         }

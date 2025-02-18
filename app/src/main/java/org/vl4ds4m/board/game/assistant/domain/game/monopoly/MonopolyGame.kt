@@ -11,6 +11,7 @@ import org.vl4ds4m.board.game.assistant.domain.game.monopoly.entity.MonopolyEnti
 import org.vl4ds4m.board.game.assistant.domain.game.monopoly.entity.Supplier
 import org.vl4ds4m.board.game.assistant.util.updateMap
 
+@Suppress("unused")
 class MonopolyGame(
     private val gameEnv: OrderedGameEnv = BaseOrderedGameEnv(Monopoly)
 ) : OrderedGameEnv by gameEnv
@@ -32,18 +33,6 @@ class MonopolyGame(
     private val afterStepField: StateFlow<MonopolyField?> =
         mAfterStepField.asStateFlow()
 
-    override fun saveIn(session: GameSession) {
-        session.state = session.state.let {
-            it as? MonopolyGameState ?: MonopolyGameState()
-        }.also {
-            it.entityOwner = this.entityOwner.value
-            it.playerState = this.playerState.value
-            it.repeatCount = this.repeatCount
-            it.afterStepField = this.afterStepField.value
-        }
-        gameEnv.saveIn(session)
-    }
-
     override fun loadFrom(session: GameSession) {
         gameEnv.loadFrom(session)
         session.state.let {
@@ -54,6 +43,18 @@ class MonopolyGame(
             this.repeatCount = it.repeatCount
             this.mAfterStepField.value = it.afterStepField
         }
+    }
+
+    override fun saveIn(session: GameSession) {
+        session.state = session.state.let {
+            it as? MonopolyGameState ?: MonopolyGameState()
+        }.also {
+            it.entityOwner = this.entityOwner.value
+            it.playerState = this.playerState.value
+            it.repeatCount = this.repeatCount
+            it.afterStepField = this.afterStepField.value
+        }
+        gameEnv.saveIn(session)
     }
 
     fun movePlayer(step1: Int, step2: Int) {

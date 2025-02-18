@@ -10,10 +10,11 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import org.vl4ds4m.board.game.assistant.ui.Home
 import org.vl4ds4m.board.game.assistant.ui.game.end.EndGameScreen
+import org.vl4ds4m.board.game.assistant.ui.game.setting.GameSettingScreen
 import org.vl4ds4m.board.game.assistant.ui.game.start.NewGamePlayersScreen
 import org.vl4ds4m.board.game.assistant.ui.game.start.NewGameStartScreen
+import org.vl4ds4m.board.game.assistant.ui.home.Home
 
 @Serializable
 object NewGameStart
@@ -25,10 +26,20 @@ object NewGamePlayers
 data class Game(val type: String, val sessionId: Long? = null)
 
 @Serializable
+object GameSetting
+
+/*@Serializable
+object PlayerSetting*/
+
+@Serializable
 object End
 
-fun NavGraphBuilder.gameNavigation(navController: NavController) {
+fun NavGraphBuilder.gameNavigation(
+    navController: NavController,
+    gameModifier: GameModifier
+) {
     composable<NewGameStart> {
+        gameModifier.topAppBarText?.value = "New game"
         NewGameStartScreen(
             viewModel = viewModel(),
             onSetupPlayers = {
@@ -53,9 +64,17 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
     composable<Game> {
         GameScreen(
             game = it.toRoute<Game>(),
-            onGameComplete = {
-                navController.navigate(End)
-            }
+            gameModifier = gameModifier.apply {
+                onGameComplete = { navController.navigate(End) }
+            },
+        )
+    }
+    composable<GameSetting> { entry ->
+        val backStackEntry = navController.rememberTopmost<Game>(entry)
+        GameSettingScreen(
+            viewModel = viewModel(
+                viewModelStoreOwner = backStackEntry
+            )
         )
     }
     composable<End> {

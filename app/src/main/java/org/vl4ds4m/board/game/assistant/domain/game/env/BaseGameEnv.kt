@@ -11,55 +11,12 @@ import org.vl4ds4m.board.game.assistant.util.updateMap
 import java.util.concurrent.atomic.AtomicLong
 
 open class BaseGameEnv(private val type: GameType) : GameEnv {
+    override val name: MutableStateFlow<String> = MutableStateFlow("")
+
     private val mPlayers: MutableStateFlow<Map<Long, Player>> = MutableStateFlow(mapOf())
     override val players: StateFlow<Map<Long, Player>> = mPlayers.asStateFlow()
 
-    override val name: MutableStateFlow<String> = MutableStateFlow("")
-
     private var nextPlayerId: AtomicLong = AtomicLong(0)
-
-    private var startTime: Long? = null
-
-    override val timeout: MutableStateFlow<Boolean> = MutableStateFlow(false)
-
-    private val mSecondsToEnd: MutableStateFlow<Int> = MutableStateFlow(0)
-    override val secondsToEnd: StateFlow<Int> = mSecondsToEnd.asStateFlow()
-
-    private val mCompleted: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val completed: StateFlow<Boolean> = mCompleted.asStateFlow()
-
-    override fun loadFrom(session: GameSession) {
-        session.let { s ->
-            name.value = s.name
-            mPlayers.value = s.players
-            s.nextPlayerId?.let {
-                nextPlayerId.set(it)
-            }
-            startTime = s.startTime
-            timeout.value = s.timeout
-            mSecondsToEnd.value = s.secondsToEnd
-        }
-    }
-
-    override fun saveIn(session: GameSession) {
-        session.let {
-            it.type = type
-            it.completed = completed.value
-            it.name = name.value
-            it.players = players.value
-            it.nextPlayerId = nextPlayerId.get()
-            it.startTime = startTime
-            it.timeout = timeout.value
-            it.secondsToEnd = secondsToEnd.value
-            it.state = null
-        }
-    }
-
-    override fun setSecondsToEnd(time: Int) {
-        if (time >= 0) {
-            mSecondsToEnd.value = time
-        }
-    }
 
     override fun addPlayer(name: String): Long {
         val id = nextPlayerId.incrementAndGet()
@@ -105,6 +62,22 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
         }
     }
 
+    private var startTime: Long? = null
+
+    override val timeout: MutableStateFlow<Boolean> = MutableStateFlow(false)
+
+    private val mSecondsToEnd: MutableStateFlow<Int> = MutableStateFlow(0)
+    override val secondsToEnd: StateFlow<Int> = mSecondsToEnd.asStateFlow()
+
+    private val mCompleted: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    override val completed: StateFlow<Boolean> = mCompleted.asStateFlow()
+
+    override fun changeSecondsToEnd(seconds: Int) {
+        if (seconds >= 0) {
+            mSecondsToEnd.value = seconds
+        }
+    }
+
     private val timer: Timer = Timer()
 
     override val initializables: Array<Initializable> = arrayOf(timer)
@@ -124,5 +97,31 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
 
     override fun complete() {
         mCompleted.value = true
+    }
+
+    override fun loadFrom(session: GameSession) {
+        session.let { s ->
+            name.value = s.name
+            mPlayers.value = s.players
+            s.nextPlayerId?.let {
+                nextPlayerId.set(it)
+            }
+            startTime = s.startTime
+            timeout.value = s.timeout
+            mSecondsToEnd.value = s.secondsToEnd
+        }
+    }
+
+    override fun saveIn(session: GameSession) {
+        session.let {
+            it.type = type
+            it.completed = completed.value
+            it.name = name.value
+            it.players = players.value
+            it.nextPlayerId = nextPlayerId.get()
+            it.startTime = startTime
+            it.timeout = timeout.value
+            it.secondsToEnd = secondsToEnd.value
+        }
     }
 }

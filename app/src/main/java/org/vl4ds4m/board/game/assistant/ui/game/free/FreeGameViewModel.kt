@@ -12,13 +12,11 @@ class FreeGameViewModel private constructor(
     game = game,
     sessionId = sessionId
 ) {
-    override val name: String = "${game.name.value} (free)"
-
     fun addPoints(playerId: Long?, points: Int) {
         playerId?.let { game.addPoints(it, points) }
     }
 
-    companion object : GameViewModelFactory<FreeGameViewModel> {
+    companion object : GameViewModelFactory {
         override fun createFrom(gameEnv: GameEnv): FreeGameViewModel {
             return FreeGameViewModel(game = gameEnv as FreeGame)
         }

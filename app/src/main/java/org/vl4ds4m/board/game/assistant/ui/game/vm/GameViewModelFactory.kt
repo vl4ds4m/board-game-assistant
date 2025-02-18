@@ -18,10 +18,10 @@ import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.SimpleOrderedGameViewModel
 
-interface GameViewModelFactory<out VM : GameViewModel> {
-    fun createFrom(gameEnv: GameEnv): VM
+interface GameViewModelFactory {
+    fun createFrom(gameEnv: GameEnv): GameViewModel
 
-    fun createFrom(sessionId: Long): VM
+    fun createFrom(sessionId: Long): GameViewModel
 
     companion object {
         fun create(type: GameType, sessionId: Long?): ViewModelProvider.Factory {
@@ -48,11 +48,11 @@ interface GameViewModelFactory<out VM : GameViewModel> {
     }
 }
 
-private inline fun <reified VM : GameViewModel> InitializerViewModelFactoryBuilder.initializer(
-    factory: GameViewModelFactory<VM>,
+private fun InitializerViewModelFactoryBuilder.initializer(
+    factory: GameViewModelFactory,
     sessionId: Long?
 ) {
-    initializer<VM> {
+    initializer<GameViewModel> {
         if (sessionId == null) {
             factory.createFrom(Store.currentGame as GameEnv)
         } else {

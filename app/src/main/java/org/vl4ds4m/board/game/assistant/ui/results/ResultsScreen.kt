@@ -9,7 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import kotlinx.serialization.Serializable
+import org.vl4ds4m.board.game.assistant.ui.Route
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
+
+@Serializable
+object Results : Route
 
 @Composable
 fun ResultsScreen(modifier: Modifier = Modifier) {

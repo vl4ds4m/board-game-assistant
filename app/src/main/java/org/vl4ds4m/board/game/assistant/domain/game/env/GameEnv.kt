@@ -7,21 +7,9 @@ import org.vl4ds4m.board.game.assistant.domain.Initializable
 import org.vl4ds4m.board.game.assistant.domain.Player
 
 interface GameEnv {
-    fun loadFrom(session: GameSession)
-
-    fun saveIn(session: GameSession)
-
-    val players: StateFlow<Map<Long, Player>>
-
     val name: MutableStateFlow<String>
 
-    val timeout: MutableStateFlow<Boolean>
-
-    val secondsToEnd: StateFlow<Int>
-
-    fun setSecondsToEnd(time: Int)
-
-    val completed: StateFlow<Boolean>
+    val players: StateFlow<Map<Long, Player>>
 
     fun addPlayer(name: String): Long
 
@@ -37,9 +25,21 @@ interface GameEnv {
 
     val initializables: Array<Initializable>
 
+    val timeout: MutableStateFlow<Boolean>
+
+    val secondsToEnd: StateFlow<Int>
+
+    fun changeSecondsToEnd(seconds: Int)
+
+    val completed: StateFlow<Boolean>
+
     fun start()
 
     fun stop()
 
     fun complete()
+
+    fun loadFrom(session: GameSession)
+
+    fun saveIn(session: GameSession)
 }

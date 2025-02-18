@@ -2,18 +2,20 @@ package org.vl4ds4m.board.game.assistant.ui.game.monopoly
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import org.vl4ds4m.board.game.assistant.ui.game.GameModifier
 import org.vl4ds4m.board.game.assistant.ui.game.OrderedGameScreen
 
 @Composable
 fun MonopolyGameScreen(
     viewModel: MonopolyGameViewModel,
-    onGameComplete: () -> Unit,
+    gameModifier: GameModifier,
     modifier: Modifier = Modifier,
 ) {
     OrderedGameScreen(
         viewModel = viewModel,
-        onGameComplete = onGameComplete,
+        onNameFormat = { "Monopoly '$it'" },
         masterActions = {},
+        gameModifier = gameModifier,
         modifier = modifier
     )
 }

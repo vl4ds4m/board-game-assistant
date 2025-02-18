@@ -14,9 +14,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.data.Store
+import org.vl4ds4m.board.game.assistant.ui.Route
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
+
+@Serializable
+object Home : Route
 
 @Composable
 fun HomeScreen(

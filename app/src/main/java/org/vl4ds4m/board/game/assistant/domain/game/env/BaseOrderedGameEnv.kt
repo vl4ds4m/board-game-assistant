@@ -17,22 +17,6 @@ class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
     private val mCurrentPlayerId: MutableStateFlow<Long?> = MutableStateFlow(null)
     override val currentPlayerId: StateFlow<Long?> = mCurrentPlayerId.asStateFlow()
 
-    override fun loadFrom(session: GameSession) {
-        super.loadFrom(session)
-        mCurrentPlayerId.value = session.state
-            .let { it as? OrderedGameState }
-            ?.currentPlayerId
-    }
-
-    override fun saveIn(session: GameSession) {
-        super.saveIn(session)
-        session.state = session.state.let {
-            it as? OrderedGameState ?: OrderedGameState()
-        }.also {
-            it.currentPlayerId = this.currentPlayerId.value
-        }
-    }
-
     override fun selectNextPlayerId() {
         mCurrentPlayerId.update { currentId ->
             currentId?.let {
@@ -124,5 +108,25 @@ class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
             if (it == null && id in orderedPlayerIds.value) id
             else it
         }
+    }
+
+    override fun loadFrom(session: GameSession) {
+        super.loadFrom(session)
+        session.state.let {
+            it as? OrderedGameState
+        }?.let {
+            this.mOrderedPlayerIds.value = it.orderedPlayerIds
+            this.mCurrentPlayerId.value = it.currentPlayerId
+        }
+    }
+
+    override fun saveIn(session: GameSession) {
+        session.state = session.state.let {
+            it as? OrderedGameState ?: OrderedGameState()
+        }.also {
+            it.orderedPlayerIds = this.orderedPlayerIds.value
+            it.currentPlayerId = this.currentPlayerId.value
+        }
+        super.saveIn(session)
     }
 }

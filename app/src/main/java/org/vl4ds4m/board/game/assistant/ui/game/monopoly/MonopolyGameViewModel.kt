@@ -1,7 +1,7 @@
 package org.vl4ds4m.board.game.assistant.ui.game.monopoly
 
-import org.vl4ds4m.board.game.assistant.domain.game.monopoly.MonopolyGame
 import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
+import org.vl4ds4m.board.game.assistant.domain.game.monopoly.MonopolyGame
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 import org.vl4ds4m.board.game.assistant.ui.game.vm.OrderedGameViewModel
 
@@ -12,9 +12,7 @@ class MonopolyGameViewModel(
     game = game,
     sessionId = sessionId
 ) {
-    override val name: String = "Monopoly '${game.name.value}'"
-
-    companion object : GameViewModelFactory<MonopolyGameViewModel> {
+    companion object : GameViewModelFactory {
         override fun createFrom(gameEnv: GameEnv): MonopolyGameViewModel {
             return MonopolyGameViewModel(game = gameEnv as MonopolyGame)
         }

@@ -12,15 +12,6 @@ class CarcassonneGame(
 {
     val onFinal: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    override fun saveIn(session: GameSession) {
-        session.state = session.state.let {
-            it as? CarcassonneGameState ?: CarcassonneGameState()
-        }.also {
-            it.onFinal = this.onFinal.value
-        }
-        gameEnv.saveIn(session)
-    }
-
     override fun loadFrom(session: GameSession) {
         gameEnv.loadFrom(session)
         session.state.let {
@@ -28,6 +19,15 @@ class CarcassonneGame(
         }?.let {
             this.onFinal.value = it.onFinal
         }
+    }
+
+    override fun saveIn(session: GameSession) {
+        session.state = session.state.let {
+            it as? CarcassonneGameState ?: CarcassonneGameState()
+        }.also {
+            it.onFinal = this.onFinal.value
+        }
+        gameEnv.saveIn(session)
     }
 
     fun addPoints(property: CarcassonneProperty, count: Int) {

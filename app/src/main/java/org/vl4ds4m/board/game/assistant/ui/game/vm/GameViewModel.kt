@@ -3,6 +3,7 @@ package org.vl4ds4m.board.game.assistant.ui.game.vm
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.data.Store
@@ -15,8 +16,6 @@ abstract class GameViewModel(
 ) : ViewModel(
     closeables = game.initializables
 ) {
-    open val name: String = game.name.value
-
     val players: StateFlow<Map<Long, Player>> = game.players
 
     init {
@@ -27,6 +26,20 @@ abstract class GameViewModel(
         game.initializables.forEach {
             it.init(viewModelScope)
         }
+    }
+
+    val name: MutableStateFlow<String> = game.name
+
+    val timeout: StateFlow<Boolean> = game.timeout
+
+    fun changeTimeout(enabled: Boolean) {
+        game.timeout.value = enabled
+    }
+
+    val secondsToEnd: StateFlow<Int> = game.secondsToEnd
+
+    fun changeSecondsToEnd(seconds: Int) {
+        game.changeSecondsToEnd(seconds)
     }
 
     override fun onCleared() {

@@ -12,13 +12,11 @@ class DiceGameViewModel private constructor(
     game = game,
     sessionId = sessionId
 ) {
-    override val name: String = "Dice '${game.name.value}'"
-
     fun addPoints(points: Int) {
         game.addPoints(points)
     }
 
-    companion object : GameViewModelFactory<DiceGameViewModel> {
+    companion object : GameViewModelFactory {
         override fun createFrom(gameEnv: GameEnv): DiceGameViewModel {
             return DiceGameViewModel(game = gameEnv as DiceGame)
         }

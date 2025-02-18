@@ -12,13 +12,11 @@ class SimpleOrderedGameViewModel private constructor(
     game = game,
     sessionId = sessionId
 ) {
-    override val name: String = "${game.name.value} (ordered)"
-
     fun addPoints(points: Int) {
         game.addPoints(points)
     }
 
-    companion object : GameViewModelFactory<SimpleOrderedGameViewModel> {
+    companion object : GameViewModelFactory {
         override fun createFrom(gameEnv: GameEnv): SimpleOrderedGameViewModel {
             return SimpleOrderedGameViewModel(game = gameEnv as SimpleOrderedGame)
         }

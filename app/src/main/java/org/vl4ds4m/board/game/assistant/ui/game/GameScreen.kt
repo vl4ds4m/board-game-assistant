@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,6 +23,7 @@ import org.vl4ds4m.board.game.assistant.domain.Player
 import org.vl4ds4m.board.game.assistant.domain.game.Free
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
 import org.vl4ds4m.board.game.assistant.domain.game.OrderedGameType
+import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenuActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameTopBar
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameScreen
@@ -36,8 +38,8 @@ fun GameScreen(
     entry: NavBackStackEntry,
     topBarTitle: State<String>,
     onBackClick: () -> Unit,
-    onMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
+    menuActions: GameMenuActions? = null,
     content: @Composable (NavBackStackEntry, Modifier) -> Unit
 ) {
     Scaffold(
@@ -46,14 +48,14 @@ fun GameScreen(
             GameTopBar(
                 title = topBarTitle,
                 onArrowBackClick = onBackClick,
-                onMenuClick = onMenuClick
+                menuActions = menuActions
             )
         }
     ) { innerPadding ->
-        content(
-            entry,
-            Modifier.padding(innerPadding)
-        )
+        val m = Modifier
+            .padding(innerPadding)
+            .fillMaxSize()
+        content(entry, m)
     }
 }
 

@@ -10,14 +10,17 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameTopBar(
     title: State<String>,
     onArrowBackClick: () -> Unit,
-    onMenuClick: () -> Unit
+    menuActions: GameMenuActions?
 ) {
+
     CenterAlignedTopAppBar(
         title = { Text(title.value) },
         navigationIcon = {
@@ -31,13 +34,20 @@ fun GameTopBar(
             }
         },
         actions = {
-            IconButton(
-                onClick = onMenuClick
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Menu,
-                    contentDescription = "Menu"
-                )
+            if (menuActions != null) {
+                val expanded = remember { mutableStateOf(false) }
+                IconButton(
+                    onClick = { expanded.value = true }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = "Menu"
+                    )
+                    GameMenu(
+                        expanded = expanded,
+                        actions = menuActions
+                    )
+                }
             }
         }
     )

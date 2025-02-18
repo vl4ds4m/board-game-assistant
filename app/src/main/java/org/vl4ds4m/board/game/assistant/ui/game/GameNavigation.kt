@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.ui.Home
+import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenuActions
 import org.vl4ds4m.board.game.assistant.ui.game.end.EndGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.setting.GameSettingScreen
 import org.vl4ds4m.board.game.assistant.ui.game.start.NewGamePlayersScreen
@@ -42,8 +43,7 @@ data object End : GameRoute
 fun NavGraphBuilder.gameNavigation(navController: NavController) {
     gameComposable<NewGameStart>(
         navController = navController,
-        topBarTitle = mutableStateOf("New game"),
-        onMenuClick = {}
+        topBarTitle = mutableStateOf("New game")
     ) { _, modifier ->
         NewGameStartScreen(
             viewModel = viewModel(),
@@ -55,8 +55,7 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
     }
     gameComposable<NewGamePlayers>(
         navController = navController,
-        topBarTitle = mutableStateOf("New game"),
-        onMenuClick = {}
+        topBarTitle = mutableStateOf("New game")
     ) { entry, modifier ->
         val backStackEntry = navController.rememberTopmost<NewGameStart>(entry)
         NewGamePlayersScreen(
@@ -74,12 +73,14 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
     }
     val gameModifier = GameModifier(
         topBarTitle = mutableStateOf(""),
-        onGameComplete = { navController.navigate(End) }
     )
     gameComposable<Game>(
         navController = navController,
         topBarTitle = gameModifier.topBarTitle,
-        onMenuClick = {}
+        gameMenuActions = GameMenuActions(
+            onGameSettingOpen = { navController.navigate(GameSetting) },
+            onGameComplete = { navController.navigate(End) }
+        )
     ) { entry, modifier ->
         GameScreen(
             game = entry.toRoute<Game>(),
@@ -89,8 +90,7 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
     }
     gameComposable<GameSetting>(
         navController = navController,
-        topBarTitle = mutableStateOf("Game settings"),
-        onMenuClick = {}
+        topBarTitle = mutableStateOf("Game settings")
     ) { entry, modifier ->
         val backStackEntry = navController.rememberTopmost<Game>(entry)
         GameSettingScreen(
@@ -102,8 +102,7 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
     }
     gameComposable<End>(
         navController = navController,
-        topBarTitle = mutableStateOf("Game end"),
-        onMenuClick = {}
+        topBarTitle = mutableStateOf("Game end")
     ) { _, modifier ->
         EndGameScreen(
             onHomeNavigate = {
@@ -120,7 +119,7 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
 private inline fun <reified T : GameRoute> NavGraphBuilder.gameComposable(
     navController: NavController,
     topBarTitle: State<String>,
-    noinline onMenuClick: () -> Unit,
+    gameMenuActions: GameMenuActions? = null,
     noinline content: @Composable (NavBackStackEntry, Modifier) -> Unit
 ) {
     composable<T>{ navBackStackEntry ->
@@ -128,7 +127,7 @@ private inline fun <reified T : GameRoute> NavGraphBuilder.gameComposable(
             entry = navBackStackEntry,
             topBarTitle = topBarTitle,
             onBackClick = { navController.navigateUp() },
-            onMenuClick = onMenuClick,
+            menuActions = gameMenuActions,
             content = content
         )
     }

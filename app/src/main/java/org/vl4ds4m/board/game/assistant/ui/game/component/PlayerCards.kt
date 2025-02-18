@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.ui.game
+package org.vl4ds4m.board.game.assistant.ui.game.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row

@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.domain.game.carcassonne.CarcassonneProperty
 import org.vl4ds4m.board.game.assistant.ui.game.GameModifier
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreenPreview
-import org.vl4ds4m.board.game.assistant.ui.game.OrderedGameScreen
+import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameScreen
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 import org.vl4ds4m.board.game.assistant.util.title
 

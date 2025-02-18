@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -14,20 +15,47 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import org.vl4ds4m.board.game.assistant.domain.Player
 import org.vl4ds4m.board.game.assistant.domain.game.Free
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
 import org.vl4ds4m.board.game.assistant.domain.game.OrderedGameType
+import org.vl4ds4m.board.game.assistant.ui.game.component.GameTopBar
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
-import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreCounter
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
+
+@Composable
+fun GameScreen(
+    entry: NavBackStackEntry,
+    topBarTitle: State<String>,
+    onBackClick: () -> Unit,
+    onMenuClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable (NavBackStackEntry, Modifier) -> Unit
+) {
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            GameTopBar(
+                title = topBarTitle,
+                onArrowBackClick = onBackClick,
+                onMenuClick = onMenuClick
+            )
+        }
+    ) { innerPadding ->
+        content(
+            entry,
+            Modifier.padding(innerPadding)
+        )
+    }
+}
 
 @Composable
 fun GameScreen(
@@ -51,6 +79,7 @@ fun GameScreen(
                 modifier = modifier
             )
         }
+
         is OrderedGameType -> {
             OrderedGameScreen(
                 type = type,
@@ -74,7 +103,7 @@ fun GameScreen(
 ) {
     LaunchedEffect(Unit) {
         viewModel.name.collect {
-            gameModifier.topAppBarText?.value = onNameFormat(it)
+            gameModifier.topBarTitle.value = onNameFormat(it)
         }
     }
     GameScreenContent(
@@ -113,18 +142,6 @@ fun GameScreenContent(
             masterActions()
         }
     }
-}
-
-@Preview
-@Composable
-private fun SimpleGameScreenPreview() {
-    GameScreenPreview(
-        masterActions = {
-            ScoreCounter(
-                onPointsAdd = {}
-            )
-        }
-    )
 }
 
 @SuppressLint("UnrememberedMutableState")

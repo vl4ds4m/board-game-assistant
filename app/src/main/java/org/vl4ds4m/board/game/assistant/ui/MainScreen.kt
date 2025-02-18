@@ -10,9 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavBackStackEntry
@@ -22,14 +20,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import org.vl4ds4m.board.game.assistant.ui.game.GameModifier
 import org.vl4ds4m.board.game.assistant.ui.game.gameNavigation
-import org.vl4ds4m.board.game.assistant.ui.home.Home
-import org.vl4ds4m.board.game.assistant.ui.profile.Profile
-import org.vl4ds4m.board.game.assistant.ui.results.Results
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
-
-interface Route
 
 @Composable
 fun MainScreen() {
@@ -54,24 +46,14 @@ fun MainScreen() {
 fun MainScreenContent(
     navController: NavHostController,
     onMainScreen: State<Boolean>,
-    isNavItemSelected: (Route) -> Boolean,
+    isNavItemSelected: (MainRoute) -> Boolean,
 ) {
-    val topAppBarText = rememberSaveable { mutableStateOf("FallBack") }
     Scaffold(
-        topBar = {
-            AnimatedVisibility(!onMainScreen.value) {
-                AppTopBar(
-                    title = topAppBarText,
-                    onArrowBackClick = { navController.navigateUp() },
-                    onMenuClick = {}
-                )
-            }
-        },
         bottomBar = {
             AnimatedVisibility(onMainScreen.value) {
                 MainNavBar(
-                    selected = isNavItemSelected,
-                    onClick = { navController.navigateToTop(it) }
+                    isRouteSelected = isNavItemSelected,
+                    onRouteNavigate = { navController.navigateToTop(it) }
                 )
             }
         }
@@ -84,12 +66,7 @@ fun MainScreenContent(
                 .fillMaxSize()
         ) {
             mainNavigation(navController)
-            gameNavigation(
-                navController = navController,
-                gameModifier = GameModifier(
-                    topAppBarText = topAppBarText
-                )
-            )
+            gameNavigation(navController)
         }
     }
 }
@@ -104,12 +81,12 @@ private fun MainScreenPreview() {
 
 private fun isCurrentDestination(
     currentEntry: State<NavBackStackEntry?>,
-    route: Route
+    route: MainRoute
 ): Boolean {
     return currentEntry.value?.destination?.hasRoute(route::class) ?: false
 }
 
-private fun <T : Route> NavController.navigateToTop(route: T) {
+private fun <T : MainRoute> NavController.navigateToTop(route: T) {
     navigate(route) {
         popUpTo<Home> { saveState = true }
         restoreState = true

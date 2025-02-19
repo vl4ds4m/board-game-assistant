@@ -7,7 +7,8 @@ import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
 class FreeGame(gameEnv: GameEnv = BaseGameEnv(Free)) : GameEnv by gameEnv {
     private val scoreAdder = SimpleScoreAdder(gameEnv)
 
-    fun addPoints(playerId: Long, points: Int) {
-        scoreAdder.addPoints(playerId, points)
+    fun addPoints(points: Int) {
+        val id = currentPlayerId.value ?: return
+        scoreAdder.addPoints(id, points)
     }
 }

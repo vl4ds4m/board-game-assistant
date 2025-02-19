@@ -1,7 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui.game.ordered
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import org.vl4ds4m.board.game.assistant.domain.game.Carcassonne
 import org.vl4ds4m.board.game.assistant.domain.game.Dice
@@ -17,7 +16,6 @@ import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.vm.OrderedGameViewModel
 
 @Composable
 fun OrderedGameScreen(
@@ -81,7 +79,7 @@ fun OrderedGameScreen(
     GameScreen(
         viewModel = viewModel,
         onNameFormat = onNameFormat,
-        currentPlayerId = viewModel.currentPlayerId.collectAsState(),
+        currentPlayerId = viewModel.currentPlayerId,
         onSelectPlayer = null,
         masterActions = masterActions,
         menuActions = menuActions,

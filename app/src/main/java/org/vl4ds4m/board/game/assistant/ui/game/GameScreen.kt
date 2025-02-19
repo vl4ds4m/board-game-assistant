@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.flow.StateFlow
 import org.vl4ds4m.board.game.assistant.domain.Player
 import org.vl4ds4m.board.game.assistant.domain.game.Free
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
@@ -96,7 +97,7 @@ fun GameScreen(
 fun GameScreen(
     viewModel: GameViewModel,
     onNameFormat: (String) -> String,
-    currentPlayerId: State<Long?>,
+    currentPlayerId: StateFlow<Long?>,
     onSelectPlayer: ((Long) -> Unit)?,
     masterActions: @Composable () -> Unit,
     menuActions: GameMenuActions,
@@ -124,7 +125,7 @@ fun GameScreen(
     ) { innerModifier ->
         GameScreenContent(
             players = viewModel.players.collectAsState(),
-            currentPlayerId = currentPlayerId,
+            currentPlayerId = currentPlayerId.collectAsState(),
             onSelectPlayer = onSelectPlayer,
             masterActions = masterActions,
             modifier = innerModifier

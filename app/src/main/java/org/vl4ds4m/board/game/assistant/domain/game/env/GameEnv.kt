@@ -11,6 +11,13 @@ interface GameEnv {
 
     val players: StateFlow<Map<Long, Player>>
 
+    val currentPlayerId: StateFlow<Long?>
+
+    fun changeCurrentPlayerId(id: Long)
+
+    val currentPlayer: Player?
+        get() = currentPlayerId.value?.let { players.value[it] }
+
     fun addPlayer(name: String): Long
 
     fun removePlayer(id: Long)

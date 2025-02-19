@@ -12,8 +12,8 @@ class FreeGameViewModel private constructor(
     game = game,
     sessionId = sessionId
 ) {
-    fun addPoints(playerId: Long?, points: Int) {
-        playerId?.let { game.addPoints(it, points) }
+    fun addPoints(points: Int) {
+        game.addPoints(points)
     }
 
     companion object : GameViewModelFactory {

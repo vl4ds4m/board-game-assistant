@@ -16,8 +16,6 @@ abstract class GameViewModel(
 ) : ViewModel(
     closeables = game.initializables
 ) {
-    val players: StateFlow<Map<Long, Player>> = game.players
-
     init {
         Log.d(TAG, "Initiate ${this::class.simpleName}")
         sessionId?.let { id ->
@@ -30,11 +28,35 @@ abstract class GameViewModel(
 
     val name: MutableStateFlow<String> = game.name
 
-    val timeout: StateFlow<Boolean> = game.timeout
+    val players: StateFlow<Map<Long, Player>> = game.players
 
-    fun changeTimeout(enabled: Boolean) {
-        game.timeout.value = enabled
+    val currentPlayerId: StateFlow<Long?> = game.currentPlayerId
+
+    fun changeCurrentPlayerId(id: Long) {
+        game.changeCurrentPlayerId(id)
     }
+
+    fun addPlayer(name: String) {
+        game.addPlayer(name)
+    }
+
+    fun removePlayer(id: Long) {
+        game.removePlayer(id)
+    }
+
+    fun renamePlayer(id: Long, name: String) {
+        game.renamePlayer(id, name)
+    }
+
+    fun freezePlayer(id: Long) {
+        game.freezePlayer(id)
+    }
+
+    fun unfreezePlayer(id: Long) {
+        game.unfreezePlayer(id)
+    }
+
+    val timeout: MutableStateFlow<Boolean> = game.timeout
 
     val secondsToEnd: StateFlow<Int> = game.secondsToEnd
 

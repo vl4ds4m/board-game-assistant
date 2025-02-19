@@ -5,7 +5,7 @@ import org.vl4ds4m.board.game.assistant.domain.game.carcassonne.CarcassonneGame
 import org.vl4ds4m.board.game.assistant.domain.game.carcassonne.CarcassonneProperty
 import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
-import org.vl4ds4m.board.game.assistant.ui.game.vm.OrderedGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
 
 class CarcassonneGameViewModel(
     private val game: CarcassonneGame = CarcassonneGame(),

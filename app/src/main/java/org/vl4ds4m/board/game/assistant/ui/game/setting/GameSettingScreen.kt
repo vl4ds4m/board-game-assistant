@@ -40,7 +40,7 @@ fun GameSettingScreen(
             name = viewModel.name.collectAsState(""),
             onNameChange = { viewModel.name.value = it },
             timeout = viewModel.timeout.collectAsState(),
-            onTimeoutChange = viewModel::changeTimeout,
+            onTimeoutChange = { viewModel.timeout.value = it },
             secondsToEnd = viewModel.secondsToEnd.map {
                 if (it <= 0) ""
                 else it.toString()

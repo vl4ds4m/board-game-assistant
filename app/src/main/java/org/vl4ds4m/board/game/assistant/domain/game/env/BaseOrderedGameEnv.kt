@@ -14,38 +14,12 @@ class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
     private val mOrderedPlayerIds: MutableStateFlow<List<Long>> = MutableStateFlow(listOf())
     override val orderedPlayerIds: StateFlow<List<Long>> = mOrderedPlayerIds.asStateFlow()
 
-    private val mCurrentPlayerId: MutableStateFlow<Long?> = MutableStateFlow(null)
-    override val currentPlayerId: StateFlow<Long?> = mCurrentPlayerId.asStateFlow()
-
     override fun selectNextPlayerId() {
         mCurrentPlayerId.update { currentId ->
             currentId?.let {
-                nextActive(
-                    ids = this.orderedPlayerIds.value,
-                    players = this.players.value,
-                    currentId = it
-                )
+                nextActive(orderedPlayerIds.value, players.value, it)
             }
         }
-    }
-
-    private fun nextActive(ids: List<Long>, players: Map<Long, Player>, currentId: Long): Long? {
-        val startIndex = ids.indexOf(currentId)
-        if (startIndex == -1) return null
-        var index = startIndex
-        while (true) {
-            index = (index + 1) % ids.size
-            val id = ids[index]
-            if (players[id]?.active == true) break
-            if (index == startIndex) return null
-        }
-        return ids[index]
-    }
-
-    override fun changeCurrentPlayerId(id: Long) {
-        val player = players.value[id] ?: return
-        if (!player.active) return
-        mCurrentPlayerId.value = id
     }
 
     override fun changePlayerOrder(id: Long, order: Int) {
@@ -61,53 +35,32 @@ class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
     override fun addPlayer(name: String): Long {
         val id = super.addPlayer(name)
         mOrderedPlayerIds.updateList { add(id) }
-        mCurrentPlayerId.update { it ?: id }
         return id
     }
 
     override fun removePlayer(id: Long) {
-        val gameEnv = this
         mOrderedPlayerIds.updateList {
-            val ids = this
-            val removed = remove(id)
-            if (removed) {
-                mCurrentPlayerId.update { currentId ->
-                    if (id == currentId) {
-                        nextActive(
-                            ids = ids,
-                            players = gameEnv.players.value,
-                            currentId = currentId
-                        )?.takeUnless { it == id }
-                    } else {
-                        currentId
-                    }
-                }
+            if (remove(id)) {
+                updateOnEqual(this, players.value, id)
             }
         }
         super.removePlayer(id)
     }
 
-    override fun freezePlayer(id: Long) {
-        super.freezePlayer(id)
+    private fun updateOnEqual(ids: List<Long>, players: Map<Long, Player>, playerId: Long) {
         mCurrentPlayerId.update { currentId ->
-            if (id == currentId) {
-                nextActive(
-                    ids = this.orderedPlayerIds.value,
-                    players = this.players.value,
-                    currentId = currentId
-                )?.takeUnless { it == id }
+            if (playerId == currentId) {
+                nextActive(ids, players, currentId)
+                    .takeUnless { it == currentId }
             } else {
                 currentId
             }
         }
     }
 
-    override fun unfreezePlayer(id: Long) {
-        super.unfreezePlayer(id)
-        mCurrentPlayerId.update {
-            if (it == null && id in orderedPlayerIds.value) id
-            else it
-        }
+    override fun freezePlayer(id: Long) {
+        updateOnEqual(orderedPlayerIds.value, players.value, id)
+        super.freezePlayer(id)
     }
 
     override fun loadFrom(session: GameSession) {
@@ -116,7 +69,6 @@ class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
             it as? OrderedGameState
         }?.let {
             this.mOrderedPlayerIds.value = it.orderedPlayerIds
-            this.mCurrentPlayerId.value = it.currentPlayerId
         }
     }
 
@@ -125,8 +77,20 @@ class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
             it as? OrderedGameState ?: OrderedGameState()
         }.also {
             it.orderedPlayerIds = this.orderedPlayerIds.value
-            it.currentPlayerId = this.currentPlayerId.value
         }
         super.saveIn(session)
     }
+}
+
+private fun nextActive(ids: List<Long>, players: Map<Long, Player>, currentId: Long): Long? {
+    val startIndex = ids.indexOf(currentId)
+    if (startIndex == -1) return null
+    var index = startIndex
+    while (true) {
+        index = (index + 1) % ids.size
+        val id = ids[index]
+        if (players[id]?.active == true) break
+        if (index == startIndex) return null
+    }
+    return ids[index]
 }

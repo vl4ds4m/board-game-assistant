@@ -3,7 +3,7 @@ package org.vl4ds4m.board.game.assistant.ui.game.monopoly
 import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.domain.game.monopoly.MonopolyGame
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
-import org.vl4ds4m.board.game.assistant.ui.game.vm.OrderedGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
 
 class MonopolyGameViewModel(
     game: MonopolyGame = MonopolyGame(),

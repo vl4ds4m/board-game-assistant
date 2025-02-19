@@ -3,6 +3,7 @@ package org.vl4ds4m.board.game.assistant.domain.game.env
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.domain.Initializable
 import org.vl4ds4m.board.game.assistant.domain.game.GameType
@@ -16,6 +17,16 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
     private val mPlayers: MutableStateFlow<Map<Long, Player>> = MutableStateFlow(mapOf())
     override val players: StateFlow<Map<Long, Player>> = mPlayers.asStateFlow()
 
+    protected val mCurrentPlayerId: MutableStateFlow<Long?> = MutableStateFlow(null)
+    override val currentPlayerId: StateFlow<Long?> = mCurrentPlayerId.asStateFlow()
+
+    override fun changeCurrentPlayerId(id: Long) {
+        val player = players.value[id] ?: return
+        if (player.active) {
+            mCurrentPlayerId.value = id
+        }
+    }
+
     private var nextPlayerId: AtomicLong = AtomicLong(0)
 
     override fun addPlayer(name: String): Long {
@@ -26,11 +37,15 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
             score = 0
         )
         mPlayers.updateMap { put(id, player) }
+        mCurrentPlayerId.update { it ?: id }
         return id
     }
 
     override fun removePlayer(id: Long) {
         mPlayers.updateMap { remove(id) }
+        mCurrentPlayerId.update { currentId ->
+            currentId.takeUnless { it == id }
+        }
     }
 
     override fun renamePlayer(id: Long, name: String) {
@@ -41,17 +56,22 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
     }
 
     override fun freezePlayer(id: Long) {
-        updatePlayerActivity(id, false)
+        mPlayers.updateMap {
+            val player = get(id) ?: return
+            if (!player.active) return
+            put(id, player.copy(active = false))
+            mCurrentPlayerId.update { currentId ->
+                currentId.takeUnless { it == id }
+            }
+        }
     }
 
     override fun unfreezePlayer(id: Long) {
-        updatePlayerActivity(id, true)
-    }
-
-    private fun updatePlayerActivity(id: Long, active: Boolean) {
         mPlayers.updateMap {
             val player = get(id) ?: return
-            put(id, player.copy(active = active))
+            if (player.active) return
+            put(id, player.copy(active = true))
+            mCurrentPlayerId.update { it ?: id }
         }
     }
 
@@ -109,6 +129,7 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
             mCompleted.value = s.completed
             name.value = s.name
             mPlayers.value = s.players
+            mCurrentPlayerId.value = s.currentPlayerId
             s.nextPlayerId?.let {
                 nextPlayerId.set(it)
             }
@@ -124,6 +145,7 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
             it.completed = completed.value
             it.name = name.value
             it.players = players.value
+            it.currentPlayerId = currentPlayerId.value
             it.nextPlayerId = nextPlayerId.get()
             it.startTime = startTime
             it.timeout = timeout.value

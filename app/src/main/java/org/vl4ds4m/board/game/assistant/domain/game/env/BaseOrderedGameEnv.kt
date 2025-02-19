@@ -40,8 +40,10 @@ class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
 
     override fun removePlayer(id: Long) {
         mOrderedPlayerIds.updateList {
-            if (remove(id)) {
+            val index = indexOf(id)
+            if (index != -1) {
                 updateOnEqual(this, players.value, id)
+                removeAt(index)
             }
         }
         super.removePlayer(id)

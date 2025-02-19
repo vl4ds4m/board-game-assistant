@@ -1,15 +1,16 @@
 package org.vl4ds4m.board.game.assistant.ui.game.setting
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
@@ -24,6 +25,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -39,6 +42,9 @@ fun PlayerSettingCard(
     active: Boolean,
     selected: Boolean,
     menuActions: PlayerSettingActions,
+    index: Int,
+    count: State<Int>,
+    onOrderChange: ((Long, Int) -> Unit)?,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -47,12 +53,8 @@ fun PlayerSettingCard(
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = with(MaterialTheme.colorScheme) {
-                if (active) {
-                    if (selected) surfaceVariant
-                    else surfaceContainerLow
-                } else {
-                    this.surfaceContainerLowest
-                }
+                if (selected && active) surfaceContainerHigh
+                else surfaceContainerLow
             }
         )
     ) {
@@ -60,28 +62,43 @@ fun PlayerSettingCard(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Player setting",
-                modifier = Modifier.size(40.dp)
-            )
-            Spacer(Modifier.width(24.dp))
+            if (onOrderChange != null) {
+                val expanded = remember { mutableStateOf(false) }
+                Text(
+                    text = "${index + 1}.",
+                    modifier = Modifier.clickable { expanded.value = true },
+                    style = MaterialTheme.typography.titleLarge
+                )
+                PlayerSettingSelectOrderMenu(
+                    expanded = expanded,
+                    itemCount = count,
+                    onItemClick = { onOrderChange(id, it) }
+                )
+            }
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "Player image",
                 modifier = Modifier.size(40.dp)
             )
-            Spacer(Modifier.width(16.dp))
             TextField(
                 value = name,
                 onValueChange = { menuActions.onRename(id, it) },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(50.dp),
                 textStyle = MaterialTheme.typography.titleMedium,
                 singleLine = true
             )
-            Spacer(Modifier.width(24.dp))
+            if (!active) {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = "Inactive",
+                    modifier = Modifier.size(16.dp)
+                )
+            }
             val expanded = remember { mutableStateOf(false) }
             IconButton(
                 onClick = { expanded.value = true }
@@ -104,6 +121,30 @@ fun PlayerSettingCard(
 }
 
 @Composable
+fun PlayerSettingSelectOrderMenu(
+    expanded: MutableState<Boolean>,
+    itemCount: State<Int>,
+    onItemClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    DropdownMenu(
+        expanded = expanded.value,
+        onDismissRequest = { expanded.value = false },
+        modifier = modifier
+    ) {
+        repeat(itemCount.value) {
+            DropdownMenuItem(
+                text = { Text("${it + 1}") },
+                onClick = {
+                    expanded.value = false
+                    onItemClick(it)
+                }
+            )
+        }
+    }
+}
+
+@Composable
 fun PlayerSettingMenu(
     id: Long,
     active: Boolean,
@@ -118,10 +159,10 @@ fun PlayerSettingMenu(
         modifier = modifier
     ) {
         buildList {
-            if (!selected) {
-                add("Make current" to actions.onSelect)
-            }
             if (active) {
+                if (!selected) {
+                    add("Make current" to actions.onSelect)
+                }
                 add("Freeze player" to actions.onFreeze)
             } else {
                 add("Unfreeze player" to actions.onUnfreeze)
@@ -154,6 +195,7 @@ class PlayerSettingActions(
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 private fun PlayerSettingCardPreview(
     active: Boolean,
@@ -165,7 +207,10 @@ private fun PlayerSettingCardPreview(
             name = "Hello",
             active = active,
             selected = selected,
-            menuActions = PlayerSettingActions.Empty
+            menuActions = PlayerSettingActions.Empty,
+            index = 6,
+            count = mutableIntStateOf(10),
+            onOrderChange = { _, _ -> }
         )
     }
 }

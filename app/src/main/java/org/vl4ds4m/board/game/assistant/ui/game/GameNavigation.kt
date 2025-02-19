@@ -14,6 +14,7 @@ import org.vl4ds4m.board.game.assistant.ui.Home
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenuActions
 import org.vl4ds4m.board.game.assistant.ui.game.end.EndGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.setting.GameSettingScreen
+import org.vl4ds4m.board.game.assistant.ui.game.setting.PlayerSettingScreen
 import org.vl4ds4m.board.game.assistant.ui.game.start.NewGamePlayersScreen
 import org.vl4ds4m.board.game.assistant.ui.game.start.NewGameStartScreen
 
@@ -31,8 +32,8 @@ data class Game(val type: String, val sessionId: Long? = null) : GameRoute
 @Serializable
 data object GameSetting : GameRoute
 
-/*@Serializable
-data object PlayerSetting : GameRoute*/
+@Serializable
+data object PlayerSetting : GameRoute
 
 @Serializable
 data object End : GameRoute
@@ -67,6 +68,7 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
             menuActions = GameMenuActions(
                 onBackClick = onBackClick,
                 onGameSettingOpen = { navController.navigate(GameSetting) },
+                onPlayerSettingOpen = { navController.navigate(PlayerSetting) },
                 onGameComplete = { navController.navigate(End) },
             )
         )
@@ -74,6 +76,13 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
     composable<GameSetting> { entry ->
         val gameEntry = navController.rememberTopmost<Game>(entry)
         GameSettingScreen(
+            viewModel = viewModel(gameEntry),
+            onBackClick = onBackClick
+        )
+    }
+    composable<PlayerSetting> { entry ->
+        val gameEntry = navController.rememberTopmost<Game>(entry)
+        PlayerSettingScreen(
             viewModel = viewModel(gameEntry),
             onBackClick = onBackClick
         )

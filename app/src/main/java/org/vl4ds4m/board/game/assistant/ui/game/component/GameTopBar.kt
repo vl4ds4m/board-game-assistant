@@ -69,14 +69,19 @@ fun GameMenu(
         onDismissRequest = { expanded.value = false },
         modifier = modifier
     ) {
-        DropdownMenuItem(
-            text = { Text("Open game settings") },
-            onClick = actions.onGameSettingOpen
-        )
-        DropdownMenuItem(
-            text = { Text("Complete game") },
-            onClick = actions.onGameComplete
-        )
+        listOf(
+            "Open game settings"   to actions.onGameSettingOpen,
+            "Open player settings" to actions.onPlayerSettingOpen,
+            "Complete game"        to actions.onGameComplete,
+        ).forEach { (text, action) ->
+            DropdownMenuItem(
+                text = { Text(text) },
+                onClick = {
+                    expanded.value = false
+                    action()
+                }
+            )
+        }
     }
 }
 
@@ -84,5 +89,6 @@ fun GameMenu(
 data class GameMenuActions(
     val onBackClick: () -> Unit,
     val onGameSettingOpen: () -> Unit,
+    val onPlayerSettingOpen: () -> Unit,
     val onGameComplete: () -> Unit
 )

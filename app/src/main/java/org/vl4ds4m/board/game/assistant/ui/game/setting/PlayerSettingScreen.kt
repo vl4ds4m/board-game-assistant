@@ -1,2 +1,122 @@
 package org.vl4ds4m.board.game.assistant.ui.game.setting
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import org.vl4ds4m.board.game.assistant.domain.Player
+import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
+import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
+
+@Composable
+fun PlayerSettingScreen(
+    viewModel: GameViewModel,
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val onPlayerOrderChange: ((Long, Int) -> Unit)?
+    val players = viewModel.players.let { flow ->
+        if (viewModel is OrderedGameViewModel) {
+            onPlayerOrderChange = viewModel::changePlayerOrder
+            viewModel.orderedPlayerIds.combine(flow) { ids, players ->
+                buildList {
+                    for (id in ids) {
+                        val player = players[id] ?: continue
+                        add(id to player)
+                    }
+                }
+            }
+        } else {
+            onPlayerOrderChange = null
+            flow.map { it.toList() }
+        }
+    }.collectAsState(listOf())
+    GameScreen(
+        topBarTitle = "Player Settings",
+        onBackClick = onBackClick,
+        modifier = modifier
+    ) { innerModifier ->
+        PlayerSettingScreenContent(
+            players = players,
+            currentPlayerId = viewModel.currentPlayerId.collectAsState(),
+            onPlayerAdd = { viewModel.addPlayer("New player") },
+            onPlayerOrderChange = onPlayerOrderChange,
+            playerSettingActions = PlayerSettingActions(
+                onSelect = viewModel::changeCurrentPlayerId,
+                onRename = viewModel::renamePlayer,
+                onRemove = viewModel::removePlayer,
+                onFreeze = viewModel::freezePlayer,
+                onUnfreeze = viewModel::unfreezePlayer
+            ),
+            modifier = innerModifier
+        )
+    }
+}
+
+@Composable
+fun PlayerSettingScreenContent(
+    players: State<List<Pair<Long, Player>>>,
+    currentPlayerId: State<Long?>,
+    onPlayerAdd: () -> Unit,
+    onPlayerOrderChange: ((Long, Int) -> Unit)?,
+    playerSettingActions: PlayerSettingActions,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier) {
+        LazyColumn {
+            items(
+                items = players.value,
+                key = { (id, _) -> id }
+            ) { (id, player) ->
+                PlayerSettingCard(
+                    id = id,
+                    name = player.name,
+                    active = player.active,
+                    selected = id == currentPlayerId.value,
+                    menuActions = playerSettingActions
+                )
+            }
+        }
+        Spacer(Modifier.height(32.dp))
+        FloatingActionButton(
+            onClick = onPlayerAdd
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add player"
+            )
+        }
+    }
+}
+
+@SuppressLint("UnrememberedMutableState")
+@Preview
+@Composable
+private fun PlayerSettingScreenPreview() {
+    BoardGameAssistantTheme {
+        PlayerSettingScreenContent(
+            players = mutableStateOf(listOf()),
+            currentPlayerId = mutableStateOf(null),
+            onPlayerAdd = {},
+            onPlayerOrderChange = null,
+            playerSettingActions = PlayerSettingActions.Empty
+        )
+    }
+}

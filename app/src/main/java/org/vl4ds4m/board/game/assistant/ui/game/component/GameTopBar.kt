@@ -3,19 +3,22 @@ package org.vl4ds4m.board.game.assistant.ui.game.component
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import org.vl4ds4m.board.game.assistant.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,9 +26,10 @@ fun GameTopBar(
     title: String,
     onArrowBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    menuActions: GameMenuActions? = null
+    navActions: GameNavActions? = null,
+    history: GameHistory? = null
 ) {
-    CenterAlignedTopAppBar(
+    TopAppBar(
         title = { Text(title) },
         modifier = modifier,
         navigationIcon = {
@@ -39,7 +43,27 @@ fun GameTopBar(
             }
         },
         actions = {
-            if (menuActions != null) {
+            history?.let {
+                IconButton(
+                    enabled = it.reverted.value,
+                    onClick = it.onRevertAction
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.undo_24px),
+                        contentDescription = "Revert"
+                    )
+                }
+                IconButton(
+                    enabled = it.repeatable.value,
+                    onClick = it.onRepeatAction
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.redo_24px),
+                        contentDescription = "Repeat"
+                    )
+                }
+            }
+            navActions?.let { actions ->
                 val expanded = remember { mutableStateOf(false) }
                 IconButton(
                     onClick = { expanded.value = true }
@@ -50,7 +74,7 @@ fun GameTopBar(
                     )
                     GameMenu(
                         expanded = expanded,
-                        actions = menuActions
+                        actions = actions
                     )
                 }
             }
@@ -61,7 +85,7 @@ fun GameTopBar(
 @Composable
 fun GameMenu(
     expanded: MutableState<Boolean>,
-    actions: GameMenuActions,
+    actions: GameNavActions,
     modifier: Modifier = Modifier
 ) {
     DropdownMenu(
@@ -86,9 +110,17 @@ fun GameMenu(
 }
 
 @Immutable
-data class GameMenuActions(
+data class GameNavActions(
     val onBackClick: () -> Unit,
     val onGameSettingOpen: () -> Unit,
     val onPlayerSettingOpen: () -> Unit,
     val onGameComplete: () -> Unit
+)
+
+@Immutable
+data class GameHistory(
+    val reverted: State<Boolean>,
+    val repeatable: State<Boolean>,
+    val onRevertAction: () -> Unit,
+    val onRepeatAction: () -> Unit
 )

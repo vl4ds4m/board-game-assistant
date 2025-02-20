@@ -4,18 +4,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.Carcassonne
 import org.vl4ds4m.board.game.assistant.game.env.BaseOrderedGameEnv
-import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 import org.vl4ds4m.board.game.assistant.game.state.Score
 
-class CarcassonneGame private constructor(
-    private val gameEnv: OrderedGameEnv
-) : OrderedGameEnv by gameEnv {
-    constructor() : this(BaseOrderedGameEnv(Carcassonne))
-
+class CarcassonneGame : BaseOrderedGameEnv(Carcassonne) {
     val onFinal: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     override fun loadFrom(session: GameSession) {
-        gameEnv.loadFrom(session)
+        super.loadFrom(session)
         session.state.let {
             it as? CarcassonneGameState
         }?.let {
@@ -29,7 +24,7 @@ class CarcassonneGame private constructor(
         }.also {
             it.onFinal = this.onFinal.value
         }
-        gameEnv.saveIn(session)
+        super.saveIn(session)
     }
 
     fun addPoints(property: CarcassonneProperty, count: Int) {
@@ -45,8 +40,8 @@ class CarcassonneGame private constructor(
             val player = currentPlayer ?: return
             val score = Score(player.state.score + points)
             val id = currentPlayerId.value ?: return
-            gameEnv.changePlayerState(id, score)
-            gameEnv.selectNextPlayerId()
+            changePlayerState(id, score)
+            changeCurrentPlayerId()
         }
     }
 }

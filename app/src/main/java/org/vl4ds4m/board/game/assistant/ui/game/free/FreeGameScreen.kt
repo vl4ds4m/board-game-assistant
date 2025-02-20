@@ -5,13 +5,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreenPreview
-import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenuActions
+import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreCounter
 
 @Composable
 fun FreeGameScreen(
     viewModel: FreeGameViewModel,
-    menuActions: GameMenuActions,
+    navActions: GameNavActions,
     modifier: Modifier = Modifier,
 ) {
     GameScreen(
@@ -24,7 +24,7 @@ fun FreeGameScreen(
                 onPointsAdd = viewModel::addPoints
             )
         },
-        menuActions = menuActions,
+        navActions = navActions,
         modifier = modifier
     )
 }

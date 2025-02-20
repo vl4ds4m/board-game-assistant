@@ -10,7 +10,7 @@ import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenuActions
+import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreCounter
 import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameScreen
@@ -21,7 +21,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 fun OrderedGameScreen(
     type: OrderedGameType,
     viewModel: GameViewModel,
-    menuActions: GameMenuActions,
+    navActions: GameNavActions,
     modifier: Modifier = Modifier
 ) {
     when (type) {
@@ -34,7 +34,7 @@ fun OrderedGameScreen(
                         onPointsAdd = viewModel::addPoints
                     )
                 },
-                menuActions = menuActions,
+                navActions = navActions,
                 modifier = modifier
             )
         }
@@ -47,21 +47,21 @@ fun OrderedGameScreen(
                         onPointsAdd = viewModel::addPoints
                     )
                 },
-                menuActions = menuActions,
+                navActions = navActions,
                 modifier = modifier
             )
         }
         is Carcassonne -> {
             CarcassonneGameScreen(
                 viewModel = viewModel as CarcassonneGameViewModel,
-                menuActions = menuActions,
+                navActions = navActions,
                 modifier = modifier
             )
         }
         is Monopoly -> {
             MonopolyGameScreen(
                 viewModel = viewModel as MonopolyGameViewModel,
-                menuActions = menuActions,
+                navActions = navActions,
                 modifier = modifier
             )
         }
@@ -73,7 +73,7 @@ fun OrderedGameScreen(
     viewModel: OrderedGameViewModel,
     onNameFormat: (String) -> String,
     masterActions: @Composable () -> Unit,
-    menuActions: GameMenuActions,
+    navActions: GameNavActions,
     modifier: Modifier = Modifier
 ) {
     GameScreen(
@@ -82,7 +82,7 @@ fun OrderedGameScreen(
         currentPlayerId = viewModel.currentPlayerId,
         onSelectPlayer = null,
         masterActions = masterActions,
-        menuActions = menuActions,
+        navActions = navActions,
         modifier = modifier
     )
 }

@@ -18,7 +18,7 @@ class CarcassonneGameViewModel(
     }
 
     fun skip() {
-        gameEnv.selectNextPlayerId()
+        gameEnv.changeCurrentPlayerId()
     }
 
     companion object : GameViewModelFactory {

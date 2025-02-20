@@ -32,7 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneProperty
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreenPreview
-import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenuActions
+import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameScreen
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 import org.vl4ds4m.board.game.assistant.util.title
@@ -40,7 +40,7 @@ import org.vl4ds4m.board.game.assistant.util.title
 @Composable
 fun CarcassonneGameScreen(
     viewModel: CarcassonneGameViewModel,
-    menuActions: GameMenuActions,
+    navActions: GameNavActions,
     modifier: Modifier = Modifier,
 ) {
     OrderedGameScreen(
@@ -54,7 +54,7 @@ fun CarcassonneGameScreen(
                 onFinalChange = { viewModel.onFinal.value = it }
             )
         },
-        menuActions = menuActions,
+        navActions = navActions,
         modifier = modifier
     )
 }

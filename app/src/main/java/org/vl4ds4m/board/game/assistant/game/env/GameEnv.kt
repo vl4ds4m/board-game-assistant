@@ -9,4 +9,8 @@ interface GameEnv : Game {
     fun loadFrom(session: GameSession)
 
     fun saveIn(session: GameSession)
+
+    companion object {
+        const val TAG = "GameEnvironment"
+    }
 }

@@ -1,12 +1,11 @@
 package org.vl4ds4m.board.game.assistant.ui.game
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -20,12 +19,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.StateFlow
-import org.vl4ds4m.board.game.assistant.game.Player
+import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.OrderedGameType
+import org.vl4ds4m.board.game.assistant.game.Player
+import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.game.log.CurrentPlayerChangeAction
+import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
 import org.vl4ds4m.board.game.assistant.game.state.Score
-import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenuActions
+import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
+import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameTopBar
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameScreen
@@ -40,7 +44,8 @@ fun GameScreen(
     topBarTitle: String,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    menuActions: GameMenuActions? = null,
+    navActions: GameNavActions? = null,
+    history: GameHistory? = null,
     content: @Composable (Modifier) -> Unit
 ) {
     Scaffold(
@@ -49,7 +54,8 @@ fun GameScreen(
             GameTopBar(
                 title = topBarTitle,
                 onArrowBackClick = onBackClick,
-                menuActions = menuActions
+                navActions = navActions,
+                history = history
             )
         }
     ) { innerPadding ->
@@ -63,7 +69,7 @@ fun GameScreen(
 @Composable
 fun GameScreen(
     game: Game,
-    menuActions: GameMenuActions,
+    navActions: GameNavActions,
     modifier: Modifier = Modifier
 ) {
     val type = GameType.valueOf(game.type)
@@ -78,7 +84,7 @@ fun GameScreen(
         is Free -> {
             FreeGameScreen(
                 viewModel = viewModel as FreeGameViewModel,
-                menuActions = menuActions,
+                navActions = navActions,
                 modifier = modifier
             )
         }
@@ -87,7 +93,7 @@ fun GameScreen(
             OrderedGameScreen(
                 type = type,
                 viewModel = viewModel,
-                menuActions = menuActions,
+                navActions = navActions,
                 modifier = modifier
             )
         }
@@ -101,7 +107,7 @@ fun GameScreen(
     currentPlayerId: StateFlow<Long?>,
     onSelectPlayer: ((Long) -> Unit)?,
     masterActions: @Composable () -> Unit,
-    menuActions: GameMenuActions,
+    navActions: GameNavActions,
     modifier: Modifier = Modifier
 ) {
     DisposableEffect(Unit) {
@@ -112,21 +118,28 @@ fun GameScreen(
     }
     LaunchedEffect(Unit) {
         viewModel.completed.collect { completed ->
-            if (completed) menuActions.onGameComplete()
+            if (completed) navActions.onGameComplete()
         }
     }
     val name = viewModel.name.collectAsState()
     GameScreen(
         topBarTitle = onNameFormat(name.value),
-        onBackClick = menuActions.onBackClick,
+        onBackClick = navActions.onBackClick,
         modifier = modifier,
-        menuActions = menuActions.copy(
+        navActions = navActions.copy(
             onGameComplete = viewModel::complete
+        ),
+        history = GameHistory(
+            reverted = viewModel.reverted.collectAsState(),
+            repeatable = viewModel.repeatable.collectAsState(),
+            onRevertAction = viewModel::revert,
+            onRepeatAction = viewModel::repeat
         )
     ) { innerModifier ->
         GameScreenContent(
             players = viewModel.players.collectAsState(),
             currentPlayerId = currentPlayerId.collectAsState(),
+            actions = viewModel.actions.collectAsState(),
             onSelectPlayer = onSelectPlayer,
             masterActions = masterActions,
             modifier = innerModifier
@@ -136,14 +149,16 @@ fun GameScreen(
 
 @Composable
 fun GameScreenContent(
-    players: State<Map<Long, Player>>,
+    players: State<Players>,
     currentPlayerId: State<Long?>,
+    actions: State<Actions>,
     onSelectPlayer: ((Long) -> Unit)?,
     masterActions: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.padding(16.dp)
+        modifier = modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         PlayersRating(
             players = players,
@@ -151,11 +166,15 @@ fun GameScreenContent(
             onSelectPlayer = onSelectPlayer,
             modifier = Modifier.weight(1f)
         )
-        Spacer(Modifier.height(40.dp))
-        Box(
+        GameHistory(
+            players = players,
+            actions = actions,
             modifier = Modifier
                 .weight(0.5f)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+        )
+        Box(
+            modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
             masterActions()
@@ -173,6 +192,7 @@ internal fun GameScreenPreview(
         GameScreenContent(
             players = mutableStateOf(fakePlayers),
             currentPlayerId = mutableStateOf(1),
+            actions = mutableStateOf(fakeActions),
             onSelectPlayer = null,
             masterActions = masterActions,
             modifier = modifier
@@ -193,3 +213,8 @@ private val fakePlayers = sequence {
         state = Score(score)
     )
 }.toMap()
+
+private val fakeActions = listOf(
+    CurrentPlayerChangeAction(3, 4, {}, {}),
+    PlayerStateChangeAction(4, Score(2), Score(7), {}, {})
+)

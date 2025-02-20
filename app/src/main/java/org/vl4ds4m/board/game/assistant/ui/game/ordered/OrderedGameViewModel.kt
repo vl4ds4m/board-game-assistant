@@ -9,9 +9,11 @@ abstract class OrderedGameViewModel(
     private val gameEnv: OrderedGameEnv,
     sessionId: Long? = null
 ) : GameViewModel(gameEnv, sessionId), OrderedGame {
+    override val nextPlayerId: StateFlow<Long?> = gameEnv.nextPlayerId
+
     override val orderedPlayerIds: StateFlow<List<Long>> = gameEnv.orderedPlayerIds
 
     override fun changePlayerOrder(id: Long, order: Int) = gameEnv.changePlayerOrder(id, order)
 
-    override fun selectNextPlayerId() = gameEnv.selectNextPlayerId()
+    override fun changeCurrentPlayerId() = gameEnv.changeCurrentPlayerId()
 }

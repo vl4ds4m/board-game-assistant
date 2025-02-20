@@ -1,25 +1,38 @@
 package org.vl4ds4m.board.game.assistant.game.env
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
 import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.GameType
+import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.state.OrderedGameState
-import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.state.PlayerState
+import org.vl4ds4m.board.game.assistant.util.updateAndGetStates
 import org.vl4ds4m.board.game.assistant.util.updateList
 
-class BaseOrderedGameEnv(type: GameType) : OrderedGameEnv, BaseGameEnv(type) {
+open class BaseOrderedGameEnv(type: GameType) : OrderedGameEnv, BaseGameEnv(type) {
+    private val mNextPlayerId: MutableStateFlow<Long?> = MutableStateFlow(null)
+    override val nextPlayerId = mCurrentPlayerId.asStateFlow()
+
     private val mOrderedPlayerIds: MutableStateFlow<List<Long>> = MutableStateFlow(listOf())
     override val orderedPlayerIds: StateFlow<List<Long>> = mOrderedPlayerIds.asStateFlow()
 
-    override fun selectNextPlayerId() {
-        mCurrentPlayerId.update { currentId ->
-            currentId?.let {
-                nextActive(orderedPlayerIds.value, players.value, it)
+    override fun changeCurrentPlayerId() {
+        mCurrentPlayerId.updateAndGetStates { currentId ->
+            getNextActivePlayerId(
+                players.value,
+                orderedPlayerIds.value,
+                currentId
+            ).also {
+                if (it == currentId) return
             }
+        }.let {
+            addActionForCurrentIdUpdate(it)
         }
     }
 
@@ -40,31 +53,58 @@ class BaseOrderedGameEnv(type: GameType) : OrderedGameEnv, BaseGameEnv(type) {
     }
 
     override fun removePlayer(id: Long) {
-        mOrderedPlayerIds.updateList {
+        val (players, _) = remove(id) ?: return
+        val (ids, _) = mOrderedPlayerIds.updateList {
             val index = indexOf(id)
-            if (index != -1) {
-                updateOnEqual(this, players.value, id)
-                removeAt(index)
-            }
+            if (index == -1) return
+            removeAt(index)
         }
-        super.removePlayer(id)
+        updateCurrentIdOnEqual(id, players, ids)?.let {
+            addActionForCurrentIdUpdate(it)
+        }
     }
 
-    private fun updateOnEqual(ids: List<Long>, players: Map<Long, Player>, playerId: Long) {
-        mCurrentPlayerId.update { currentId ->
-            if (playerId == currentId) {
-                nextActive(ids, players, currentId)
-                    .takeUnless { it == currentId }
-            } else {
-                currentId
-            }
+    private fun updateCurrentIdOnEqual(
+        playerId: Long,
+        players: Players,
+        ids: List<Long>
+    ): States<Long?>? {
+        return mCurrentPlayerId.updateAndGetStates { currentId ->
+            if (currentId != playerId) return null
+            getNextActivePlayerId(players, ids, currentId)
+                .takeUnless { it == currentId }
         }
     }
 
     override fun freezePlayer(id: Long) {
-        updateOnEqual(orderedPlayerIds.value, players.value, id)
-        super.freezePlayer(id)
+        val (players, _) = freeze(id) ?: return
+        updateCurrentIdOnEqual(id, players, orderedPlayerIds.value)?.let {
+            addActionForCurrentIdUpdate(it)
+        }
     }
+
+    private val nextPlayerIdObserver = object : Initializable {
+        private var job: Job? = null
+
+        override fun init(scope: CoroutineScope) {
+            close()
+            job = players.combine(orderedPlayerIds) { players, ids ->
+                players to ids
+            }.combine(currentPlayerId) { (players, ids), currentId ->
+                getNextActivePlayerId(players, ids, currentId).let {
+                    mNextPlayerId.value = it
+                }
+            }.launchIn(scope)
+        }
+
+        override fun close() {
+            job?.cancel()
+            job = null
+        }
+    }
+
+    override val initializables: Array<Initializable> =
+        super.initializables + nextPlayerIdObserver
 
     override fun loadFrom(session: GameSession) {
         super.loadFrom(session)
@@ -85,7 +125,12 @@ class BaseOrderedGameEnv(type: GameType) : OrderedGameEnv, BaseGameEnv(type) {
     }
 }
 
-private fun nextActive(ids: List<Long>, players: Map<Long, Player>, currentId: Long): Long? {
+private fun getNextActivePlayerId(
+    players: Players,
+    ids: List<Long>,
+    currentId: Long?
+): Long? {
+    currentId ?: return null
     val startIndex = ids.indexOf(currentId)
     if (startIndex == -1) return null
     var index = startIndex

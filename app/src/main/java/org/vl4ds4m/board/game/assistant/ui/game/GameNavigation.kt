@@ -11,7 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.ui.Home
-import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenuActions
+import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.end.EndGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.setting.GameSettingScreen
 import org.vl4ds4m.board.game.assistant.ui.game.setting.PlayerSettingScreen
@@ -65,7 +65,7 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
     composable<Game> { entry ->
         GameScreen(
             game = entry.toRoute<Game>(),
-            menuActions = GameMenuActions(
+            navActions = GameNavActions(
                 onBackClick = onBackClick,
                 onGameSettingOpen = { navController.navigate(GameSetting) },
                 onPlayerSettingOpen = { navController.navigate(PlayerSetting) },

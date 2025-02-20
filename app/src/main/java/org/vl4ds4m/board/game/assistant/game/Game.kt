@@ -2,14 +2,18 @@ package org.vl4ds4m.board.game.assistant.game
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.vl4ds4m.board.game.assistant.game.log.GameAction
 import org.vl4ds4m.board.game.assistant.game.state.PlayerState
+
+typealias Players = Map<Long, Player>
+typealias Actions = List<GameAction>
 
 interface Game {
     val type: GameType
 
     val name: MutableStateFlow<String>
 
-    val players: StateFlow<Map<Long, Player>>
+    val players: StateFlow<Players>
 
     val currentPlayerId: StateFlow<Long?>
 
@@ -17,8 +21,6 @@ interface Game {
 
     val currentPlayer: Player?
         get() = currentPlayerId.value?.let { players.value[it] }
-
-    fun addPlayer(name: String, state: PlayerState): Long
 
     fun addPlayer(name: String)
 
@@ -47,4 +49,14 @@ interface Game {
     fun complete()
 
     fun returnGame()
+
+    val reverted: StateFlow<Boolean>
+
+    val repeatable: StateFlow<Boolean>
+
+    val actions: StateFlow<Actions>
+
+    fun revert()
+
+    fun repeat()
 }

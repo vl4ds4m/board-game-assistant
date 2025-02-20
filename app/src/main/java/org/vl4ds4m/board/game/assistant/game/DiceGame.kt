@@ -1,12 +1,9 @@
 package org.vl4ds4m.board.game.assistant.game
 
 import org.vl4ds4m.board.game.assistant.game.env.BaseOrderedGameEnv
-import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 import org.vl4ds4m.board.game.assistant.game.state.Score
 
-class DiceGame private constructor(gameEnv: OrderedGameEnv) : OrderedGameEnv by gameEnv {
-    constructor() : this(BaseOrderedGameEnv(Dice))
-
+class DiceGame : BaseOrderedGameEnv(Dice) {
     fun addPoints(points: Int) {
         if (points < 0 || points % 5 != 0) {
             return
@@ -24,7 +21,7 @@ class DiceGame private constructor(gameEnv: OrderedGameEnv) : OrderedGameEnv by 
         }
         val id = currentPlayerId.value ?: return
         changePlayerState(id, newScore)
-        selectNextPlayerId()
+        changeCurrentPlayerId()
     }
 }
 

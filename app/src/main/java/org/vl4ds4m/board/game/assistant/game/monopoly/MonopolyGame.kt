@@ -7,17 +7,12 @@ import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.env.BaseOrderedGameEnv
-import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 import org.vl4ds4m.board.game.assistant.game.monopoly.entity.MonopolyEntity
 import org.vl4ds4m.board.game.assistant.game.monopoly.entity.Supplier
 import org.vl4ds4m.board.game.assistant.util.updateMap
 
 @Suppress("unused")
-class MonopolyGame private constructor(
-    private val gameEnv: OrderedGameEnv
-) : OrderedGameEnv by gameEnv {
-    constructor() : this(BaseOrderedGameEnv(Monopoly))
-
+class MonopolyGame : BaseOrderedGameEnv(Monopoly) {
     private val mEntityOwner: MutableStateFlow<Map<MonopolyEntity, Long>> =
         MutableStateFlow(mapOf())
     private val entityOwner: StateFlow<Map<MonopolyEntity, Long>> =
@@ -35,7 +30,7 @@ class MonopolyGame private constructor(
     }
 
     override fun loadFrom(session: GameSession) {
-        gameEnv.loadFrom(session)
+        super.loadFrom(session)
         session.state.let {
             it as? MonopolyGameState
         }?.let {
@@ -53,7 +48,7 @@ class MonopolyGame private constructor(
             it.repeatCount = this.repeatCount
             it.afterStepField = this.afterStepField.value
         }
-        gameEnv.saveIn(session)
+        super.saveIn(session)
     }
 
     fun movePlayer(step1: Int, step2: Int) {
@@ -94,13 +89,13 @@ class MonopolyGame private constructor(
     private fun moveToPrison(state: MonopolyPlayerState) {
         state.position = GoToPrison.POSITION
         state.inPrison = true
-        selectNextPlayerId()
+        changeCurrentPlayerId()
     }
 
-    override fun selectNextPlayerId() {
+    override fun changeCurrentPlayerId() {
         repeatCount = 0
         mAfterStepField.value = null
-        gameEnv.selectNextPlayerId()
+        changeCurrentPlayerId()
     }
 
     fun buyCurrentEntity() {
@@ -109,7 +104,7 @@ class MonopolyGame private constructor(
         buyEntity(id, entity, entity.cost)
     }
 
-    fun buyEntity(playerId: Long, entity: MonopolyEntity, cost: Int) {
+    private fun buyEntity(playerId: Long, entity: MonopolyEntity, cost: Int) {
         if (cost <= 0) return
         if (entity in entityOwner.value) return
         if (playerId !in players.value) return

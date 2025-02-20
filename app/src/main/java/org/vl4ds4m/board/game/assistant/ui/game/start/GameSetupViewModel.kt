@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import org.vl4ds4m.board.game.assistant.data.Store
-import org.vl4ds4m.board.game.assistant.domain.game.GameType
+import org.vl4ds4m.board.game.assistant.game.GameType
 
 class GameSetupViewModel : ViewModel() {
     val type = mutableStateOf<GameType?>(null)

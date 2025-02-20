@@ -1,7 +1,7 @@
 package org.vl4ds4m.board.game.assistant.ui.game.free
 
-import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
-import org.vl4ds4m.board.game.assistant.domain.game.simple.FreeGame
+import org.vl4ds4m.board.game.assistant.game.env.GameEnv
+import org.vl4ds4m.board.game.assistant.game.simple.FreeGame
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 

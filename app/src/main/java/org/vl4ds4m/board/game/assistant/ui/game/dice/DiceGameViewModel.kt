@@ -1,7 +1,7 @@
 package org.vl4ds4m.board.game.assistant.ui.game.dice
 
-import org.vl4ds4m.board.game.assistant.domain.game.DiceGame
-import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
+import org.vl4ds4m.board.game.assistant.game.DiceGame
+import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
 

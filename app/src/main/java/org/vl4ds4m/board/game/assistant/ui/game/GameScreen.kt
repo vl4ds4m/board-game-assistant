@@ -20,10 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.StateFlow
-import org.vl4ds4m.board.game.assistant.domain.Player
-import org.vl4ds4m.board.game.assistant.domain.game.Free
-import org.vl4ds4m.board.game.assistant.domain.game.GameType
-import org.vl4ds4m.board.game.assistant.domain.game.OrderedGameType
+import org.vl4ds4m.board.game.assistant.game.Player
+import org.vl4ds4m.board.game.assistant.game.Free
+import org.vl4ds4m.board.game.assistant.game.GameType
+import org.vl4ds4m.board.game.assistant.game.OrderedGameType
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenuActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameTopBar
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating

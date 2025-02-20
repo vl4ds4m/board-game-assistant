@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.vl4ds4m.board.game.assistant.domain.game.carcassonne.CarcassonneProperty
+import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneProperty
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreenPreview
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenuActions
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameScreen

@@ -1,7 +1,7 @@
 package org.vl4ds4m.board.game.assistant.ui.game.ordered
 
-import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
-import org.vl4ds4m.board.game.assistant.domain.game.simple.SimpleOrderedGame
+import org.vl4ds4m.board.game.assistant.game.env.GameEnv
+import org.vl4ds4m.board.game.assistant.game.simple.SimpleOrderedGame
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 
 class SimpleOrderedGameViewModel private constructor(

@@ -2,11 +2,11 @@ package org.vl4ds4m.board.game.assistant.ui.game.ordered
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import org.vl4ds4m.board.game.assistant.domain.game.Carcassonne
-import org.vl4ds4m.board.game.assistant.domain.game.Dice
-import org.vl4ds4m.board.game.assistant.domain.game.Monopoly
-import org.vl4ds4m.board.game.assistant.domain.game.OrderedGameType
-import org.vl4ds4m.board.game.assistant.domain.game.SimpleOrdered
+import org.vl4ds4m.board.game.assistant.game.Carcassonne
+import org.vl4ds4m.board.game.assistant.game.Dice
+import org.vl4ds4m.board.game.assistant.game.Monopoly
+import org.vl4ds4m.board.game.assistant.game.OrderedGameType
+import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameViewModel

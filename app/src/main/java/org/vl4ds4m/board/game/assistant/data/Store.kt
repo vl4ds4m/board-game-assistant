@@ -1,13 +1,13 @@
 package org.vl4ds4m.board.game.assistant.data
 
 import androidx.compose.runtime.mutableStateMapOf
-import org.vl4ds4m.board.game.assistant.domain.game.Carcassonne
-import org.vl4ds4m.board.game.assistant.domain.game.Dice
-import org.vl4ds4m.board.game.assistant.domain.game.Free
-import org.vl4ds4m.board.game.assistant.domain.game.GameType
-import org.vl4ds4m.board.game.assistant.domain.game.Monopoly
-import org.vl4ds4m.board.game.assistant.domain.game.SimpleOrdered
-import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
+import org.vl4ds4m.board.game.assistant.game.Carcassonne
+import org.vl4ds4m.board.game.assistant.game.Dice
+import org.vl4ds4m.board.game.assistant.game.Free
+import org.vl4ds4m.board.game.assistant.game.GameType
+import org.vl4ds4m.board.game.assistant.game.Monopoly
+import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
+import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import java.util.concurrent.atomic.AtomicLong
 
 object Store {

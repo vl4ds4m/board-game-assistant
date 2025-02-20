@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import org.vl4ds4m.board.game.assistant.domain.Player
+import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel

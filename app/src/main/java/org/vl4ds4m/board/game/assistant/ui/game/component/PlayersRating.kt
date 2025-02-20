@@ -9,7 +9,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.vl4ds4m.board.game.assistant.domain.Player
+import org.vl4ds4m.board.game.assistant.game.Player
 
 @Composable
 fun PlayersRating(

@@ -1,9 +1,9 @@
 package org.vl4ds4m.board.game.assistant.ui.game.carcassonne
 
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.vl4ds4m.board.game.assistant.domain.game.carcassonne.CarcassonneGame
-import org.vl4ds4m.board.game.assistant.domain.game.carcassonne.CarcassonneProperty
-import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
+import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneGame
+import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneProperty
+import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
 

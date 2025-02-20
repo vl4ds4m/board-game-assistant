@@ -1,7 +1,7 @@
 package org.vl4ds4m.board.game.assistant.ui.game.monopoly
 
-import org.vl4ds4m.board.game.assistant.domain.game.env.GameEnv
-import org.vl4ds4m.board.game.assistant.domain.game.monopoly.MonopolyGame
+import org.vl4ds4m.board.game.assistant.game.env.GameEnv
+import org.vl4ds4m.board.game.assistant.game.monopoly.MonopolyGame
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
 

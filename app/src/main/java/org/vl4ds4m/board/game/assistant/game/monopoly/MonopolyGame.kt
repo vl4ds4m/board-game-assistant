@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.Monopoly
+import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.env.BaseOrderedGameEnv
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 import org.vl4ds4m.board.game.assistant.game.monopoly.entity.MonopolyEntity
@@ -12,19 +13,15 @@ import org.vl4ds4m.board.game.assistant.game.monopoly.entity.Supplier
 import org.vl4ds4m.board.game.assistant.util.updateMap
 
 @Suppress("unused")
-class MonopolyGame(
-    private val gameEnv: OrderedGameEnv = BaseOrderedGameEnv(Monopoly)
-) : OrderedGameEnv by gameEnv
-{
+class MonopolyGame private constructor(
+    private val gameEnv: OrderedGameEnv
+) : OrderedGameEnv by gameEnv {
+    constructor() : this(BaseOrderedGameEnv(Monopoly))
+
     private val mEntityOwner: MutableStateFlow<Map<MonopolyEntity, Long>> =
         MutableStateFlow(mapOf())
     private val entityOwner: StateFlow<Map<MonopolyEntity, Long>> =
         mEntityOwner.asStateFlow()
-
-    private val mPlayerState: MutableStateFlow<Map<Long, MonopolyPlayerState>> =
-        MutableStateFlow(mapOf())
-    private val playerState: StateFlow<Map<Long, MonopolyPlayerState>> =
-        mPlayerState.asStateFlow()
 
     private var repeatCount: Int = 0
 
@@ -33,13 +30,16 @@ class MonopolyGame(
     private val afterStepField: StateFlow<MonopolyField?> =
         mAfterStepField.asStateFlow()
 
+    override fun addPlayer(name: String) {
+        addPlayer(name, MonopolyPlayerState())
+    }
+
     override fun loadFrom(session: GameSession) {
         gameEnv.loadFrom(session)
         session.state.let {
             it as? MonopolyGameState
         }?.let {
             this.mEntityOwner.value = it.entityOwner
-            this.mPlayerState.value = it.playerState
             this.repeatCount = it.repeatCount
             this.mAfterStepField.value = it.afterStepField
         }
@@ -50,7 +50,6 @@ class MonopolyGame(
             it as? MonopolyGameState ?: MonopolyGameState()
         }.also {
             it.entityOwner = this.entityOwner.value
-            it.playerState = this.playerState.value
             it.repeatCount = this.repeatCount
             it.afterStepField = this.afterStepField.value
         }
@@ -63,7 +62,7 @@ class MonopolyGame(
             if (it !in 1..6) return
         }
         val id = currentPlayerId.value ?: return
-        val state = playerState.value[id] ?: return
+        val state = players.value[id]?.monopolyState ?: return
         val equalSteps = step1 == step2
         if (state.inPrison) {
             if (equalSteps) state.inPrison = false
@@ -78,9 +77,7 @@ class MonopolyGame(
         val step = step1 + step2
         val pos = (state.position + step).let {
             if (it > MonopolyField.COUNT) {
-                val player = currentPlayer ?: return
-                val score = player.score + Ahead.MONEY
-                changePlayerScore(id, score)
+                state.score += Ahead.MONEY
                 it % MonopolyField.COUNT
             } else {
                 it
@@ -116,10 +113,9 @@ class MonopolyGame(
         if (cost <= 0) return
         if (entity in entityOwner.value) return
         if (playerId !in players.value) return
-        val state = playerState.value[playerId] ?: return
-        val score = players.value[playerId]?.score ?: return
-        if (score >= cost) {
-            changePlayerScore(playerId, score - cost)
+        val state = players.value[playerId]?.monopolyState ?: return
+        if (state.score >= cost) {
+            state.score -= cost
             state.entities += entity
             mEntityOwner.updateMap {
                 put(entity, playerId)
@@ -136,19 +132,18 @@ class MonopolyGame(
         }
         val ownerId = entityOwner.value[entity] ?: return
         if (ownerId == payerId) return
-        val payee = players.value[ownerId] ?: return
+        val payeeState = players.value[ownerId]?.monopolyState ?: return
         val cost = when (entity) {
             is Supplier -> entity.rent * factor!!
             else -> entity.rent
         }
-        val payer = players.value[payerId] ?: return
-        if (payer.score >= cost) {
-            changePlayerScore(payerId, payer.score - cost)
-            changePlayerScore(ownerId, payee.score + cost)
+        val payerState = players.value[payerId]?.monopolyState ?: return
+        if (payerState.score >= cost) {
+            payerState.score -= cost
+            payeeState.score += cost
         }
     }
-
-
 }
 
-
+private val Player.monopolyState: MonopolyPlayerState?
+    get() = state as? MonopolyPlayerState

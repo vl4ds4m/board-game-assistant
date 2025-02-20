@@ -6,19 +6,16 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
 
 class DiceGameViewModel private constructor(
-    private val game: DiceGame = DiceGame(),
+    private val gameEnv: DiceGame = DiceGame(),
     sessionId: Long? = null
-) : OrderedGameViewModel(
-    game = game,
-    sessionId = sessionId
-) {
+) : OrderedGameViewModel(gameEnv, sessionId) {
     fun addPoints(points: Int) {
-        game.addPoints(points)
+        gameEnv.addPoints(points)
     }
 
     companion object : GameViewModelFactory {
         override fun createFrom(gameEnv: GameEnv): DiceGameViewModel {
-            return DiceGameViewModel(game = gameEnv as DiceGame)
+            return DiceGameViewModel(gameEnv = gameEnv as DiceGame)
         }
 
         override fun createFrom(sessionId: Long): DiceGameViewModel {

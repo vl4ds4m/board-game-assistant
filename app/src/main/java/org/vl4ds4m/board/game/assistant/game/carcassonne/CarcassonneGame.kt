@@ -5,11 +5,13 @@ import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.Carcassonne
 import org.vl4ds4m.board.game.assistant.game.env.BaseOrderedGameEnv
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
+import org.vl4ds4m.board.game.assistant.game.state.Score
 
-class CarcassonneGame(
-    private val gameEnv: OrderedGameEnv = BaseOrderedGameEnv(Carcassonne)
-) : OrderedGameEnv by gameEnv
-{
+class CarcassonneGame private constructor(
+    private val gameEnv: OrderedGameEnv
+) : OrderedGameEnv by gameEnv {
+    constructor() : this(BaseOrderedGameEnv(Carcassonne))
+
     val onFinal: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     override fun loadFrom(session: GameSession) {
@@ -41,9 +43,9 @@ class CarcassonneGame(
         }
         if (points > 0) {
             val player = currentPlayer ?: return
-            val score = player.score + points
+            val score = Score(player.state.score + points)
             val id = currentPlayerId.value ?: return
-            gameEnv.changePlayerScore(id, score)
+            gameEnv.changePlayerState(id, score)
             gameEnv.selectNextPlayerId()
         }
     }

@@ -1,11 +1,5 @@
 package org.vl4ds4m.board.game.assistant.game.env
 
-import kotlinx.coroutines.flow.StateFlow
+import org.vl4ds4m.board.game.assistant.game.OrderedGame
 
-interface OrderedGameEnv : GameEnv {
-    val orderedPlayerIds: StateFlow<List<Long>>
-
-    fun selectNextPlayerId()
-
-    fun changePlayerOrder(id: Long, order: Int)
-}
+interface OrderedGameEnv : OrderedGame, GameEnv

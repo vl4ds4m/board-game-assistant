@@ -5,13 +5,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import org.vl4ds4m.board.game.assistant.data.GameSession
-import org.vl4ds4m.board.game.assistant.game.Initializable
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.Player
+import org.vl4ds4m.board.game.assistant.game.state.PlayerState
+import org.vl4ds4m.board.game.assistant.game.state.Score
 import org.vl4ds4m.board.game.assistant.util.updateMap
 import java.util.concurrent.atomic.AtomicLong
 
-open class BaseGameEnv(private val type: GameType) : GameEnv {
+open class BaseGameEnv(override val type: GameType) : GameEnv {
     override val name: MutableStateFlow<String> = MutableStateFlow("")
 
     private val mPlayers: MutableStateFlow<Map<Long, Player>> = MutableStateFlow(mapOf())
@@ -29,16 +30,20 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
 
     private var nextPlayerId: AtomicLong = AtomicLong(0)
 
-    override fun addPlayer(name: String): Long {
+    override fun addPlayer(name: String, state: PlayerState): Long {
         val id = nextPlayerId.incrementAndGet()
         val player = Player(
             name = name,
             active = true,
-            score = 0
+            state = state
         )
         mPlayers.updateMap { put(id, player) }
         mCurrentPlayerId.update { it ?: id }
         return id
+    }
+
+    override fun addPlayer(name: String) {
+        addPlayer(name, Score())
     }
 
     override fun removePlayer(id: Long) {
@@ -75,10 +80,10 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
         }
     }
 
-    override fun changePlayerScore(id: Long, score: Int) {
+    override fun changePlayerState(id: Long, state: PlayerState) {
         mPlayers.updateMap {
             val player = get(id) ?: return
-            put(id, player.copy(score = score))
+            put(id, player.copy(state = state))
         }
     }
 
@@ -99,8 +104,6 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
     }
 
     private val timer: Timer = Timer()
-
-    override val initializables: Array<Initializable> = arrayOf(timer)
 
     override fun start() {
         if (startTime == null) {
@@ -123,6 +126,8 @@ open class BaseGameEnv(private val type: GameType) : GameEnv {
         timeout.value = false
         mCompleted.value = false
     }
+
+    override val initializables: Array<Initializable> = arrayOf(timer)
 
     override fun loadFrom(session: GameSession) {
         session.let { s ->

@@ -8,9 +8,10 @@ import org.vl4ds4m.board.game.assistant.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.state.OrderedGameState
 import org.vl4ds4m.board.game.assistant.game.Player
+import org.vl4ds4m.board.game.assistant.game.state.PlayerState
 import org.vl4ds4m.board.game.assistant.util.updateList
 
-class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
+class BaseOrderedGameEnv(type: GameType) : OrderedGameEnv, BaseGameEnv(type) {
     private val mOrderedPlayerIds: MutableStateFlow<List<Long>> = MutableStateFlow(listOf())
     override val orderedPlayerIds: StateFlow<List<Long>> = mOrderedPlayerIds.asStateFlow()
 
@@ -32,8 +33,8 @@ class BaseOrderedGameEnv(type: GameType) : BaseGameEnv(type), OrderedGameEnv {
         }
     }
 
-    override fun addPlayer(name: String): Long {
-        val id = super.addPlayer(name)
+    override fun addPlayer(name: String, state: PlayerState): Long {
+        val id = super.addPlayer(name, state)
         mOrderedPlayerIds.updateList { add(id) }
         return id
     }

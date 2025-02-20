@@ -6,7 +6,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.vl4ds4m.board.game.assistant.game.Initializable
 import kotlin.time.Duration.Companion.seconds
 
 class Timer : Initializable {

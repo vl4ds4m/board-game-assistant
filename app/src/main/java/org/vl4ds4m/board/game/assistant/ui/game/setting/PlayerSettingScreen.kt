@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import org.vl4ds4m.board.game.assistant.game.Player
+import org.vl4ds4m.board.game.assistant.game.state.Score
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
@@ -127,8 +128,8 @@ private fun PlayerSettingScreenPreview() {
     BoardGameAssistantTheme {
         PlayerSettingScreenContent(
             players = mutableStateOf(listOf(
-                1L to Player("Abc", true, 0),
-                2L to Player("Def", true, 0),
+                1L to Player("Abc", true, Score()),
+                2L to Player("Def", true, Score()),
             )),
             currentPlayerId = mutableStateOf(null),
             onPlayerAdd = {},

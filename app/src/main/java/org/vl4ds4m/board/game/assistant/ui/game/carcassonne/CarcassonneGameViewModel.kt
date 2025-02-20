@@ -8,25 +8,22 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
 
 class CarcassonneGameViewModel(
-    private val game: CarcassonneGame = CarcassonneGame(),
+    private val gameEnv: CarcassonneGame = CarcassonneGame(),
     sessionId: Long? = null
-) : OrderedGameViewModel(
-    game = game,
-    sessionId = sessionId
-) {
-    val onFinal: MutableStateFlow<Boolean> = game.onFinal
+) : OrderedGameViewModel(gameEnv, sessionId) {
+    val onFinal: MutableStateFlow<Boolean> = gameEnv.onFinal
 
     fun addPoints(property: CarcassonneProperty, count: Int) {
-        game.addPoints(property, count)
+        gameEnv.addPoints(property, count)
     }
 
     fun skip() {
-        game.selectNextPlayerId()
+        gameEnv.selectNextPlayerId()
     }
 
     companion object : GameViewModelFactory {
         override fun createFrom(gameEnv: GameEnv): CarcassonneGameViewModel {
-            return CarcassonneGameViewModel(game = gameEnv as CarcassonneGame)
+            return CarcassonneGameViewModel(gameEnv = gameEnv as CarcassonneGame)
         }
 
         override fun createFrom(sessionId: Long): CarcassonneGameViewModel {

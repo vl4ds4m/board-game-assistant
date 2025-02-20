@@ -24,6 +24,7 @@ import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.OrderedGameType
+import org.vl4ds4m.board.game.assistant.game.state.Score
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenuActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameTopBar
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
@@ -189,6 +190,6 @@ private val fakePlayers = sequence {
     (i + 1L) to Player(
         name = name,
         active = true,
-        score = score
+        state = Score(score)
     )
 }.toMap()

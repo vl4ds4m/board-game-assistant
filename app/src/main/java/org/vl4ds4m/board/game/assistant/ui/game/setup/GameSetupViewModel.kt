@@ -27,9 +27,9 @@ class GameSetupViewModel : ViewModel() {
     }
 
     fun createGame() {
-        val game = this.type.value!!.createGame()
-        game.name.value = this.name.value
-        this.players.forEach { game.addPlayer(it) }
+        val game = type.value?.createGame() ?: return
+        game.name.value = name.value
+        players.forEach { game.addPlayer(it) }
         Store.currentGame = game
     }
 }

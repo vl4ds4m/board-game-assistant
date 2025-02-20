@@ -15,8 +15,8 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenuActions
 import org.vl4ds4m.board.game.assistant.ui.game.end.EndGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.setting.GameSettingScreen
 import org.vl4ds4m.board.game.assistant.ui.game.setting.PlayerSettingScreen
-import org.vl4ds4m.board.game.assistant.ui.game.start.NewGamePlayersScreen
-import org.vl4ds4m.board.game.assistant.ui.game.start.NewGameStartScreen
+import org.vl4ds4m.board.game.assistant.ui.game.setup.NewGamePlayersScreen
+import org.vl4ds4m.board.game.assistant.ui.game.setup.NewGameStartScreen
 
 sealed interface GameRoute
 

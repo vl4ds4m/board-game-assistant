@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.ui.game.start
+package org.vl4ds4m.board.game.assistant.ui.game.setup
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf

@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.ui.Home
+import org.vl4ds4m.board.game.assistant.ui.game.component.DiceImitationScreen
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.end.EndGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.setting.GameSettingScreen
@@ -36,14 +37,17 @@ data object GameSetting : GameRoute
 data object PlayerSetting : GameRoute
 
 @Serializable
+data object DiceImitation : GameRoute
+
+@Serializable
 data object End : GameRoute
 
 fun NavGraphBuilder.gameNavigation(navController: NavController) {
-    val onBackClick: () -> Unit = { navController.navigateUp() }
+    val navigateUp: () -> Unit = { navController.navigateUp() }
     composable<NewGameStart> {
         NewGameStartScreen(
             viewModel = viewModel(),
-            onBackClick = onBackClick,
+            onBackClick = navigateUp,
             onSetupPlayers = {
                 navController.navigate(NewGamePlayers)
             }
@@ -53,7 +57,7 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
         val gameStartEntry = navController.rememberTopmost<NewGameStart>(entry)
         NewGamePlayersScreen(
             viewModel = viewModel(gameStartEntry),
-            onBackClick = onBackClick,
+            onBackClick = navigateUp,
             onStartGame = { type ->
                 val game = Game(type.title)
                 navController.navigate(game) {
@@ -66,9 +70,10 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
         GameScreen(
             game = entry.toRoute<Game>(),
             navActions = GameNavActions(
-                onBackClick = onBackClick,
+                onBackClick = navigateUp,
                 onGameSettingOpen = { navController.navigate(GameSetting) },
                 onPlayerSettingOpen = { navController.navigate(PlayerSetting) },
+                navigateDiceImitation = { navController.navigate(DiceImitation) },
                 onGameComplete = { navController.navigate(End) },
             )
         )
@@ -77,21 +82,24 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
         val gameEntry = navController.rememberTopmost<Game>(entry)
         GameSettingScreen(
             viewModel = viewModel(gameEntry),
-            onBackClick = onBackClick
+            onBackClick = navigateUp
         )
     }
     composable<PlayerSetting> { entry ->
         val gameEntry = navController.rememberTopmost<Game>(entry)
         PlayerSettingScreen(
             viewModel = viewModel(gameEntry),
-            onBackClick = onBackClick
+            onBackClick = navigateUp
         )
+    }
+    composable<DiceImitation> {
+        DiceImitationScreen(navigateUp)
     }
     composable<End> { entry ->
         val gameEntry = navController.rememberTopmost<Game>(entry)
         EndGameScreen(
             viewModel = viewModel(gameEntry),
-            onBackClick = onBackClick,
+            onBackClick = navigateUp,
             onHomeNavigate = {
                 navController.navigate(Home) {
                     popUpTo<Home>()

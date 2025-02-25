@@ -98,6 +98,7 @@ fun GameMenu(
         listOf(
             "Open game settings"   to actions.onGameSettingOpen,
             "Open player settings" to actions.onPlayerSettingOpen,
+            "Open Dice imitation"  to actions.navigateDiceImitation,
             "Complete game"        to actions.onGameComplete,
         ).forEach { (text, action) ->
             DropdownMenuItem(
@@ -129,6 +130,7 @@ data class GameNavActions(
     val onBackClick: () -> Unit,
     val onGameSettingOpen: () -> Unit,
     val onPlayerSettingOpen: () -> Unit,
+    val navigateDiceImitation: () -> Unit,
     val onGameComplete: () -> Unit
 ) {
     companion object {
@@ -136,6 +138,7 @@ data class GameNavActions(
             onBackClick = {},
             onGameSettingOpen = {},
             onPlayerSettingOpen = {},
+            navigateDiceImitation = {},
             onGameComplete = {}
         )
     }

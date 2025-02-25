@@ -54,7 +54,7 @@ private fun InitializerViewModelFactoryBuilder.initializer(
 ) {
     initializer<GameViewModel> {
         if (sessionId == null) {
-            factory.createFrom(Store.currentGame as GameEnv)
+            factory.createFrom(Store.currentGameEnv as GameEnv)
         } else {
             factory.createFrom(sessionId)
         }

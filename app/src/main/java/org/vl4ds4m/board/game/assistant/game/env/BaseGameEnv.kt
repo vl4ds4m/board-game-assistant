@@ -220,7 +220,7 @@ open class BaseGameEnv(override val type: GameType) : GameEnv {
             name.value = s.name
             mPlayers.value = s.players
             mCurrentPlayerId.value = s.currentPlayerId
-            s.nextPlayerId?.let {
+            s.nextNewPlayerId?.let {
                 nextNewPlayerId.set(it)
             }
             startTime = s.startTime
@@ -237,7 +237,7 @@ open class BaseGameEnv(override val type: GameType) : GameEnv {
             it.name = name.value
             it.players = players.value
             it.currentPlayerId = currentPlayerId.value
-            it.nextPlayerId = nextNewPlayerId.get()
+            it.nextNewPlayerId = nextNewPlayerId.get()
             it.startTime = startTime
             it.timeout = timeout.value
             it.secondsToEnd = secondsToEnd.value

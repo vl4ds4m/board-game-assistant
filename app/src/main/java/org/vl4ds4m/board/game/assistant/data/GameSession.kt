@@ -11,12 +11,11 @@ class GameSession(
     var name: String = "",
     var players: Map<Long, Player> = mapOf(),
     var currentPlayerId: Long? = null,
-    var nextPlayerId: Long? = null,
+    var nextNewPlayerId: Long? = null,
     var startTime: Long? = null,
     var timeout: Boolean = false,
     var secondsToEnd: Int = 0,
     var actions: List<GameAction> = listOf(),
     var currentActionPosition: Int = 0,
-    var state: GameState? = null,
-    var fake: Boolean = false
+    var state: GameState? = null
 )

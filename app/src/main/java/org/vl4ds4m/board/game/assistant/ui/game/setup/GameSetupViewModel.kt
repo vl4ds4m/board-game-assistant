@@ -30,6 +30,6 @@ class GameSetupViewModel : ViewModel() {
         val game = type.value?.createGame() ?: return
         game.name.value = name.value
         players.forEach { game.addPlayer(it) }
-        Store.currentGame = game
+        Store.currentGameEnv = game
     }
 }

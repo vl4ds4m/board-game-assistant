@@ -7,6 +7,7 @@ import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
+import org.vl4ds4m.board.game.assistant.game.state.OrderedGameState
 import org.vl4ds4m.board.game.assistant.game.state.Score
 import java.util.concurrent.atomic.AtomicLong
 
@@ -65,6 +66,7 @@ private val defaultGames: List<GameSession> = listOf(
         currentPlayerId = 1L,
         nextNewPlayerId = 10L,
         startTime = initialTime + 40_000,
+        state = OrderedGameState(listOf(1, 2, 3))
     ),
     GameSession(
         type = Free,
@@ -118,6 +120,7 @@ private val defaultGames: List<GameSession> = listOf(
         ),
         currentPlayerId = 3L,
         nextNewPlayerId = 10L,
-        startTime = initialTime + 30_000
+        startTime = initialTime + 30_000,
+        state = OrderedGameState(listOf(1, 2, 3, 4))
     )
 )

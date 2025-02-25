@@ -12,6 +12,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -162,8 +163,13 @@ fun GameScreenContent(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        val activePlayers = remember {
+            derivedStateOf {
+                players.value.filterValues { it.active }
+            }
+        }
         PlayersRating(
-            players = players,
+            players = activePlayers,
             currentPlayerId = currentPlayerId,
             onSelectPlayer = onSelectPlayer,
             modifier = Modifier.weight(1f)

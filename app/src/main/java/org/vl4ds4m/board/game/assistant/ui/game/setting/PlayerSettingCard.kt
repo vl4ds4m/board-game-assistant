@@ -1,6 +1,5 @@
 package org.vl4ds4m.board.game.assistant.ui.game.setting
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -195,7 +194,6 @@ class PlayerSettingActions(
     }
 }
 
-@SuppressLint("UnrememberedMutableState")
 @Composable
 private fun PlayerSettingCardPreview(
     active: Boolean,
@@ -209,7 +207,7 @@ private fun PlayerSettingCardPreview(
             selected = selected,
             menuActions = PlayerSettingActions.Empty,
             index = 6,
-            count = mutableIntStateOf(10),
+            count = remember { mutableIntStateOf(10) },
             onOrderChange = { _, _ -> }
         )
     }

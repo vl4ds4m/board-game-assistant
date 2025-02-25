@@ -2,9 +2,7 @@ package org.vl4ds4m.board.game.assistant.ui.game.free
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.GameScreenPreview
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreCounter
 
@@ -26,17 +24,5 @@ fun FreeGameScreen(
         },
         navActions = navActions,
         modifier = modifier
-    )
-}
-
-@Preview
-@Composable
-private fun FreeGameScreenPreview() {
-    GameScreenPreview(
-        masterActions = {
-            ScoreCounter(
-                onPointsAdd = {}
-            )
-        }
     )
 }

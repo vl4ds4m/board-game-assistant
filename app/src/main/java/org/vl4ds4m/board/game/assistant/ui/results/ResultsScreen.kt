@@ -2,8 +2,6 @@ package org.vl4ds4m.board.game.assistant.ui.results
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,12 +23,6 @@ fun ResultsScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun ResultsScreenPreview() {
     BoardGameAssistantTheme {
-        Scaffold { innerPadding ->
-            ResultsScreen(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            )
-        }
+        ResultsScreen(Modifier.fillMaxSize())
     }
 }

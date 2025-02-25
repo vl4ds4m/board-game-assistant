@@ -1,6 +1,5 @@
 package org.vl4ds4m.board.game.assistant.ui.game
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +13,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +33,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameTopBar
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
+import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreCounter
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameScreen
@@ -182,21 +184,26 @@ fun GameScreenContent(
     }
 }
 
-@SuppressLint("UnrememberedMutableState")
+@Preview
 @Composable
-internal fun GameScreenPreview(
-    masterActions: @Composable () -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun GameScreenPreview() {
     BoardGameAssistantTheme {
-        GameScreenContent(
-            players = mutableStateOf(fakePlayers),
-            currentPlayerId = mutableStateOf(1),
-            actions = mutableStateOf(fakeActions),
-            onSelectPlayer = null,
-            masterActions = masterActions,
-            modifier = modifier
-        )
+        GameScreen(
+            topBarTitle = "Some game",
+            onBackClick = {},
+            modifier = Modifier.fillMaxSize(),
+            navActions = GameNavActions.Empty,
+            history = GameHistory.Empty
+        ) {
+            GameScreenContent(
+                players = remember { mutableStateOf(fakePlayers) },
+                currentPlayerId = remember { mutableStateOf(1) },
+                actions = remember { mutableStateOf(fakeActions) },
+                onSelectPlayer = null,
+                masterActions = { ScoreCounter({}) },
+                modifier = it
+            )
+        }
     }
 }
 

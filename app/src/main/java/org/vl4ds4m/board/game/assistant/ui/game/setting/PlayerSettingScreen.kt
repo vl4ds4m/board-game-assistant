@@ -1,6 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui.game.setting
 
-import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -88,7 +88,8 @@ fun PlayerSettingScreenContent(
     Column(modifier) {
         val count = remember { derivedStateOf { players.value.size } }
         LazyColumn(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             itemsIndexed(
                 items = players.value,
@@ -111,7 +112,7 @@ fun PlayerSettingScreenContent(
             onClick = onPlayerAdd,
             modifier = Modifier
                 .align(Alignment.End)
-                .padding(horizontal = 24.dp)
+                .padding(24.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
@@ -121,17 +122,20 @@ fun PlayerSettingScreenContent(
     }
 }
 
-@SuppressLint("UnrememberedMutableState")
 @Preview
 @Composable
 private fun PlayerSettingScreenPreview() {
     BoardGameAssistantTheme {
         PlayerSettingScreenContent(
-            players = mutableStateOf(listOf(
-                1L to Player("Abc", true, Score()),
-                2L to Player("Def", true, Score()),
-            )),
-            currentPlayerId = mutableStateOf(null),
+            players = remember {
+                mutableStateOf(
+                    listOf(
+                        1L to Player("Abc", true, Score()),
+                        2L to Player("Def", true, Score()),
+                    )
+                )
+            },
+            currentPlayerId = remember { mutableStateOf(null) },
             onPlayerAdd = {},
             onPlayerOrderChange = { _, _ -> },
             playerSettingActions = PlayerSettingActions.Empty,

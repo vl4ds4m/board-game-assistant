@@ -18,7 +18,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import org.vl4ds4m.board.game.assistant.R
+import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,13 +111,35 @@ fun GameMenu(
     }
 }
 
+@Preview
+@Composable
+private fun GameTopBarPreview() {
+    BoardGameAssistantTheme {
+        GameTopBar(
+            title = "Some game",
+            onArrowBackClick = {},
+            navActions = GameNavActions.Empty,
+            history = GameHistory.Empty
+        )
+    }
+}
+
 @Immutable
 data class GameNavActions(
     val onBackClick: () -> Unit,
     val onGameSettingOpen: () -> Unit,
     val onPlayerSettingOpen: () -> Unit,
     val onGameComplete: () -> Unit
-)
+) {
+    companion object {
+        val Empty = GameNavActions(
+            onBackClick = {},
+            onGameSettingOpen = {},
+            onPlayerSettingOpen = {},
+            onGameComplete = {}
+        )
+    }
+}
 
 @Immutable
 data class GameHistory(
@@ -123,4 +147,12 @@ data class GameHistory(
     val repeatable: State<Boolean>,
     val onRevertAction: () -> Unit,
     val onRepeatAction: () -> Unit
-)
+) {
+    companion object {
+        val Empty = GameHistory(
+            reverted = mutableStateOf(false),
+            repeatable = mutableStateOf(false),
+            onRevertAction = {}, onRepeatAction = {}
+        )
+    }
+}

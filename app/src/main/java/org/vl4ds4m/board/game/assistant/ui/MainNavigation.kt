@@ -7,9 +7,10 @@ import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.data.Store
 import org.vl4ds4m.board.game.assistant.ui.game.Game
 import org.vl4ds4m.board.game.assistant.ui.game.NewGameStart
+import org.vl4ds4m.board.game.assistant.ui.game.gameNavigation
 import org.vl4ds4m.board.game.assistant.ui.home.HomeScreen
 import org.vl4ds4m.board.game.assistant.ui.profile.ProfileScreen
-import org.vl4ds4m.board.game.assistant.ui.results.ResultsScreen
+import org.vl4ds4m.board.game.assistant.ui.results.resultsNavigation
 
 sealed interface MainRoute
 
@@ -35,10 +36,9 @@ fun NavGraphBuilder.mainNavigation(navController: NavController) {
             }
         )
     }
-    composable<Results> {
-        ResultsScreen()
-    }
     composable<Profile> {
         ProfileScreen()
     }
+    gameNavigation(navController)
+    resultsNavigation(navController)
 }

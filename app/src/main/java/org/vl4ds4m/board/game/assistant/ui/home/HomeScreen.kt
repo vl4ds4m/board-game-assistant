@@ -43,16 +43,17 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp)
         ) {
-            sessions.forEach{ (id, session) ->
-                item(id) {
-                    Text(
-                        text = "${session.name} $id",
-                        modifier = Modifier
-                            .padding(vertical = 16.dp)
-                            .clickable { onSessionClick(id) }
-                    )
+            sessions.filterValues { !it.completed }
+                .onEachIndexed { index, (id, session) ->
+                    item(id) {
+                        Text(
+                            text = "${index + 1}. ${session.name}",
+                            modifier = Modifier
+                                .padding(vertical = 16.dp)
+                                .clickable { onSessionClick(id) }
+                        )
+                    }
                 }
-            }
         }
     }
 }

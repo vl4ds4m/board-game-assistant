@@ -37,7 +37,7 @@ fun NavGraphBuilder.mainNavigation(navController: NavController) {
         )
     }
     composable<Profile> {
-        ProfileScreen()
+        ProfileScreen(Store.username)
     }
     gameNavigation(navController)
     resultsNavigation(navController)

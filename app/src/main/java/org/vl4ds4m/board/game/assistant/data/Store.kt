@@ -1,6 +1,8 @@
 package org.vl4ds4m.board.game.assistant.data
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
@@ -32,6 +34,8 @@ object Store {
     fun load(sessionId: Long): GameSession? {
         return sessions[sessionId]
     }
+
+    val username: MutableState<String> = mutableStateOf("A. Helper")
 }
 
 private val initialTime: Long = java.time.Instant
@@ -64,7 +68,7 @@ private val defaultGames: List<GameSession> = listOf(
     ),
     GameSession(
         type = Free,
-        name = "Poker Counts 93",
+        name = "Poker Counts 28",
         players = mapOf(
             1L to Player(
                 name = "Bar",

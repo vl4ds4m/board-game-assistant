@@ -5,10 +5,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.vl4ds4m.board.game.assistant.game.Actions
-import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 
-class GameActionsHistory(private val game: Game) {
+class GameActionsHistory {
     private var mContainer: MutableList<GameAction> = mutableListOf()
     val container: Actions get() = mContainer
 
@@ -63,33 +62,33 @@ class GameActionsHistory(private val game: Game) {
         mRepeatable.value = false
     }
 
-    fun revert() {
+    fun revert(): GameAction? {
         if (!history.hasPrevious()) {
             Log.w(
                 GameEnv.TAG,
                 "Can't revert action. There is no previous one"
             )
-            return
+            return null
         }
         val action = history.previous()
-        action.revert(game)
         updateActions()
         mReverted.value = history.hasPrevious()
         mRepeatable.value = true
+        return action
     }
 
-    fun repeat() {
+    fun repeat(): GameAction? {
         if (!history.hasNext()) {
             Log.w(
                 GameEnv.TAG,
                 "Can't repeat action. There is no next one"
             )
-            return
+            return null
         }
         val action = history.next()
-        action.repeat(game)
         updateActions()
         mReverted.value = true
         mRepeatable.value = history.hasNext()
+        return action
     }
 }

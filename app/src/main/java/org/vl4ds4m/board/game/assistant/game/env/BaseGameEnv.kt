@@ -28,7 +28,7 @@ open class BaseGameEnv(override val type: GameType) : GameEnv {
     protected val mCurrentPlayerId: MutableStateFlow<Long?> = MutableStateFlow(null)
     override val currentPlayerId: StateFlow<Long?> = mCurrentPlayerId.asStateFlow()
 
-    private val actionsHistory by lazy { GameActionsHistory(this) }
+    private val actionsHistory = GameActionsHistory()
 
     override fun changeCurrentPlayerId(id: Long) {
         players.value[id]?.takeIf { it.active } ?: return
@@ -44,9 +44,7 @@ open class BaseGameEnv(override val type: GameType) : GameEnv {
         val (old, new) = states
         actionsHistory += CurrentPlayerChangeAction(
             oldPlayerId = old,
-            newPlayerId = new,
-            revert = { mCurrentPlayerId.value = old },
-            repeat = { mCurrentPlayerId.value = new }
+            newPlayerId = new
         )
     }
 
@@ -137,27 +135,15 @@ open class BaseGameEnv(override val type: GameType) : GameEnv {
             if (player.state == state) return
             put(id, player.copy(state = state))
         }.let {
-            addActionForPlayerStateUpdate(it, id)
-        }
-    }
-
-    private fun addActionForPlayerStateUpdate(states: States<Players>, id: Long) {
-        val (old, new) = states.run {
-            first[id]!!.state to second[id]!!.state
-        }
-        actionsHistory += PlayerStateChangeAction(
-            playerId = id, oldState = old, newState = new,
-            revert = {
-                mPlayers.updateMap {
-                    compute(id) { _, v -> v?.copy(state = old) }
-                }
-            },
-            repeat = {
-                mPlayers.updateMap {
-                    compute(id) { _, v -> v?.copy(state = new) }
-                }
+            val (old, new) = it.run {
+                first[id]!!.state to second[id]!!.state
             }
-        )
+            actionsHistory += PlayerStateChangeAction(
+                playerId = id,
+                oldState = old,
+                newState = new,
+            )
+        }
     }
 
     private var startTime: Long? = null
@@ -208,9 +194,37 @@ open class BaseGameEnv(override val type: GameType) : GameEnv {
 
     override val actions = actionsHistory.actions
 
-    override fun revert() = actionsHistory.revert()
+    override fun revert() {
+        val action = actionsHistory.revert() ?: return
+        when (action) {
+            is CurrentPlayerChangeAction -> {
+                mCurrentPlayerId.value = action.oldPlayerId
+            }
+            is PlayerStateChangeAction -> {
+                mPlayers.updateMap {
+                    compute(action.playerId) { _, v ->
+                        v?.copy(state = action.oldState)
+                    }
+                }
+            }
+        }
+    }
 
-    override fun repeat() = actionsHistory.repeat()
+    override fun repeat() {
+        val action = actionsHistory.repeat() ?: return
+        when (action) {
+            is CurrentPlayerChangeAction -> {
+                mCurrentPlayerId.value = action.newPlayerId
+            }
+            is PlayerStateChangeAction -> {
+                mPlayers.updateMap {
+                    compute(action.playerId) { _, v ->
+                        v?.copy(state = action.newState)
+                    }
+                }
+            }
+        }
+    }
 
     override val initializables: Array<Initializable> = arrayOf(timer)
 

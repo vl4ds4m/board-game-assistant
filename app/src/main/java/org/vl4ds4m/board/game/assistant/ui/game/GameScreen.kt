@@ -228,6 +228,6 @@ private val fakePlayers = sequence {
 }.toMap()
 
 private val fakeActions = listOf(
-    CurrentPlayerChangeAction(3, 4, {}, {}),
-    PlayerStateChangeAction(4, Score(2), Score(7), {}, {})
+    CurrentPlayerChangeAction(3, 4),
+    PlayerStateChangeAction(4, Score(2), Score(7))
 )

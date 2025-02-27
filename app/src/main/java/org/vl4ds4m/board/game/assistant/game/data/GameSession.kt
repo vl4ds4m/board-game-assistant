@@ -1,7 +1,6 @@
-package org.vl4ds4m.board.game.assistant.data
+package org.vl4ds4m.board.game.assistant.game.data
 
 import org.vl4ds4m.board.game.assistant.game.GameType
-import org.vl4ds4m.board.game.assistant.game.state.GameState
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
 

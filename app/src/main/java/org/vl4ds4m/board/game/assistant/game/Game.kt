@@ -3,7 +3,7 @@ package org.vl4ds4m.board.game.assistant.game
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
-import org.vl4ds4m.board.game.assistant.game.state.PlayerState
+import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 
 typealias Players = Map<Long, Player>
 typealias Actions = List<GameAction>

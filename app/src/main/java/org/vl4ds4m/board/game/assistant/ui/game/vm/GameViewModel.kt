@@ -3,7 +3,7 @@ package org.vl4ds4m.board.game.assistant.ui.game.vm
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import org.vl4ds4m.board.game.assistant.data.GameSession
+import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.data.Store
 import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv

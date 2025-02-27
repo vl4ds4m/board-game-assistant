@@ -1,7 +1,7 @@
 package org.vl4ds4m.board.game.assistant.game.simple
 
 import org.vl4ds4m.board.game.assistant.game.Game
-import org.vl4ds4m.board.game.assistant.game.state.Score
+import org.vl4ds4m.board.game.assistant.game.data.Score
 import kotlin.math.max
 
 class SimpleScoreAdder(private val game: Game) {

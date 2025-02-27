@@ -1,7 +1,7 @@
 package org.vl4ds4m.board.game.assistant.game
 
 import org.vl4ds4m.board.game.assistant.game.env.BaseOrderedGameEnv
-import org.vl4ds4m.board.game.assistant.game.state.Score
+import org.vl4ds4m.board.game.assistant.game.data.Score
 
 class DiceGame : BaseOrderedGameEnv(Dice) {
     fun addPoints(points: Int) {

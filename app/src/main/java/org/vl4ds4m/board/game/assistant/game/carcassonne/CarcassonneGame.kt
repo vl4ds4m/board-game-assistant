@@ -1,10 +1,10 @@
 package org.vl4ds4m.board.game.assistant.game.carcassonne
 
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.vl4ds4m.board.game.assistant.data.GameSession
+import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.Carcassonne
 import org.vl4ds4m.board.game.assistant.game.env.BaseOrderedGameEnv
-import org.vl4ds4m.board.game.assistant.game.state.Score
+import org.vl4ds4m.board.game.assistant.game.data.Score
 
 class CarcassonneGame : BaseOrderedGameEnv(Carcassonne) {
     val onFinal: MutableStateFlow<Boolean> = MutableStateFlow(false)

@@ -1,6 +1,6 @@
 package org.vl4ds4m.board.game.assistant.game.log
 
-import org.vl4ds4m.board.game.assistant.game.state.PlayerState
+import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 
 sealed interface GameAction {
     companion object {

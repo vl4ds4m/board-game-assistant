@@ -7,11 +7,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
-import org.vl4ds4m.board.game.assistant.data.GameSession
+import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.Players
-import org.vl4ds4m.board.game.assistant.game.state.OrderedGameState
-import org.vl4ds4m.board.game.assistant.game.state.PlayerState
+import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
+import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.util.updateAndGetStates
 import org.vl4ds4m.board.game.assistant.util.updateList
 

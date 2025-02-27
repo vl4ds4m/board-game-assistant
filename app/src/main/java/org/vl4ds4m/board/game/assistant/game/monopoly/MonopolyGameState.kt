@@ -1,7 +1,7 @@
 package org.vl4ds4m.board.game.assistant.game.monopoly
 
 import org.vl4ds4m.board.game.assistant.game.monopoly.entity.MonopolyEntity
-import org.vl4ds4m.board.game.assistant.game.state.OrderedGameState
+import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
 
 class MonopolyGameState(
     orderedPlayerIds: List<Long> = listOf(),

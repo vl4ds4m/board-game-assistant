@@ -7,8 +7,9 @@ import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
-import org.vl4ds4m.board.game.assistant.game.state.OrderedGameState
-import org.vl4ds4m.board.game.assistant.game.state.Score
+import org.vl4ds4m.board.game.assistant.game.data.GameSession
+import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
+import org.vl4ds4m.board.game.assistant.game.data.Score
 import java.util.concurrent.atomic.AtomicLong
 
 object Store {

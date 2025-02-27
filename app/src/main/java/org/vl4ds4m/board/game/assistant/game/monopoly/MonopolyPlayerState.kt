@@ -2,7 +2,7 @@ package org.vl4ds4m.board.game.assistant.game.monopoly
 
 import org.vl4ds4m.board.game.assistant.game.monopoly.entity.MonopolyEntity
 import org.vl4ds4m.board.game.assistant.game.monopoly.entity.MonopolyProperty
-import org.vl4ds4m.board.game.assistant.game.state.PlayerState
+import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 
 @Suppress("unused")
 class MonopolyPlayerState(

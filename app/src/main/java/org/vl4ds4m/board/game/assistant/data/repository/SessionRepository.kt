@@ -1,7 +1,7 @@
 package org.vl4ds4m.board.game.assistant.data.repository
 
-import org.vl4ds4m.board.game.assistant.data.GameSession
-import org.vl4ds4m.board.game.assistant.game.state.GameSessionInfo
+import org.vl4ds4m.board.game.assistant.game.data.GameSession
+import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 import org.vl4ds4m.board.game.assistant.data.dao.SessionDao
 import org.vl4ds4m.board.game.assistant.data.entity.GameActionEntity
 import org.vl4ds4m.board.game.assistant.data.entity.PlayerEntity
@@ -19,9 +19,9 @@ import org.vl4ds4m.board.game.assistant.game.log.CurrentPlayerChangeAction
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
 import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
 import org.vl4ds4m.board.game.assistant.game.monopoly.MonopolyGameState
-import org.vl4ds4m.board.game.assistant.game.state.GameState
-import org.vl4ds4m.board.game.assistant.game.state.OrderedGameState
-import org.vl4ds4m.board.game.assistant.game.state.Score
+import org.vl4ds4m.board.game.assistant.game.data.GameState
+import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
+import org.vl4ds4m.board.game.assistant.game.data.Score
 
 class SessionRepository(private val dao: SessionDao) {
     fun getAllSessions(): List<GameSessionInfo> {

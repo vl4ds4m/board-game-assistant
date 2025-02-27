@@ -2,7 +2,12 @@ package org.vl4ds4m.board.game.assistant.game.log
 
 import org.vl4ds4m.board.game.assistant.game.state.PlayerState
 
-sealed interface GameAction
+sealed interface GameAction {
+    companion object {
+        const val CHANGE_CURRENT_PLAYER  = "change_current_player"
+        const val CHANGE_PLAYER_STATE  = "change_player_state"
+    }
+}
 
 data class CurrentPlayerChangeAction(
     val oldPlayerId: Long?,

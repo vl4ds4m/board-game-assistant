@@ -9,8 +9,8 @@ import androidx.room.ForeignKey
     primaryKeys = [PlayerEntity.SESSION_ID, PlayerEntity.ID],
     foreignKeys = [
         ForeignKey(
-            entity = SessionEntity::class,
-            parentColumns = [SessionEntity.ID],
+            entity = GameSessionEntity::class,
+            parentColumns = [GameSessionEntity.ID],
             childColumns = [PlayerEntity.SESSION_ID],
             onDelete = ForeignKey.CASCADE,
             onUpdate = ForeignKey.CASCADE,
@@ -19,7 +19,7 @@ import androidx.room.ForeignKey
 )
 data class PlayerEntity(
     @ColumnInfo(name = SESSION_ID)
-    val sessionId: Long,
+    val sessionId: Long?,
 
     @ColumnInfo(name = ID)
     val id: Long,
@@ -31,7 +31,10 @@ data class PlayerEntity(
     val active: Boolean,
 
     @ColumnInfo(name = SCORE)
-    val score: Int
+    val score: Int,
+
+    @ColumnInfo(name = ORDER)
+    val order: Int // Ordered game property
 ) {
     companion object {
         const val TABLE_NAME = "players"
@@ -40,5 +43,6 @@ data class PlayerEntity(
         const val NAME = "nickname"
         const val ACTIVE = "active"
         const val SCORE = "score"
+        const val ORDER = "move_order"
     }
 }

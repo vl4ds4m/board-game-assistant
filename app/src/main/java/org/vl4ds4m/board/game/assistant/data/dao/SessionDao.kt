@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import org.vl4ds4m.board.game.assistant.data.entity.SessionEntity
+import org.vl4ds4m.board.game.assistant.data.entity.GameSessionEntity
 import org.vl4ds4m.board.game.assistant.data.view.SessionInfo
 
 @Dao
@@ -12,12 +12,12 @@ interface SessionDao {
     @Query("SELECT * FROM ${SessionInfo.VIEW_NAME}")
     fun getAllSessions(): List<SessionInfo>
 
-    @Query("SELECT * FROM ${SessionEntity.TABLE_NAME} WHERE ${SessionEntity.ID} = :id")
-    fun findSession(id: Long): SessionEntity?
+    @Query("SELECT * FROM ${GameSessionEntity.TABLE_NAME} WHERE ${GameSessionEntity.ID} = :id")
+    fun findSession(id: Long): GameSessionEntity?
 
     @Insert
-    fun insertSession(session: SessionEntity)
+    fun insertSession(session: GameSessionEntity)
 
     @Update
-    fun updateSession(session: SessionEntity)
+    fun updateSession(session: GameSessionEntity)
 }

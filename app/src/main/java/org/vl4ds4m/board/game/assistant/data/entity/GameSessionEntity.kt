@@ -5,8 +5,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 
-@Entity(tableName = SessionEntity.TABLE_NAME)
-data class SessionEntity(
+@Entity(tableName = GameSessionEntity.TABLE_NAME)
+data class GameSessionEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = ID)
     val id: Long? = null,
@@ -46,12 +46,15 @@ data class SessionEntity(
 
     @Relation(
         parentColumn = ID,
-        entityColumn = ActionEntity.SESSION_ID
+        entityColumn = GameActionEntity.SESSION_ID
     )
-    val actions: List<ActionEntity>,
+    val actions: List<GameActionEntity>,
 
     @ColumnInfo(name = CURRENT_ACTION_POSITION)
-    val currentActionPosition: Int
+    val currentActionPosition: Int,
+
+    @ColumnInfo(name = FINAL_STAGE)
+    val finalStage: Boolean? // Carcassonne property, TODO: move to another entity
 ) {
     companion object {
         const val TABLE_NAME = "sessions"
@@ -66,5 +69,6 @@ data class SessionEntity(
         const val TIMEOUT = "timeout"
         const val SECONDS_UNTIL_END = "seconds_until_end"
         const val CURRENT_ACTION_POSITION = "current_action_position"
+        const val FINAL_STAGE = "final_stage"
     }
 }

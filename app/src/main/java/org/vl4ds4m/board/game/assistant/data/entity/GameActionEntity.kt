@@ -5,21 +5,21 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 
 @Entity(
-    tableName = ActionEntity.TABLE_NAME,
-    primaryKeys = [ActionEntity.SESSION_ID, ActionEntity.POSITION],
+    tableName = GameActionEntity.TABLE_NAME,
+    primaryKeys = [GameActionEntity.SESSION_ID, GameActionEntity.POSITION],
     foreignKeys = [
         ForeignKey(
-            entity = SessionEntity::class,
-            parentColumns = [SessionEntity.ID],
-            childColumns = [ActionEntity.SESSION_ID],
+            entity = GameSessionEntity::class,
+            parentColumns = [GameSessionEntity.ID],
+            childColumns = [GameActionEntity.SESSION_ID],
             onDelete = ForeignKey.CASCADE,
             onUpdate = ForeignKey.CASCADE,
         )
     ]
 )
-data class ActionEntity(
+data class GameActionEntity(
     @ColumnInfo(name = SESSION_ID)
-    val sessionId: Long,
+    val sessionId: Long?,
 
     @ColumnInfo(name = POSITION)
     val position: Int,

@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.StateFlow
 import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.Free
@@ -27,19 +26,17 @@ import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.OrderedGameType
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.game.log.CurrentPlayerChangeAction
 import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
-import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameTopBar
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreCounter
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -71,31 +68,23 @@ fun GameScreen(
 
 @Composable
 fun GameScreen(
-    game: Game,
+    type: GameType,
+    sessionId: Long?,
     navActions: GameNavActions,
     modifier: Modifier = Modifier
 ) {
-    val type = GameType.valueOf(game.type)
-    val viewModelFactory = GameViewModelFactory.create(
-        type = type,
-        sessionId = game.sessionId
-    )
-    val viewModel = viewModel<GameViewModel>(
-        factory = viewModelFactory
-    )
     when (type) {
         is Free -> {
             FreeGameScreen(
-                viewModel = viewModel as FreeGameViewModel,
+                sessionId = sessionId,
                 navActions = navActions,
                 modifier = modifier
             )
         }
-
         is OrderedGameType -> {
             OrderedGameScreen(
                 type = type,
-                viewModel = viewModel,
+                sessionId = sessionId,
                 navActions = navActions,
                 modifier = modifier
             )

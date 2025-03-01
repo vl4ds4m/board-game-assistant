@@ -23,6 +23,17 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun ProfileScreen(
+    viewModel: ProfileViewModel,
+    modifier: Modifier = Modifier
+) {
+    ProfileScreenContent(
+        viewModel.username,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ProfileScreenContent(
     username: MutableState<String>,
     modifier: Modifier = Modifier
 ) {
@@ -56,7 +67,7 @@ fun ProfileScreen(
 @Composable
 private fun ProfileScreenPreview() {
     BoardGameAssistantTheme {
-        ProfileScreen(
+        ProfileScreenContent(
             username = remember { mutableStateOf("B. Name") },
             modifier = Modifier.fillMaxSize()
         )

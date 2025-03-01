@@ -2,6 +2,7 @@ package org.vl4ds4m.board.game.assistant.ui.game.ordered
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import org.vl4ds4m.board.game.assistant.game.Carcassonne
 import org.vl4ds4m.board.game.assistant.game.Dice
 import org.vl4ds4m.board.game.assistant.game.Monopoly
@@ -20,14 +21,17 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 @Composable
 fun OrderedGameScreen(
     type: OrderedGameType,
-    viewModel: GameViewModel,
+    sessionId: Long?,
     navActions: GameNavActions,
     modifier: Modifier = Modifier
 ) {
     when (type) {
         is SimpleOrdered -> {
+            val viewModel = viewModel<GameViewModel>(
+                factory = SimpleOrderedGameViewModel.createFactory(sessionId)
+            ) as SimpleOrderedGameViewModel
             OrderedGameScreen(
-                viewModel = viewModel as SimpleOrderedGameViewModel,
+                viewModel = viewModel,
                 onNameFormat = { "$it (ordered)" },
                 masterActions = {
                     ScoreCounter(
@@ -39,8 +43,11 @@ fun OrderedGameScreen(
             )
         }
         is Dice -> {
+            val viewModel = viewModel<GameViewModel>(
+                factory = DiceGameViewModel.createFactory(sessionId)
+            ) as DiceGameViewModel
             OrderedGameScreen(
-                viewModel = viewModel as DiceGameViewModel,
+                viewModel = viewModel,
                 onNameFormat = { "Dice '$it'" },
                 masterActions = {
                     ScoreCounter(
@@ -52,15 +59,21 @@ fun OrderedGameScreen(
             )
         }
         is Carcassonne -> {
+            val viewModel = viewModel<GameViewModel>(
+                factory = CarcassonneGameViewModel.createFactory(sessionId)
+            ) as CarcassonneGameViewModel
             CarcassonneGameScreen(
-                viewModel = viewModel as CarcassonneGameViewModel,
+                viewModel = viewModel,
                 navActions = navActions,
                 modifier = modifier
             )
         }
         is Monopoly -> {
+            val viewModel = viewModel<GameViewModel>(
+                factory = MonopolyGameViewModel.createFactory(sessionId)
+            ) as MonopolyGameViewModel
             MonopolyGameScreen(
-                viewModel = viewModel as MonopolyGameViewModel,
+                viewModel = viewModel,
                 navActions = navActions,
                 modifier = modifier
             )

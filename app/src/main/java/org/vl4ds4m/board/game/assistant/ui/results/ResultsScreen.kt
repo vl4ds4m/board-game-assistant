@@ -10,17 +10,34 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.vl4ds4m.board.game.assistant.game.data.GameSession
-import org.vl4ds4m.board.game.assistant.data.Store
+import org.vl4ds4m.board.game.assistant.defaultGames
+import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun ResultsScreen(
-    sessions: Map<Long, GameSession>,
-    onSessionClick: (Long) -> Unit,
+    viewModel: ResultsViewModel,
+    clickSession: (Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ResultsScreenContent(
+        sessions = viewModel.sessions.collectAsState(),
+        clickSession = clickSession,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ResultsScreenContent(
+    sessions: State<List<GameSessionInfo>>,
+    clickSession: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -37,14 +54,14 @@ fun ResultsScreen(
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            sessions.filterValues { it.completed }
-                .onEachIndexed { index, (id, session) ->
-                    item(id) {
+            sessions.value.sortedByDescending { it.stopTime }
+                .onEachIndexed { index, session ->
+                    item(session.id) {
                         Text(
                             text = "${index + 1}. ${session.name}",
                             modifier = Modifier
                                 .padding(vertical = 16.dp)
-                                .clickable { onSessionClick(id) },
+                                .clickable { clickSession(session.id) },
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
@@ -57,10 +74,22 @@ fun ResultsScreen(
 @Composable
 private fun ResultsScreenPreview() {
     BoardGameAssistantTheme {
-        ResultsScreen(
-            sessions = Store.sessions,
-            onSessionClick = {},
+        ResultsScreenContent(
+            sessions = remember { mutableStateOf(sessionsInfo) },
+            clickSession = {},
             modifier = Modifier.fillMaxSize()
         )
     }
 }
+
+private val sessionsInfo: List<GameSessionInfo> = defaultGames.filter { it.completed }
+    .mapIndexed { i, s ->
+        GameSessionInfo(
+            id = i.inc().toLong(),
+            completed = s.completed,
+            type = s.type,
+            name = s.name,
+            startTime = s.startTime,
+            stopTime = s.stopTime
+        )
+    }

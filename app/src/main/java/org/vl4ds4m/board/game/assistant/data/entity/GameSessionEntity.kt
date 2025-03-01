@@ -3,13 +3,12 @@ package org.vl4ds4m.board.game.assistant.data.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.Relation
 
 @Entity(tableName = GameSessionEntity.TABLE_NAME)
 data class GameSessionEntity(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     @ColumnInfo(name = ID)
-    val id: Long? = null,
+    val id: Long,
 
     @ColumnInfo(name = COMPLETED)
     val completed: Boolean,
@@ -20,12 +19,6 @@ data class GameSessionEntity(
     @ColumnInfo(name = NAME)
     val name: String,
 
-    @Relation(
-        parentColumn = ID,
-        entityColumn = PlayerEntity.SESSION_ID
-    )
-    val players: List<PlayerEntity>,
-
     @ColumnInfo(name = CURRENT_PLAYER_ID)
     val currentPlayerId: Long?,
 
@@ -33,10 +26,10 @@ data class GameSessionEntity(
     val nextNewPlayerId: Long,
 
     @ColumnInfo(name = START_TIME)
-    val startTime: Long,
+    val startTime: Long?,
 
     @ColumnInfo(name = STOP_TIME)
-    val stopTime: Long,
+    val stopTime: Long?,
 
     @ColumnInfo(name = TIMEOUT)
     val timeout: Boolean,
@@ -44,17 +37,11 @@ data class GameSessionEntity(
     @ColumnInfo(name = SECONDS_UNTIL_END)
     val secondsUntilEnd: Int,
 
-    @Relation(
-        parentColumn = ID,
-        entityColumn = GameActionEntity.SESSION_ID
-    )
-    val actions: List<GameActionEntity>,
-
     @ColumnInfo(name = CURRENT_ACTION_POSITION)
     val currentActionPosition: Int,
 
     @ColumnInfo(name = FINAL_STAGE)
-    val finalStage: Boolean? // Carcassonne property, TODO: move to another entity
+    val finalStage: Boolean? // Carcassonne property
 ) {
     companion object {
         const val TABLE_NAME = "sessions"

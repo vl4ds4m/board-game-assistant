@@ -1,24 +1,32 @@
 package org.vl4ds4m.board.game.assistant.data
 
 import android.content.Context
-//import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-//import androidx.sqlite.db.SupportSQLiteDatabase
-import org.vl4ds4m.board.game.assistant.data.dao.SessionDao
+import org.vl4ds4m.board.game.assistant.data.dao.GameSessionDao
+import org.vl4ds4m.board.game.assistant.data.dao.GameSessionNextIdDao
 import org.vl4ds4m.board.game.assistant.data.entity.GameActionEntity
 import org.vl4ds4m.board.game.assistant.data.entity.PlayerEntity
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionEntity
-import org.vl4ds4m.board.game.assistant.data.view.SessionInfo
+import org.vl4ds4m.board.game.assistant.data.entity.GameSessionNextId
+import org.vl4ds4m.board.game.assistant.data.view.GameSessionInfoView
 
 @Database(
-    entities = [GameSessionEntity::class, PlayerEntity::class, GameActionEntity::class],
-    views = [SessionInfo::class],
-    version = 1
+    entities = [
+        GameSessionEntity::class,
+        GameSessionNextId::class,
+        PlayerEntity::class,
+        GameActionEntity::class
+    ],
+    views = [GameSessionInfoView::class],
+    version = 1,
+    exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun sessionDao(): SessionDao
+    abstract fun sessionDao(): GameSessionDao
+
+    abstract fun sessionNextIdDao(): GameSessionNextIdDao
 
     companion object {
         @Volatile
@@ -35,27 +43,9 @@ abstract class AppDatabase : RoomDatabase() {
 }
 
 private fun build(applicationContext: Context): AppDatabase {
-    /*var capturedInstance: AppDatabase? = null
-    val initializer = object : RoomDatabase.Callback() {
-        override fun onCreate(db: SupportSQLiteDatabase) {
-            super.onCreate(db)
-            capturedInstance?.let {
-                prepopulateDatabase(it)
-            } ?: throw IllegalStateException(
-                "AppDatabase callback is failed as db is not yet built"
-            )
-        }
-    }*/
     return Room.databaseBuilder(
         applicationContext,
         AppDatabase::class.java,
-        "app-database"
-    )//.addCallback(initializer)
-        .build()
-        //.also { capturedInstance = it }
+        "app_database"
+    ).build()
 }
-
-/*private fun prepopulateDatabase(db: AppDatabase) {
-    Log.i("AppDatabase", "Prepopulate app-database")
-    db.clearAllTables()
-}*/

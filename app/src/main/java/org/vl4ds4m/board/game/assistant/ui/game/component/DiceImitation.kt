@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -66,7 +67,7 @@ fun DiceImitationScreenContent(modifier: Modifier = Modifier) {
             mutableStateListOf(1)
         }
         val addEnabled = remember {
-            derivedStateOf { dice.size < 10 }
+            derivedStateOf { dice.size < 9 }
         }
         val removeEnabled = remember {
             derivedStateOf { dice.size > 1 }
@@ -101,7 +102,7 @@ fun DiceImitationScreenContent(modifier: Modifier = Modifier) {
                 onClick = { dice.removeAt(dice.lastIndex) }
             ) {
                 Icon(
-                    imageVector = Icons.Default.AddCircle,
+                    imageVector = Icons.Default.Close,
                     contentDescription = "Remove last dice"
                 )
             }

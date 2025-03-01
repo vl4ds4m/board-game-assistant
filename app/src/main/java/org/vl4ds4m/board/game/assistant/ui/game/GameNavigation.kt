@@ -1,23 +1,22 @@
 package org.vl4ds4m.board.game.assistant.ui.game
 
-import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.ui.Home
 import org.vl4ds4m.board.game.assistant.ui.game.component.DiceImitationScreen
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.end.EndGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.setting.GameSettingScreen
 import org.vl4ds4m.board.game.assistant.ui.game.setting.PlayerSettingScreen
+import org.vl4ds4m.board.game.assistant.ui.game.setup.GameSetupViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.setup.NewGamePlayersScreen
 import org.vl4ds4m.board.game.assistant.ui.game.setup.NewGameStartScreen
+import org.vl4ds4m.board.game.assistant.ui.rememberTopmost
 
 sealed interface GameRoute
 
@@ -46,7 +45,7 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
     val navigateUp: () -> Unit = { navController.navigateUp() }
     composable<NewGameStart> {
         NewGameStartScreen(
-            viewModel = viewModel(),
+            viewModel = viewModel(factory = GameSetupViewModel.Factory),
             onBackClick = navigateUp,
             onSetupPlayers = {
                 navController.navigate(NewGamePlayers)
@@ -67,8 +66,11 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
         )
     }
     composable<Game> { entry ->
+        val (type, sessionId) = entry.toRoute<Game>()
+            .run { GameType.valueOf(type) to sessionId }
         GameScreen(
-            game = entry.toRoute<Game>(),
+            type = type,
+            sessionId = sessionId,
             navActions = GameNavActions(
                 onBackClick = navigateUp,
                 onGameSettingOpen = { navController.navigate(GameSetting) },
@@ -108,12 +110,4 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
             }
         )
     }
-}
-
-@Composable
-private inline fun <reified T : Any> NavController.rememberTopmost(
-    key: NavBackStackEntry
-): NavBackStackEntry = remember(key) {
-    Log.d("GameNavigation", "Remember ${T::class.simpleName} navBackStackEntry")
-    getBackStackEntry<T>()
 }

@@ -1,14 +1,16 @@
 package org.vl4ds4m.board.game.assistant.ui.game.ordered
 
 import kotlinx.coroutines.flow.StateFlow
+import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
 import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 
 abstract class OrderedGameViewModel(
     private val gameEnv: OrderedGameEnv,
-    sessionId: Long? = null
-) : GameViewModel(gameEnv, sessionId), OrderedGame {
+    sessionId: Long? = null,
+    sessionRepository: GameSessionRepository
+) : GameViewModel(gameEnv, sessionId, sessionRepository), OrderedGame {
     override val nextPlayerId: StateFlow<Long?> = gameEnv.nextPlayerId
 
     override val orderedPlayerIds: StateFlow<List<Long>> = gameEnv.orderedPlayerIds

@@ -7,6 +7,6 @@ class GameSessionInfo(
     val completed: Boolean,
     val type: GameType,
     val name: String,
-    val startTime: Long,
-    val stopTime: Long
+    val startTime: Long?,
+    val stopTime: Long?
 )

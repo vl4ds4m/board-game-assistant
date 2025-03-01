@@ -19,7 +19,7 @@ import androidx.room.ForeignKey
 )
 data class PlayerEntity(
     @ColumnInfo(name = SESSION_ID)
-    val sessionId: Long?,
+    val sessionId: Long,
 
     @ColumnInfo(name = ID)
     val id: Long,

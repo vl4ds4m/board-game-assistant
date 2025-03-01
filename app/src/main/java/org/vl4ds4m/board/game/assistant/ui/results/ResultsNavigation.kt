@@ -1,13 +1,13 @@
 package org.vl4ds4m.board.game.assistant.ui.results
 
-import android.util.Log
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import org.vl4ds4m.board.game.assistant.data.Store
 import org.vl4ds4m.board.game.assistant.ui.Results
+import org.vl4ds4m.board.game.assistant.ui.rememberTopmost
 
 @Serializable
 data class CompletedGame(val sessionId: Long)
@@ -15,26 +15,18 @@ data class CompletedGame(val sessionId: Long)
 fun NavGraphBuilder.resultsNavigation(navController: NavController) {
     composable<Results> {
         ResultsScreen(
-            sessions = Store.sessions,
-            onSessionClick = { sessionId ->
-                val route = CompletedGame(sessionId)
-                navController.navigate(route)
+            viewModel = viewModel(factory = ResultsViewModel.Factory),
+            clickSession = { sessionId ->
+                navController.navigate(CompletedGame(sessionId))
             }
         )
     }
     composable<CompletedGame> { entry ->
-        val session = entry.toRoute<CompletedGame>().sessionId.let {
-            Store.load(it) ?: run {
-                Log.e(
-                    "GameResults",
-                    "Can't load completed session[id = $it]"
-                )
-                return@composable
-            }
-        }
+        val sessionId = entry.toRoute<CompletedGame>().sessionId
+        val resultsEntry = navController.rememberTopmost<Results>(entry)
         CompletedGameScreen(
-            name = session.name,
-            players = session.players,
+            viewModel = viewModel(resultsEntry),
+            sessionId = sessionId,
             navigateUp = { navController.navigateUp() }
         )
     }

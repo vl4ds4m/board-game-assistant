@@ -2,8 +2,15 @@ package org.vl4ds4m.board.game.assistant
 
 import android.app.Application
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.vl4ds4m.board.game.assistant.data.AppDatabase
-import org.vl4ds4m.board.game.assistant.data.repository.SessionRepository
+import org.vl4ds4m.board.game.assistant.data.repository.GameRepository
+import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
 import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
@@ -12,21 +19,31 @@ import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
 import org.vl4ds4m.board.game.assistant.game.data.Score
 
 class BoardGameAssistantApp : Application() {
-    private val db: AppDatabase = AppDatabase.getInstance(applicationContext)
-
-    val sessionRepository: SessionRepository = SessionRepository(db.sessionDao())
-
-    // Test usage
-    init {
-        db.clearAllTables() // key auto-increment is not cleared
-        prepopulateDatabase(sessionRepository)
+    private val db: AppDatabase by lazy {
+        AppDatabase.getInstance(applicationContext)
     }
+
+    private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
+    val sessionRepository: GameSessionRepository by lazy {
+        GameSessionRepository(db.sessionDao(), db.sessionNextIdDao(), coroutineScope).also {
+            // Test usage
+            coroutineScope.launch {
+                db.clearAllTables()
+                prepopulateDatabase(it)
+            }
+        }
+    }
+
+    val gameRepository = GameRepository()
+
+    val username: MutableState<String> = mutableStateOf("A. Helper")
 }
 
-private fun prepopulateDatabase(repo: SessionRepository) {
+private fun prepopulateDatabase(repo: GameSessionRepository) {
     Log.i("AppDatabase", "Prepopulate app-database")
     defaultGames.forEach {
-        repo.saveSession(null, it)
+        repo.saveSession(it)
     }
 }
 
@@ -34,8 +51,9 @@ private val initialTime: Long = java.time.Instant
     .parse("2025-01-24T10:15:34.00Z").epochSecond
 
 
-private val defaultGames: List<GameSession> = listOf(
+val defaultGames: List<GameSession> = listOf(
     GameSession(
+        completed = false,
         type = SimpleOrdered,
         name = "Uno 93",
         players = mapOf(
@@ -58,9 +76,15 @@ private val defaultGames: List<GameSession> = listOf(
         currentPlayerId = 1L,
         nextNewPlayerId = 10L,
         startTime = initialTime + 40_000,
-        state = OrderedGameState(listOf(1, 2, 3))
+        stopTime = initialTime + 40_005,
+        timeout = false,
+        secondsUntilEnd = 0,
+        actions = listOf(),
+        currentActionPosition = 0,
+        additional = OrderedGameState(listOf(1, 2, 3))
     ),
     GameSession(
+        completed = false,
         type = Free,
         name = "Poker Counts 28",
         players = mapOf(
@@ -83,6 +107,12 @@ private val defaultGames: List<GameSession> = listOf(
         currentPlayerId = 2L,
         nextNewPlayerId = 10L,
         startTime = initialTime + 20_000,
+        stopTime = initialTime + 20_015,
+        timeout = false,
+        secondsUntilEnd = 0,
+        actions = listOf(),
+        currentActionPosition = 0,
+        additional = null
     ),
     GameSession(
         type = SimpleOrdered,
@@ -113,6 +143,11 @@ private val defaultGames: List<GameSession> = listOf(
         currentPlayerId = 3L,
         nextNewPlayerId = 10L,
         startTime = initialTime + 30_000,
-        state = OrderedGameState(listOf(1, 2, 3, 4))
+        stopTime = initialTime + 30_010,
+        timeout = false,
+        secondsUntilEnd = 0,
+        actions = listOf(),
+        currentActionPosition = 0,
+        additional = OrderedGameState(listOf(1, 2, 3, 4))
     )
 )

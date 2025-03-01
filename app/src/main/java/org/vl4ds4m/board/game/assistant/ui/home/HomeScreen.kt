@@ -10,19 +10,39 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.vl4ds4m.board.game.assistant.game.data.GameSession
-import org.vl4ds4m.board.game.assistant.data.Store
+import org.vl4ds4m.board.game.assistant.defaultGames
+import org.vl4ds4m.board.game.assistant.game.GameType
+import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun HomeScreen(
-    sessions: Map<Long, GameSession>,
-    onStartNewGame: () -> Unit,
-    onSessionClick: (Long) -> Unit,
+    viewModel: HomeViewModel,
+    startNewGame: () -> Unit,
+    proceedGame: (Long, GameType) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    HomeScreenContent(
+        sessions = viewModel.sessions.collectAsState(),
+        clickNewGame = startNewGame,
+        clickSession = proceedGame,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun HomeScreenContent(
+    sessions: State<List<GameSessionInfo>>,
+    clickNewGame: () -> Unit,
+    clickSession: (Long, GameType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -33,7 +53,7 @@ fun HomeScreen(
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onStartNewGame) {
+            Button(clickNewGame) {
                 Text("Start a new game")
             }
         }
@@ -43,14 +63,14 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp)
         ) {
-            sessions.filterValues { !it.completed }
-                .onEachIndexed { index, (id, session) ->
-                    item(id) {
+            sessions.value.sortedByDescending { it.startTime }
+                .onEachIndexed { index, session ->
+                    item(session.id) {
                         Text(
                             text = "${index + 1}. ${session.name}",
                             modifier = Modifier
                                 .padding(vertical = 16.dp)
-                                .clickable { onSessionClick(id) }
+                                .clickable { clickSession(session.id, session.type) }
                         )
                     }
                 }
@@ -62,11 +82,23 @@ fun HomeScreen(
 @Composable
 private fun HomeScreenPreview() {
     BoardGameAssistantTheme {
-        HomeScreen(
-            sessions = Store.sessions,
-            onStartNewGame = {},
-            onSessionClick = {},
+        HomeScreenContent(
+            sessions = remember { mutableStateOf(sessionsInfo) },
+            clickNewGame = {},
+            clickSession = { _, _ -> },
             modifier = Modifier.fillMaxSize()
         )
     }
 }
+
+private val sessionsInfo: List<GameSessionInfo> = defaultGames.filter { !it.completed }
+    .mapIndexed { i, s ->
+        GameSessionInfo(
+            id = i.inc().toLong(),
+            completed = s.completed,
+            type = s.type,
+            name = s.name,
+            startTime = s.startTime,
+            stopTime = s.stopTime
+        )
+    }

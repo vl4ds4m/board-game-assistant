@@ -1,39 +1,33 @@
 package org.vl4ds4m.board.game.assistant.game.carcassonne
 
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.Carcassonne
-import org.vl4ds4m.board.game.assistant.game.env.BaseOrderedGameEnv
+import org.vl4ds4m.board.game.assistant.game.data.GameState
 import org.vl4ds4m.board.game.assistant.game.data.Score
+import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 
-class CarcassonneGame : BaseOrderedGameEnv(Carcassonne) {
-    val onFinal: MutableStateFlow<Boolean> = MutableStateFlow(false)
+class CarcassonneGame : OrderedGameEnv(Carcassonne) {
+    val finalStage: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    override fun loadFrom(session: GameSession) {
-        super.loadFrom(session)
-        session.state.let {
+    override fun restoreAdditionalState(state: GameState?) {
+        super.restoreAdditionalState(state)
+        state.let {
             it as? CarcassonneGameState
         }?.let {
-            this.onFinal.value = it.onFinal
+            finalStage.value = it.finalStage
         }
     }
 
-    override fun saveIn(session: GameSession) {
-        session.state = session.state.let {
-            it as? CarcassonneGameState ?: CarcassonneGameState()
-        }.also {
-            it.onFinal = this.onFinal.value
-        }
-        super.saveIn(session)
-    }
+    override val additionalState
+        get() = CarcassonneGameState(super.additionalState, finalStage.value)
 
     fun addPoints(property: CarcassonneProperty, count: Int) {
         if (count <= 0) return
         var points = 0
         when (property) {
             CarcassonneProperty.CLOISTER -> if (count <= 9) points = count
-            CarcassonneProperty.FIELD -> if (onFinal.value) points = 3 * count
-            CarcassonneProperty.CITY -> points = if (onFinal.value) count else 2 * count
+            CarcassonneProperty.FIELD -> if (finalStage.value) points = 3 * count
+            CarcassonneProperty.CITY -> points = if (finalStage.value) count else 2 * count
             CarcassonneProperty.ROAD -> points = count
         }
         if (points > 0) {

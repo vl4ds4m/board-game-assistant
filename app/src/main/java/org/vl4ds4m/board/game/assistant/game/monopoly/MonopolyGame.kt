@@ -3,16 +3,17 @@ package org.vl4ds4m.board.game.assistant.game.monopoly
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.Player
-import org.vl4ds4m.board.game.assistant.game.env.BaseOrderedGameEnv
+import org.vl4ds4m.board.game.assistant.game.data.GameState
+import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
+import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 import org.vl4ds4m.board.game.assistant.game.monopoly.entity.MonopolyEntity
 import org.vl4ds4m.board.game.assistant.game.monopoly.entity.Supplier
 import org.vl4ds4m.board.game.assistant.util.updateMap
 
 @Suppress("unused")
-class MonopolyGame : BaseOrderedGameEnv(Monopoly) {
+class MonopolyGame : OrderedGameEnv(Monopoly) {
     private val mEntityOwner: MutableStateFlow<Map<MonopolyEntity, Long>> =
         MutableStateFlow(mapOf())
     private val entityOwner: StateFlow<Map<MonopolyEntity, Long>> =
@@ -29,9 +30,9 @@ class MonopolyGame : BaseOrderedGameEnv(Monopoly) {
         addPlayer(name, MonopolyPlayerState())
     }
 
-    override fun loadFrom(session: GameSession) {
-        super.loadFrom(session)
-        session.state.let {
+    override fun restoreAdditionalState(state: GameState?) {
+        super.restoreAdditionalState(state)
+        state.let {
             it as? MonopolyGameState
         }?.let {
             this.mEntityOwner.value = it.entityOwner
@@ -40,16 +41,13 @@ class MonopolyGame : BaseOrderedGameEnv(Monopoly) {
         }
     }
 
-    override fun saveIn(session: GameSession) {
-        session.state = session.state.let {
-            it as? MonopolyGameState ?: MonopolyGameState()
-        }.also {
-            it.entityOwner = this.entityOwner.value
-            it.repeatCount = this.repeatCount
-            it.afterStepField = this.afterStepField.value
-        }
-        super.saveIn(session)
-    }
+    override val additionalState: OrderedGameState
+        get() = MonopolyGameState(
+            super.additionalState,
+            entityOwner.value,
+            repeatCount,
+            afterStepField.value
+        )
 
     fun movePlayer(step1: Int, step2: Int) {
         if (afterStepField.value != null) return

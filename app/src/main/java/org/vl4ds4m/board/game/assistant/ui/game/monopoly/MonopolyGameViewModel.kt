@@ -1,21 +1,27 @@
 package org.vl4ds4m.board.game.assistant.ui.game.monopoly
 
-import org.vl4ds4m.board.game.assistant.game.env.GameEnv
+import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
+import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.monopoly.MonopolyGame
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelFactory
+import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 
 class MonopolyGameViewModel(
     gameEnv: MonopolyGame = MonopolyGame(),
-    sessionId: Long? = null
-) : OrderedGameViewModel(gameEnv, sessionId) {
-    companion object : GameViewModelFactory {
-        override fun createFrom(gameEnv: GameEnv): MonopolyGameViewModel {
-            return MonopolyGameViewModel(gameEnv = gameEnv as MonopolyGame)
-        }
+    sessionId: Long? = null,
+    sessionRepository: GameSessionRepository
+) : OrderedGameViewModel(gameEnv, sessionId, sessionRepository) {
+    companion object : GameViewModelProducer<MonopolyGameViewModel> {
+        override fun createViewModel(game: Game, sessionRepository: GameSessionRepository) =
+            MonopolyGameViewModel(
+                gameEnv = game as MonopolyGame,
+                sessionRepository = sessionRepository
+            )
 
-        override fun createFrom(sessionId: Long): MonopolyGameViewModel {
-            return MonopolyGameViewModel(sessionId = sessionId)
-        }
+        override fun createViewModel(sessionId: Long, sessionRepository: GameSessionRepository) =
+            MonopolyGameViewModel(
+                sessionId = sessionId,
+                sessionRepository = sessionRepository
+            )
     }
 }

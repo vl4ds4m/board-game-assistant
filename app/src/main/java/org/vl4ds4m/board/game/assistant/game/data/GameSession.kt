@@ -1,20 +1,21 @@
 package org.vl4ds4m.board.game.assistant.game.data
 
+import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.GameType
-import org.vl4ds4m.board.game.assistant.game.Player
-import org.vl4ds4m.board.game.assistant.game.log.GameAction
+import org.vl4ds4m.board.game.assistant.game.Players
 
-class GameSession(
-    var type: GameType? = null,
-    var completed: Boolean = false,
-    var name: String = "",
-    var players: Map<Long, Player> = mapOf(),
-    var currentPlayerId: Long? = null,
-    var nextNewPlayerId: Long? = null,
-    var startTime: Long? = null,
-    var timeout: Boolean = false,
-    var secondsToEnd: Int = 0,
-    var actions: List<GameAction> = listOf(),
-    var currentActionPosition: Int = 0,
-    var state: GameState? = null
+data class GameSession(
+    val completed: Boolean,
+    val type: GameType,
+    val name: String,
+    val players: Players,
+    val currentPlayerId: Long?,
+    val nextNewPlayerId: Long,
+    val startTime: Long?,
+    val stopTime: Long?,
+    val timeout: Boolean,
+    val secondsUntilEnd: Int,
+    val actions: Actions,
+    val currentActionPosition: Int,
+    val additional: GameState?
 )

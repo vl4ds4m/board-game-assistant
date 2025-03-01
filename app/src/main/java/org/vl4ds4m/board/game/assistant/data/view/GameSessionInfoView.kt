@@ -5,7 +5,7 @@ import androidx.room.DatabaseView
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionEntity
 
 @DatabaseView(
-    viewName = SessionInfo.VIEW_NAME,
+    viewName = GameSessionInfoView.VIEW_NAME,
     value = """
         SELECT
             ${GameSessionEntity.ID},
@@ -18,7 +18,7 @@ import org.vl4ds4m.board.game.assistant.data.entity.GameSessionEntity
             ${GameSessionEntity.TABLE_NAME}
     """
 )
-data class SessionInfo(
+data class GameSessionInfoView(
     @ColumnInfo(name = GameSessionEntity.ID)
     val id: Long,
 
@@ -32,10 +32,10 @@ data class SessionInfo(
     val name: String,
 
     @ColumnInfo(name = GameSessionEntity.START_TIME)
-    val startTime: Long,
+    val startTime: Long?,
 
     @ColumnInfo(name = GameSessionEntity.STOP_TIME)
-    val stopTime: Long
+    val stopTime: Long?
 ) {
     companion object {
         const val VIEW_NAME = "sessions_info"

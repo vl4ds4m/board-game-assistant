@@ -2,8 +2,8 @@ package org.vl4ds4m.board.game.assistant
 
 import android.app.Application
 import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -11,6 +11,8 @@ import kotlinx.coroutines.launch
 import org.vl4ds4m.board.game.assistant.data.AppDatabase
 import org.vl4ds4m.board.game.assistant.data.repository.GameRepository
 import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
+import org.vl4ds4m.board.game.assistant.data.repository.UserDataRepository
+import org.vl4ds4m.board.game.assistant.data.userDataStore
 import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
@@ -21,6 +23,10 @@ import org.vl4ds4m.board.game.assistant.game.data.Score
 class BoardGameAssistantApp : Application() {
     private val db: AppDatabase by lazy {
         AppDatabase.getInstance(applicationContext)
+    }
+
+    private val userDataStore: DataStore<Preferences> by lazy {
+        applicationContext.userDataStore
     }
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
@@ -37,7 +43,7 @@ class BoardGameAssistantApp : Application() {
 
     val gameRepository = GameRepository()
 
-    val username: MutableState<String> = mutableStateOf("A. Helper")
+    val userDataRepository by lazy { UserDataRepository(userDataStore, coroutineScope) }
 }
 
 private fun prepopulateDatabase(repo: GameSessionRepository) {

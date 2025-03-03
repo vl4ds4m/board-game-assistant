@@ -27,14 +27,14 @@ fun ProfileScreen(
     modifier: Modifier = Modifier
 ) {
     ProfileScreenContent(
-        viewModel.username,
+        viewModel.userName,
         modifier = modifier
     )
 }
 
 @Composable
 fun ProfileScreenContent(
-    username: MutableState<String>,
+    userName: MutableState<String>,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -55,8 +55,8 @@ fun ProfileScreenContent(
             modifier = Modifier.size(56.dp)
         )
         TextField(
-            value = username.value,
-            onValueChange = { username.value = it },
+            value = userName.value,
+            onValueChange = { userName.value = it },
             label = { Text("Name") },
             singleLine = true
         )
@@ -68,7 +68,7 @@ fun ProfileScreenContent(
 private fun ProfileScreenPreview() {
     BoardGameAssistantTheme {
         ProfileScreenContent(
-            username = remember { mutableStateOf("B. Name") },
+            userName = remember { mutableStateOf("B. Name") },
             modifier = Modifier.fillMaxSize()
         )
     }

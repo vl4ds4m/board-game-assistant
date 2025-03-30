@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -19,8 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.defaultGames
+import org.vl4ds4m.board.game.assistant.defaultRemoteSession
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
+import org.vl4ds4m.board.game.assistant.network.RemoteSession
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -30,8 +35,12 @@ fun HomeScreen(
     proceedGame: (Long, GameType) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.observeRemoteSession()
+    }
     HomeScreenContent(
         sessions = viewModel.sessions.collectAsState(),
+        remoteSessions = viewModel.remoteSessions.collectAsState(),
         clickNewGame = startNewGame,
         clickSession = proceedGame,
         modifier = modifier
@@ -41,6 +50,7 @@ fun HomeScreen(
 @Composable
 fun HomeScreenContent(
     sessions: State<List<GameSessionInfo>>,
+    remoteSessions: State<List<RemoteSession>>,
     clickNewGame: () -> Unit,
     clickSession: (Long, GameType) -> Unit,
     modifier: Modifier = Modifier
@@ -57,6 +67,7 @@ fun HomeScreenContent(
                 Text("Start a new game")
             }
         }
+        Text("Continue these")
         LazyColumn(
             modifier = Modifier
                 .weight(3f)
@@ -75,6 +86,21 @@ fun HomeScreenContent(
                     }
                 }
         }
+        HorizontalDivider()
+        Text("Connect to exists")
+        LazyColumn(
+            modifier = Modifier
+                .weight(3f)
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp)
+        ) {
+            itemsIndexed(remoteSessions.value) { index, session ->
+                Text(
+                    text = "${index + 1}. ${session.name}",
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+            }
+        }
     }
 }
 
@@ -84,6 +110,7 @@ private fun HomeScreenPreview() {
     BoardGameAssistantTheme {
         HomeScreenContent(
             sessions = remember { mutableStateOf(sessionsInfo) },
+            remoteSessions = remember { mutableStateOf(defaultRemoteSession) },
             clickNewGame = {},
             clickSession = { _, _ -> },
             modifier = Modifier.fillMaxSize()

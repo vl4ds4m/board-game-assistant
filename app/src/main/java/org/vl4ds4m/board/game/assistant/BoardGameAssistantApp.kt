@@ -19,6 +19,7 @@ import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
 import org.vl4ds4m.board.game.assistant.game.data.Score
+import org.vl4ds4m.board.game.assistant.network.RemoteSession
 
 class BoardGameAssistantApp : Application() {
     private val db: AppDatabase by lazy {
@@ -156,4 +157,9 @@ val defaultGames: List<GameSession> = listOf(
         currentActionPosition = 0,
         additional = OrderedGameState(listOf(1, 2, 3, 4))
     )
+)
+
+val defaultRemoteSession = listOf<RemoteSession>(
+    RemoteSession(1, "Milki Way"),
+    RemoteSession(2, "Catch me if you can")
 )

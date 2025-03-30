@@ -12,6 +12,7 @@ import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.ui.game.Game
 import org.vl4ds4m.board.game.assistant.ui.game.NewGameStart
 import org.vl4ds4m.board.game.assistant.ui.game.gameNavigation
+import org.vl4ds4m.board.game.assistant.ui.game.observer.observerNavigation
 import org.vl4ds4m.board.game.assistant.ui.home.HomeScreen
 import org.vl4ds4m.board.game.assistant.ui.home.HomeViewModel
 import org.vl4ds4m.board.game.assistant.ui.profile.ProfileScreen
@@ -39,10 +40,11 @@ fun NavGraphBuilder.mainNavigation(navController: NavController) {
             }
         )
     }
+    gameNavigation(navController)
+    observerNavigation(navController)
     composable<Profile> {
         ProfileScreen(viewModel = viewModel(factory = ProfileViewModel.Factory))
     }
-    gameNavigation(navController)
     resultsNavigation(navController)
 }
 

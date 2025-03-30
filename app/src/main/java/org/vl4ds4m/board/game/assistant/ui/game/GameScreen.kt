@@ -202,7 +202,7 @@ private fun GameScreenPreview() {
     }
 }
 
-private val fakePlayers = sequence {
+val fakePlayers = sequence {
     yield("Abc" to 123)
     yield("Def" to 456)
     yield("Foo" to 43)
@@ -216,7 +216,7 @@ private val fakePlayers = sequence {
     )
 }.toMap()
 
-private val fakeActions = listOf(
+val fakeActions = listOf(
     CurrentPlayerChangeAction(3, 4),
     PlayerStateChangeAction(4, Score(2), Score(7))
 )

@@ -11,7 +11,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
-fun ObserverStartupScreen(
+fun ObserverEndScreen(
     title: String,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -25,16 +25,16 @@ fun ObserverStartupScreen(
             modifier = innerModifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text("Wait for game master start the game")
+            Text("End of game")
         }
     }
 }
 
 @Preview
 @Composable
-private fun ObserverStartupScreenPreview() {
+private fun ObserverEndScreenPreview() {
     BoardGameAssistantTheme {
-        ObserverStartupScreen(
+        ObserverEndScreen(
             title = "Some game",
             onBackClick = {}
         )

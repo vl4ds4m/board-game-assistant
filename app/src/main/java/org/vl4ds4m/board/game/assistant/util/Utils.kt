@@ -5,6 +5,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 val Enum<*>.title: String get() = this.name
     .replaceFirstChar { it.uppercaseChar() }
 
+val String.short: String get() =
+    if (length <= 20) this
+    else substring(0, 20) + "..."
+
 inline fun <K, V> MutableStateFlow<Map<K, V>>.updateMap(
     action: MutableMap<K, V>.() -> Unit
 ): Pair<Map<K, V>, Map<K, V>> {

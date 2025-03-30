@@ -1,38 +1,68 @@
 package org.vl4ds4m.board.game.assistant.ui.game.observer
 
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import org.vl4ds4m.board.game.assistant.ui.Home
-import org.vl4ds4m.board.game.assistant.ui.rememberTopmost
+import org.vl4ds4m.board.game.assistant.network.ObserverState
+import java.net.InetSocketAddress
 
 @Serializable
-data class ObserverStartup(val id: Int)
-
-@Serializable
-data object ObserverInGame
+data class GameObserver(val sessionId: Long, val initTitle: String, val ip: String, val port: Int)
 
 fun NavGraphBuilder.observerNavigation(navController: NavController) {
-    composable<ObserverStartup> {
-        ObserverStartupScreen(
-            viewModel = viewModel(),
-            onBackClick = { navController.navigateUp() },
-            //enterGame = { navController.navigate(ObserverInGame) }
+    composable<GameObserver> { entry ->
+        val route = entry.toRoute<GameObserver>()
+        val viewModel = viewModel<GameObserverViewModel>(
+            factory = GameObserverViewModel.createFactory(
+                address = InetSocketAddress(route.ip, route.port),
+                sessionId = route.sessionId
+            )
         )
-    }
-    composable<ObserverInGame> { entry ->
-        ObserverGameScreen(
-            viewModel = viewModel(
-                navController.rememberTopmost<ObserverStartup>(entry)
-            ),
-            onBackClick = {
-                navController.navigate(Home) {
-                    popUpTo<Home>()
-                    launchSingleTop = true
-                }
+        val observer = viewModel.observerState.collectAsState()
+        val session = viewModel.sessionState.collectAsState()
+        val onBackClick: () -> Unit = { navController.navigateUp() }
+        val title = remember {
+            derivedStateOf {
+                session.value?.let { "${it.name} (${it.type.title})" }
+                    ?: route.initTitle
             }
-        )
+        }
+        when (observer.value) {
+            ObserverState.REGISTRATION -> ObserverStartupScreen(
+                title = title.value,
+                onBackClick = onBackClick
+            )
+            ObserverState.IN_GAME -> {
+                val players = remember {
+                    derivedStateOf { session.value?.players ?: mapOf() }
+                }
+                val currentPlayerId = remember {
+                    derivedStateOf { session.value?.currentPlayerId }
+                }
+                val actions = remember {
+                    derivedStateOf { session.value?.actions ?: listOf() }
+                }
+                ObserverGameScreen(
+                    title = title,
+                    players = players,
+                    currentPlayerId = currentPlayerId,
+                    actions = actions,
+                    onBackClick = onBackClick
+                )
+            }
+            ObserverState.END_GAME -> {
+                ObserverEndScreen(
+                    title = title.value,
+                    onBackClick = onBackClick
+                )
+            }
+            ObserverState.EXIT -> onBackClick()
+        }
     }
 }

@@ -12,6 +12,7 @@ import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.ui.game.Game
 import org.vl4ds4m.board.game.assistant.ui.game.NewGameStart
 import org.vl4ds4m.board.game.assistant.ui.game.gameNavigation
+import org.vl4ds4m.board.game.assistant.ui.game.observer.GameObserver
 import org.vl4ds4m.board.game.assistant.ui.game.observer.observerNavigation
 import org.vl4ds4m.board.game.assistant.ui.home.HomeScreen
 import org.vl4ds4m.board.game.assistant.ui.home.HomeViewModel
@@ -37,6 +38,11 @@ fun NavGraphBuilder.mainNavigation(navController: NavController) {
             startNewGame = { navController.navigate(NewGameStart) },
             proceedGame = { id, type ->
                 navController.navigate(Game(type.title, id))
+            },
+            observeGame = { id, title, ip, port ->
+                GameObserver(id, title, ip, port).let {
+                    navController.navigate(it)
+                }
             }
         )
     }

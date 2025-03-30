@@ -1,12 +1,54 @@
 package org.vl4ds4m.board.game.assistant.ui.game.observer
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.StateFlow
+import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
+import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.network.GameObserver
+import org.vl4ds4m.board.game.assistant.network.ObserverState
+import java.net.InetSocketAddress
 
-class GameObserverViewModel : ViewModel() {
-    private val observer = GameObserver()
+class GameObserverViewModel(
+    address: InetSocketAddress,
+    private val sessionId: Long,
+    private val sessionRepository: GameSessionRepository
+) : ViewModel() {
+    private val observer = GameObserver(viewModelScope)
 
-    val state: StateFlow<GameSession> = observer.sessionState
+    val observerState: StateFlow<ObserverState> = observer.observerState
+
+    val sessionState: StateFlow<GameSession?> = observer.sessionState
+
+    init {
+        observer.startObserve(address)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        sessionState.value?.let {
+            sessionRepository.saveSession(it, sessionId)
+        }
+        observer.stopObserve()
+    }
+
+    companion object {
+        fun createFactory(
+            address: InetSocketAddress,
+            sessionId: Long
+        ): ViewModelProvider.Factory = viewModelFactory {
+            initializer<GameObserverViewModel> {
+                get(APPLICATION_KEY).let {
+                    it as BoardGameAssistantApp
+                }.let { app ->
+                    GameObserverViewModel(address, sessionId, app.sessionRepository)
+                }
+            }
+        }
+    }
 }

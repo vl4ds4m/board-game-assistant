@@ -159,7 +159,7 @@ val defaultGames: List<GameSession> = listOf(
     )
 )
 
-val defaultRemoteSession = listOf(
-    RemoteSession(1, "Milki Way"),
-    RemoteSession(2, "Catch me if you can")
+val fakeRemoteSession = listOf(
+    RemoteSession(1, "Milki Way", "100.0.0.100", 11234),
+    RemoteSession(2, "Catch me if you can", "100.0.0.100", 11234)
 )

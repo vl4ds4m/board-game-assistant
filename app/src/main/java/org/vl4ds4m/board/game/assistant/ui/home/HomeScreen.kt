@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.defaultGames
-import org.vl4ds4m.board.game.assistant.defaultRemoteSession
+import org.vl4ds4m.board.game.assistant.fakeRemoteSession
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 import org.vl4ds4m.board.game.assistant.network.RemoteSession
@@ -33,6 +33,7 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     startNewGame: () -> Unit,
     proceedGame: (Long, GameType) -> Unit,
+    observeGame: (Long, String, String, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LaunchedEffect(Unit) {
@@ -43,6 +44,7 @@ fun HomeScreen(
         remoteSessions = viewModel.remoteSessions.collectAsState(),
         clickNewGame = startNewGame,
         clickSession = proceedGame,
+        clickRemoteGame = observeGame,
         modifier = modifier
     )
 }
@@ -53,6 +55,7 @@ fun HomeScreenContent(
     remoteSessions: State<List<RemoteSession>>,
     clickNewGame: () -> Unit,
     clickSession: (Long, GameType) -> Unit,
+    clickRemoteGame: (Long, String, String, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -97,7 +100,11 @@ fun HomeScreenContent(
             itemsIndexed(remoteSessions.value) { index, session ->
                 Text(
                     text = "${index + 1}. ${session.name}",
-                    modifier = Modifier.padding(vertical = 16.dp)
+                    modifier = Modifier
+                        .padding(vertical = 16.dp)
+                        .clickable {
+                            session.run { clickRemoteGame(id, name, ip, port) }
+                        }
                 )
             }
         }
@@ -110,9 +117,10 @@ private fun HomeScreenPreview() {
     BoardGameAssistantTheme {
         HomeScreenContent(
             sessions = remember { mutableStateOf(sessionsInfo) },
-            remoteSessions = remember { mutableStateOf(defaultRemoteSession) },
+            remoteSessions = remember { mutableStateOf(fakeRemoteSession) },
             clickNewGame = {},
             clickSession = { _, _ -> },
+            clickRemoteGame = { _, _, _, _ -> },
             modifier = Modifier.fillMaxSize()
         )
     }

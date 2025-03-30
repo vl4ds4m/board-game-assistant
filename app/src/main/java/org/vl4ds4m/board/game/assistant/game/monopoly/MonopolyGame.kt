@@ -10,7 +10,7 @@ import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 import org.vl4ds4m.board.game.assistant.game.monopoly.entity.MonopolyEntity
 import org.vl4ds4m.board.game.assistant.game.monopoly.entity.Supplier
-import org.vl4ds4m.board.game.assistant.util.updateMap
+import org.vl4ds4m.board.game.assistant.updateMap
 
 @Suppress("unused")
 class MonopolyGame : OrderedGameEnv(Monopoly) {

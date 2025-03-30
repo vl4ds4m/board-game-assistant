@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneProperty
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
-import org.vl4ds4m.board.game.assistant.util.title
+import org.vl4ds4m.board.game.assistant.title
 
 @Composable
 fun CarcassonneCounter(

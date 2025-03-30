@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.util
+package org.vl4ds4m.board.game.assistant
 
 import kotlinx.coroutines.flow.MutableStateFlow
 

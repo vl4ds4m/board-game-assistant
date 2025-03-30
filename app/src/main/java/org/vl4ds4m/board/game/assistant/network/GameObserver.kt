@@ -10,8 +10,8 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
-import org.vl4ds4m.board.game.assistant.util.short
-import org.vl4ds4m.board.game.assistant.util.title
+import org.vl4ds4m.board.game.assistant.short
+import org.vl4ds4m.board.game.assistant.title
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.net.InetSocketAddress

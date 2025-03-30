@@ -15,8 +15,8 @@ import org.vl4ds4m.board.game.assistant.game.log.GameActionsHistory
 import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.game.data.Score
-import org.vl4ds4m.board.game.assistant.util.updateAndGetStates
-import org.vl4ds4m.board.game.assistant.util.updateMap
+import org.vl4ds4m.board.game.assistant.updateAndGetStates
+import org.vl4ds4m.board.game.assistant.updateMap
 import java.util.concurrent.atomic.AtomicLong
 
 typealias States<T> = Pair<T, T>

@@ -40,7 +40,7 @@ class GameObserver(private val scope: CoroutineScope) {
         }
         scope.launch(Dispatchers.IO) {
             try {
-                socket.connect(address)
+                socket.connect(address, 3000)
                 val output = ObjectOutputStream(socket.getOutputStream())
                 val input = ObjectInputStream(socket.getInputStream())
                 observe(output, input)

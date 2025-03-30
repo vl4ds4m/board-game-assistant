@@ -16,7 +16,6 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.net.InetSocketAddress
 import java.net.Socket
-import java.net.SocketException
 
 class GameObserver(private val scope: CoroutineScope) {
     private var socket: Socket? = null
@@ -44,10 +43,8 @@ class GameObserver(private val scope: CoroutineScope) {
                 val output = ObjectOutputStream(socket.getOutputStream())
                 val input = ObjectInputStream(socket.getInputStream())
                 observe(output, input)
-            } catch (e: SocketException) {
-                Log.i(TAG, "Socket is closed")
             } catch (e: Exception) {
-                Log.e(TAG, e.toString())
+                Log.i(TAG, e.toString())
                 mObserverState.value = ObserverState.EXIT
             }
         }
@@ -78,6 +75,7 @@ class GameObserver(private val scope: CoroutineScope) {
     fun stopObserve() {
         socket?.let {
             it.close()
+            Log.i(TAG, "Socket is closed")
             socket = null
         }
     }

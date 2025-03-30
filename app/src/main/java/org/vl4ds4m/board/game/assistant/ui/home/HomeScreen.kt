@@ -12,7 +12,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +24,7 @@ import org.vl4ds4m.board.game.assistant.defaultGames
 import org.vl4ds4m.board.game.assistant.fakeRemoteSession
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
-import org.vl4ds4m.board.game.assistant.network.RemoteSession
+import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -36,9 +35,6 @@ fun HomeScreen(
     observeGame: (Long, String, String, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.observeRemoteSession()
-    }
     HomeScreenContent(
         sessions = viewModel.sessions.collectAsState(),
         remoteSessions = viewModel.remoteSessions.collectAsState(),
@@ -52,7 +48,7 @@ fun HomeScreen(
 @Composable
 fun HomeScreenContent(
     sessions: State<List<GameSessionInfo>>,
-    remoteSessions: State<List<RemoteSession>>,
+    remoteSessions: State<List<RemoteSessionInfo>>,
     clickNewGame: () -> Unit,
     clickSession: (Long, GameType) -> Unit,
     clickRemoteGame: (Long, String, String, Int) -> Unit,

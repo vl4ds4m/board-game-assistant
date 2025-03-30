@@ -1,5 +1,6 @@
 package org.vl4ds4m.board.game.assistant.game.log
 
+import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 
 sealed interface GameAction {
@@ -9,11 +10,13 @@ sealed interface GameAction {
     }
 }
 
+@Serializable
 data class CurrentPlayerChangeAction(
     val oldPlayerId: Long?,
     val newPlayerId: Long?
 ) : GameAction
 
+@Serializable
 data class PlayerStateChangeAction(
     val playerId: Long,
     val oldState: PlayerState,

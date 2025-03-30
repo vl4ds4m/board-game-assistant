@@ -28,6 +28,7 @@ import org.vl4ds4m.board.game.assistant.game.log.CurrentPlayerChangeAction
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
 import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
 import org.vl4ds4m.board.game.assistant.game.monopoly.MonopolyGameState
+import org.vl4ds4m.board.game.assistant.game.simple.SimpleOrderedGameState
 
 class GameSessionRepository(
     private val sessionDao: GameSessionDao,
@@ -127,13 +128,12 @@ private val GameSessionData.gameState: GameState?
                     is OrderedGameType -> it
                 }
             }
-        val orderedGameState = players.sortedBy { it.order }
+        val orderedPlayerIds = players.sortedBy { it.order }
             .map { it.id }
-            .let { OrderedGameState(it) }
         return when (orderedGameType) {
-            is SimpleOrdered, Dice -> orderedGameState
-            is Carcassonne -> CarcassonneGameState(orderedGameState, entity.finalStage!!)
-            is Monopoly -> MonopolyGameState(orderedGameState)
+            is SimpleOrdered, Dice -> SimpleOrderedGameState(orderedPlayerIds)
+            is Carcassonne -> CarcassonneGameState(orderedPlayerIds, entity.finalStage!!)
+            is Monopoly -> MonopolyGameState(orderedPlayerIds)
         }
     }
 

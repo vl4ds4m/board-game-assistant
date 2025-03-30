@@ -13,6 +13,7 @@ import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.data.GameState
 import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
+import org.vl4ds4m.board.game.assistant.game.simple.SimpleOrderedGameState
 import org.vl4ds4m.board.game.assistant.util.updateAndGetStates
 import org.vl4ds4m.board.game.assistant.util.updateList
 
@@ -116,8 +117,8 @@ open class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
         }
     }
 
-    override val additionalState
-        get() = OrderedGameState(orderedPlayerIds.value)
+    override val additionalState: OrderedGameState
+        get() = SimpleOrderedGameState(orderedPlayerIds.value)
 }
 
 private fun getNextActivePlayerId(

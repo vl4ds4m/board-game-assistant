@@ -1,5 +1,6 @@
 package org.vl4ds4m.board.game.assistant.game
 
+import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneGame
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.game.monopoly.MonopolyGame
@@ -33,6 +34,7 @@ sealed interface GameType {
     }
 }
 
+@Serializable
 data object Free : GameType {
     override val title: String = "Free"
 
@@ -41,24 +43,28 @@ data object Free : GameType {
 
 sealed interface OrderedGameType : GameType
 
+@Serializable
 data object SimpleOrdered : OrderedGameType {
     override val title: String = "Ordered"
 
     override fun createGame() = SimpleOrderedGame()
 }
 
+@Serializable
 data object Dice : OrderedGameType {
     override val title: String = "Dice"
 
     override fun createGame() = DiceGame()
 }
 
+@Serializable
 data object Carcassonne : OrderedGameType {
     override val title: String = "Carcassonne"
 
     override fun createGame() = CarcassonneGame()
 }
 
+@Serializable
 data object Monopoly : OrderedGameType {
     override val title: String = "Monopoly"
 

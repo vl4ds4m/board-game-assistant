@@ -1,9 +1,11 @@
 package org.vl4ds4m.board.game.assistant.game.data
 
+import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.Players
 
+@Serializable
 data class GameSession(
     val completed: Boolean,
     val type: GameType,

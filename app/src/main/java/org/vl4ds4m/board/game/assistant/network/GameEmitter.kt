@@ -65,6 +65,7 @@ class GameEmitter(
                 closePlayerSockets()
             }
         val serverSocket = ServerSocket(0).also {
+            Log.i(TAG, "Open ServerSocket(${it.localPort})")
             serverSocket = it
         }
         scope.launch(Dispatchers.IO) {
@@ -76,6 +77,7 @@ class GameEmitter(
                     Log.i(TAG, "ServerSocket: $e")
                     break
                 }
+                Log.i(TAG, "Open PlayerSocket(${socket.inetAddress})")
                 playerSockets.add(socket)
                 scope.launch(Dispatchers.IO) {
                     try {

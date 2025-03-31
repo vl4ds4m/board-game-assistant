@@ -40,11 +40,12 @@ class GameObserver(private val scope: CoroutineScope) {
         scope.launch(Dispatchers.IO) {
             try {
                 socket.connect(address, 3000)
+                Log.i(TAG, "Open Socket(local=${socket.localPort}, remote=${socket.port})")
                 val output = ObjectOutputStream(socket.getOutputStream())
                 val input = ObjectInputStream(socket.getInputStream())
                 observe(output, input)
             } catch (e: Exception) {
-                Log.i(TAG, e.toString())
+                Log.i(TAG, "Socket: $e")
                 mObserverState.value = NetworkGameState.EXIT
             }
         }

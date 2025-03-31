@@ -40,7 +40,11 @@ interface Game {
 
     fun changeSecondsToEnd(seconds: Int)
 
+    val initialized: StateFlow<Boolean>
+
     val completed: StateFlow<Boolean>
+
+    fun initialize()
 
     fun start()
 

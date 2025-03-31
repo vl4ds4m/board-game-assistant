@@ -12,19 +12,25 @@ import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
 import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
+import org.vl4ds4m.board.game.assistant.network.GameEmitter
 
 abstract class GameViewModel(
     private val gameEnv: GameEnv,
     private val sessionId: Long?,
     private val sessionRepository: GameSessionRepository
 ) : ViewModel(), Game by gameEnv {
-    private var initialized: Boolean = false
+    private val gameEmitter = GameEmitter(
+        viewModelScope,
+        gameEnv.initialized,
+        gameEnv.completed,
+        gameEnv::save
+    )
 
     init {
         if (sessionId != null) initialize()
     }
 
-    fun initialize() {
+    final override fun initialize() {
         Log.d(TAG, "Initiate game process")
         viewModelScope.launch {
             sessionId?.let { id ->
@@ -34,16 +40,18 @@ abstract class GameViewModel(
             }
             gameEnv.initializables.forEach { it.init(viewModelScope) }
         }
-        initialized = true
+        gameEmitter.startEmit()
+        gameEnv.initialize()
     }
 
     override fun onCleared() {
-        if (initialized) {
+        if (initialized.value) {
             Log.d(TAG, "Complete game process")
             gameEnv.initializables.forEach { it.close() }
             gameEnv.save()
                 .let { sessionRepository.saveSession(it, sessionId) }
         }
+        gameEmitter.stopEmit()
         super.onCleared()
     }
 

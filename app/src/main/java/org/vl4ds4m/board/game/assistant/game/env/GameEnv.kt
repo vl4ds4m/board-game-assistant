@@ -156,6 +156,9 @@ open class GameEnv(override val type: GameType) : Game {
     private val mSecondsToEnd: MutableStateFlow<Int> = MutableStateFlow(0)
     override val secondsToEnd: StateFlow<Int> = mSecondsToEnd.asStateFlow()
 
+    private val mInitialized: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    override val initialized: StateFlow<Boolean> = mInitialized.asStateFlow()
+
     private val mCompleted: MutableStateFlow<Boolean> = MutableStateFlow(false)
     override val completed: StateFlow<Boolean> = mCompleted.asStateFlow()
 
@@ -164,6 +167,10 @@ open class GameEnv(override val type: GameType) : Game {
     }
 
     private val timer: Timer = Timer()
+
+    override fun initialize() {
+        mInitialized.value = true
+    }
 
     override fun start() {
         Log.i(TAG, "Start game")

@@ -20,9 +20,9 @@ import java.net.Socket
 class GameObserver(private val scope: CoroutineScope) {
     private var socket: Socket? = null
 
-    private val mObserverState: MutableStateFlow<ObserverState> =
-        MutableStateFlow(ObserverState.REGISTRATION)
-    val observerState: StateFlow<ObserverState> = mObserverState.asStateFlow()
+    private val mObserverState: MutableStateFlow<NetworkGameState> =
+        MutableStateFlow(NetworkGameState.REGISTRATION)
+    val observerState: StateFlow<NetworkGameState> = mObserverState.asStateFlow()
 
     private val mSessionState: MutableStateFlow<GameSession?> =
         MutableStateFlow(null)
@@ -45,7 +45,7 @@ class GameObserver(private val scope: CoroutineScope) {
                 observe(output, input)
             } catch (e: Exception) {
                 Log.i(TAG, e.toString())
-                mObserverState.value = ObserverState.EXIT
+                mObserverState.value = NetworkGameState.EXIT
             }
         }
     }
@@ -56,13 +56,13 @@ class GameObserver(private val scope: CoroutineScope) {
             .let { output.writeObject(it) }
         while (true) {
             val state = when (val header = input.readObject() as String) {
-                ObserverState.REGISTRATION.title -> ObserverState.REGISTRATION
-                ObserverState.IN_GAME.title -> ObserverState.IN_GAME
-                ObserverState.END_GAME.title -> ObserverState.END_GAME
-                ObserverState.EXIT.title -> ObserverState.EXIT
+                NetworkGameState.REGISTRATION.title -> NetworkGameState.REGISTRATION
+                NetworkGameState.IN_GAME.title -> NetworkGameState.IN_GAME
+                NetworkGameState.END_GAME.title -> NetworkGameState.END_GAME
+                NetworkGameState.EXIT.title -> NetworkGameState.EXIT
                 else -> throw NetworkException("Invalid header: ${header.short}")
             }
-            if (state == ObserverState.IN_GAME) {
+            if (state == NetworkGameState.IN_GAME) {
                 mSessionState.value = input.readObject()
                     .let { it as String }
                     .let { Json.decodeFromString<NetworkSession>(it) }

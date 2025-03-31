@@ -11,7 +11,7 @@ import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.network.GameObserver
-import org.vl4ds4m.board.game.assistant.network.ObserverState
+import org.vl4ds4m.board.game.assistant.network.NetworkGameState
 import java.net.InetSocketAddress
 
 class GameObserverViewModel(
@@ -21,7 +21,7 @@ class GameObserverViewModel(
 ) : ViewModel() {
     private val observer = GameObserver(viewModelScope)
 
-    val observerState: StateFlow<ObserverState> = observer.observerState
+    val observerState: StateFlow<NetworkGameState> = observer.observerState
 
     val sessionState: StateFlow<GameSession?> = observer.sessionState
 

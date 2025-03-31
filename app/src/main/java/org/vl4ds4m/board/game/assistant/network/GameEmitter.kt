@@ -27,7 +27,7 @@ class GameEmitter(
     private var serverSocket: ServerSocket? = null
     private val playerSockets: MutableCollection<Socket> = mutableListOf()
 
-    private val emitterState = MutableStateFlow(ObserverState.REGISTRATION)
+    private val emitterState = MutableStateFlow(NetworkGameState.REGISTRATION)
 
     private val sessionState = MutableStateFlow<GameSession?>(null)
 
@@ -37,16 +37,16 @@ class GameEmitter(
         scope.launch {
             isGameInitialized.combine(isGameCompleted) { initialized, completed ->
                 val state =
-                    if (!initialized) ObserverState.REGISTRATION
-                    else if (completed) ObserverState.END_GAME
-                    else ObserverState.IN_GAME
+                    if (!initialized) NetworkGameState.REGISTRATION
+                    else if (completed) NetworkGameState.END_GAME
+                    else NetworkGameState.IN_GAME
                 emitterState.value = state
-                lastUpdate.value = state == ObserverState.END_GAME
+                lastUpdate.value = state == NetworkGameState.END_GAME
             }
         }
         scope.launch {
             while (true) {
-                if (emitterState.value == ObserverState.IN_GAME) {
+                if (emitterState.value == NetworkGameState.IN_GAME) {
                     sessionState.value = produceGameState()
                 }
                 delay(1000)
@@ -99,13 +99,13 @@ class GameEmitter(
             .let { Json.decodeFromString<NetworkPlayer>(it) }
         while (true) {
             val state = emitterState.value
-            if (state == ObserverState.END_GAME && lastUpdate.value) {
-                output.writeObject(ObserverState.IN_GAME)
+            if (state == NetworkGameState.END_GAME && lastUpdate.value) {
+                output.writeObject(NetworkGameState.IN_GAME)
                 emitGameSession(output)
                 lastUpdate.value = false
             }
             output.writeObject(state.title)
-            if (state == ObserverState.IN_GAME) {
+            if (state == NetworkGameState.IN_GAME) {
                 emitGameSession(output)
             }
             delay(2000)

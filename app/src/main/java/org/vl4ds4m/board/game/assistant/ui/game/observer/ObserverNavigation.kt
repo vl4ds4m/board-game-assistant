@@ -9,7 +9,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import org.vl4ds4m.board.game.assistant.network.ObserverState
+import org.vl4ds4m.board.game.assistant.network.NetworkGameState
 import java.net.InetSocketAddress
 
 @Serializable
@@ -34,11 +34,11 @@ fun NavGraphBuilder.observerNavigation(navController: NavController) {
             }
         }
         when (observer.value) {
-            ObserverState.REGISTRATION -> ObserverStartupScreen(
+            NetworkGameState.REGISTRATION -> ObserverStartupScreen(
                 title = title.value,
                 onBackClick = onBackClick
             )
-            ObserverState.IN_GAME -> {
+            NetworkGameState.IN_GAME -> {
                 val players = remember {
                     derivedStateOf { session.value?.players ?: mapOf() }
                 }
@@ -56,13 +56,13 @@ fun NavGraphBuilder.observerNavigation(navController: NavController) {
                     onBackClick = onBackClick
                 )
             }
-            ObserverState.END_GAME -> {
+            NetworkGameState.END_GAME -> {
                 ObserverEndScreen(
                     title = title.value,
                     onBackClick = onBackClick
                 )
             }
-            ObserverState.EXIT -> onBackClick()
+            NetworkGameState.EXIT -> onBackClick()
         }
     }
 }

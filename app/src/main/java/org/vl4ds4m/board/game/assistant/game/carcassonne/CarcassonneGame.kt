@@ -2,6 +2,7 @@ package org.vl4ds4m.board.game.assistant.game.carcassonne
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.vl4ds4m.board.game.assistant.game.Carcassonne
+import org.vl4ds4m.board.game.assistant.game.data.CarcassonneGameState
 import org.vl4ds4m.board.game.assistant.game.data.GameState
 import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv

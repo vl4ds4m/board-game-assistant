@@ -3,6 +3,7 @@ package org.vl4ds4m.board.game.assistant.game.log
 import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 
+@Serializable
 sealed interface GameAction {
     companion object {
         const val CHANGE_CURRENT_PLAYER  = "change_current_player"

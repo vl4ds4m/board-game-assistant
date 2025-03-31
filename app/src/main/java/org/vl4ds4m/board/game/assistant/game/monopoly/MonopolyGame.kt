@@ -6,7 +6,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.GameState
-import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
+import org.vl4ds4m.board.game.assistant.game.data.MonopolyGameState
+import org.vl4ds4m.board.game.assistant.game.data.MonopolyPlayerState
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 import org.vl4ds4m.board.game.assistant.game.monopoly.entity.MonopolyEntity
 import org.vl4ds4m.board.game.assistant.game.monopoly.entity.Supplier
@@ -41,7 +42,7 @@ class MonopolyGame : OrderedGameEnv(Monopoly) {
         }
     }
 
-    override val additionalState: OrderedGameState
+    override val additionalState
         get() = MonopolyGameState(
             super.additionalState,
             entityOwner.value,

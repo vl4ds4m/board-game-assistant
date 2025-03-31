@@ -1,10 +1,19 @@
-package org.vl4ds4m.board.game.assistant.game.monopoly
+package org.vl4ds4m.board.game.assistant.game.data
 
+import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.game.monopoly.entity.MonopolyEntity
 import org.vl4ds4m.board.game.assistant.game.monopoly.entity.MonopolyProperty
-import org.vl4ds4m.board.game.assistant.game.data.PlayerState
+
+@Serializable
+sealed interface PlayerState {
+    val score: Int
+}
+
+@Serializable
+data class Score(override val score: Int = 0) : PlayerState
 
 @Suppress("unused")
+// not yet @Serializable
 class MonopolyPlayerState(
     override var score: Int = 0,
     var position: Int = 1,

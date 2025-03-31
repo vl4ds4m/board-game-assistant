@@ -18,7 +18,7 @@ import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.Score
-import org.vl4ds4m.board.game.assistant.game.simple.SimpleOrderedGameState
+import org.vl4ds4m.board.game.assistant.game.data.SimpleOrderedGameState
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 
 class BoardGameAssistantApp : Application() {

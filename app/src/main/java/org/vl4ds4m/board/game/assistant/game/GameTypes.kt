@@ -14,6 +14,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.ordered.SimpleOrderedGameViewMod
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 
+@Serializable
 sealed interface GameType {
     val title: String
 
@@ -52,6 +53,7 @@ data object Free : GameType {
     override val viewModelProducer = FreeGameViewModel
 }
 
+@Serializable
 sealed interface OrderedGameType : GameType
 
 @Serializable

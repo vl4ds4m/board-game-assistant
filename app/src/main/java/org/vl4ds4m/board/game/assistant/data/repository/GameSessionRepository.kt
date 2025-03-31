@@ -18,17 +18,17 @@ import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.OrderedGameType
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
-import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneGameState
+import org.vl4ds4m.board.game.assistant.game.data.CarcassonneGameState
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 import org.vl4ds4m.board.game.assistant.game.data.GameState
+import org.vl4ds4m.board.game.assistant.game.data.MonopolyGameState
 import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
 import org.vl4ds4m.board.game.assistant.game.data.Score
+import org.vl4ds4m.board.game.assistant.game.data.SimpleOrderedGameState
 import org.vl4ds4m.board.game.assistant.game.log.CurrentPlayerChangeAction
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
 import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
-import org.vl4ds4m.board.game.assistant.game.monopoly.MonopolyGameState
-import org.vl4ds4m.board.game.assistant.game.simple.SimpleOrderedGameState
 
 class GameSessionRepository(
     private val sessionDao: GameSessionDao,

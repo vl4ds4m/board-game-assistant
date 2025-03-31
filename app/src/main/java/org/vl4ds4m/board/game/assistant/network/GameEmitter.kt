@@ -104,21 +104,22 @@ class GameEmitter(
         while (true) {
             val state = emitterState.value
             if (state == NetworkGameState.END_GAME && lastUpdate.value) {
-                output.writeObject(NetworkGameState.IN_GAME.title)
-                emitGameSession(output)
+                emitState(NetworkGameState.IN_GAME, output, input)
+                emitGameSession(output, input)
                 lastUpdate.value = false
             }
-            output.writeObject(state.title)
+            emitState(state, output, input)
             if (state == NetworkGameState.IN_GAME) {
-                emitGameSession(output)
+                emitGameSession(output, input)
             }
             delay(2000)
         }
     }
 
-    private fun emitGameSession(output: ObjectOutputStream) {
+    private fun emitGameSession(output: ObjectOutputStream, input: ObjectInputStream) {
         sessionState.value?.let { Json.encodeToString(it) }
             ?.let { output.writeObject(it) }
+            ?.also { input.readObject() }
     }
 
     fun stopEmit() {
@@ -144,3 +145,12 @@ class GameEmitter(
 }
 
 private const val TAG = "GameEmitter"
+
+private fun emitState(
+    state: NetworkGameState,
+    output: ObjectOutputStream,
+    input: ObjectInputStream
+) {
+    output.writeObject(state.title)
+    input.readObject()
+}

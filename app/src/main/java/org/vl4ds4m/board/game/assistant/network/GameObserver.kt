@@ -63,11 +63,13 @@ class GameObserver(private val scope: CoroutineScope) {
                 NetworkGameState.EXIT.title -> NetworkGameState.EXIT
                 else -> throw NetworkException("Invalid header: ${header.short}")
             }
+            output.writeObject(null)
             if (state == NetworkGameState.IN_GAME) {
                 mSessionState.value = input.readObject()
                     .let { it as String }
                     .let { Json.decodeFromString<NetworkSession>(it) }
                     .session
+                output.writeObject(null)
             }
             mObserverState.value = state
         }

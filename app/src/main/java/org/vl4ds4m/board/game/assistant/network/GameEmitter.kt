@@ -7,6 +7,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
@@ -34,16 +36,16 @@ class GameEmitter(
     private val lastUpdate = MutableStateFlow(false)
 
     init {
-        scope.launch {
-            isGameInitialized.combine(isGameCompleted) { initialized, completed ->
-                val state =
-                    if (!initialized) NetworkGameState.REGISTRATION
-                    else if (completed) NetworkGameState.END_GAME
-                    else NetworkGameState.IN_GAME
-                emitterState.value = state
-                lastUpdate.value = state == NetworkGameState.END_GAME
-            }
-        }
+        isGameInitialized.combine(isGameCompleted) {
+            init, comp -> init to comp
+        }.onEach { (initialized, completed) ->
+            val state =
+                if (!initialized) NetworkGameState.REGISTRATION
+                else if (completed) NetworkGameState.END_GAME
+                else NetworkGameState.IN_GAME
+            emitterState.value = state
+            lastUpdate.value = state == NetworkGameState.END_GAME
+        }.launchIn(scope)
         scope.launch {
             while (true) {
                 if (emitterState.value == NetworkGameState.IN_GAME) {
@@ -102,7 +104,7 @@ class GameEmitter(
         while (true) {
             val state = emitterState.value
             if (state == NetworkGameState.END_GAME && lastUpdate.value) {
-                output.writeObject(NetworkGameState.IN_GAME)
+                output.writeObject(NetworkGameState.IN_GAME.title)
                 emitGameSession(output)
                 lastUpdate.value = false
             }

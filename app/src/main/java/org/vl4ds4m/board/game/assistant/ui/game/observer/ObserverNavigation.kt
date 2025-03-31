@@ -46,7 +46,11 @@ fun NavGraphBuilder.observerNavigation(navController: NavController) {
                     derivedStateOf { session.value?.currentPlayerId }
                 }
                 val actions = remember {
-                    derivedStateOf { session.value?.actions ?: listOf() }
+                    derivedStateOf {
+                        session.value?.let {
+                            it.actions.take(it.currentActionPosition)
+                        } ?: listOf()
+                    }
                 }
                 ObserverGameScreen(
                     title = title,

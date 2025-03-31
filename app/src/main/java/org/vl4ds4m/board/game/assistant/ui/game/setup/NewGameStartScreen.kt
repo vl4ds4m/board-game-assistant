@@ -30,7 +30,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 fun NewGameStartScreen(
     viewModel: GameSetupViewModel,
     onBackClick: () -> Unit,
-    onSetupPlayers: () -> Unit,
+    onSetupPlayers: (GameType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     GameScreen(
@@ -41,7 +41,10 @@ fun NewGameStartScreen(
         NewGameStartScreenContent(
             vmType = viewModel.type,
             vmName = viewModel.name,
-            onSetupPlayers = onSetupPlayers,
+            onSetupPlayers = {
+                viewModel.createGame()
+                onSetupPlayers(viewModel.type.value!!)
+            },
             modifier = innerModifier
         )
     }

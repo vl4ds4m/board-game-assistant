@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayerCard
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
@@ -31,7 +30,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 fun NewGamePlayersScreen(
     viewModel: GameSetupViewModel,
     onBackClick: () -> Unit,
-    onStartGame: (GameType) -> Unit,
+    onStartGame: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     GameScreen(
@@ -44,10 +43,7 @@ fun NewGamePlayersScreen(
             onAddPlayer = viewModel::addPlayer,
             onRenamePlayer = viewModel::renamePlayer,
             onRemovePlayer = viewModel::removePlayerAt,
-            onStartGame = {
-                viewModel.createGame()
-                onStartGame(viewModel.type.value!!)
-            },
+            onStartGame = onStartGame,
             modifier = innerModifier
         )
     }

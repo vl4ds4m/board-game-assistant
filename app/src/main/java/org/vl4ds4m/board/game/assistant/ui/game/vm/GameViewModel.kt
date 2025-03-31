@@ -18,8 +18,14 @@ abstract class GameViewModel(
     private val sessionId: Long?,
     private val sessionRepository: GameSessionRepository
 ) : ViewModel(), Game by gameEnv {
+    private var initialized: Boolean = false
+
     init {
-        Log.d(TAG, "Initiate ${this::class.simpleName}")
+        if (sessionId != null) initialize()
+    }
+
+    fun initialize() {
+        Log.d(TAG, "Initiate game process")
         viewModelScope.launch {
             sessionId?.let { id ->
                 sessionRepository.loadSession(id)
@@ -28,13 +34,16 @@ abstract class GameViewModel(
             }
             gameEnv.initializables.forEach { it.init(viewModelScope) }
         }
+        initialized = true
     }
 
     override fun onCleared() {
-        Log.d(TAG, "Clear ${this::class.simpleName}")
-        gameEnv.initializables.forEach { it.close() }
-        gameEnv.save()
-            .let { sessionRepository.saveSession(it, sessionId) }
+        if (initialized) {
+            Log.d(TAG, "Complete game process")
+            gameEnv.initializables.forEach { it.close() }
+            gameEnv.save()
+                .let { sessionRepository.saveSession(it, sessionId) }
+        }
         super.onCleared()
     }
 

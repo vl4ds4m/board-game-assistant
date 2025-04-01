@@ -30,10 +30,7 @@ abstract class GameViewModel(
             .let { it as BoardGameAssistantApp }
         sessionRepository = app.sessionRepository
         gameEmitter = GameEmitter(
-            viewModelScope,
-            gameEnv.initialized,
-            gameEnv.completed,
-            gameEnv::save,
+            viewModelScope, gameEnv,
             app.applicationContext.getSystemService(NsdManager::class.java)
         )
         if (sessionId != null) initialize()

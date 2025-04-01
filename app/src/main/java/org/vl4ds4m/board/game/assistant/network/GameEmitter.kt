@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -15,6 +14,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
+import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.title
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -23,9 +23,7 @@ import java.net.Socket
 
 class GameEmitter(
     private val scope: CoroutineScope,
-    isGameInitialized: StateFlow<Boolean>,
-    isGameCompleted: StateFlow<Boolean>,
-    produceGameState: () -> GameSession,
+    gameEnv: GameEnv,
     nsdManager: NsdManager
 ) {
     private var serverSocket: ServerSocket? = null
@@ -35,12 +33,14 @@ class GameEmitter(
 
     private val sessionState = MutableStateFlow<GameSession?>(null)
 
+    private val produceGameState: () -> GameSession = gameEnv::save
+
     private val lastUpdate = MutableStateFlow(false)
 
     private val sessionEmitter = SessionEmitter(nsdManager)
 
     init {
-        isGameInitialized.combine(isGameCompleted) {
+        gameEnv.initialized.combine(gameEnv.completed) {
             init, comp -> init to comp
         }.onEach { (initialized, completed) ->
             val state =
@@ -110,21 +110,18 @@ class GameEmitter(
             val state = emitterState.value
             if (state == NetworkGameState.END_GAME && lastUpdate.value) {
                 emitState(NetworkGameState.IN_GAME, output, input)
-                emitGameSession(output, input)
+                produceGameState().also {
+                    it.emitGameSession(output, input)
+                    sessionState.value = it
+                }
                 lastUpdate.value = false
             }
             emitState(state, output, input)
             if (state == NetworkGameState.IN_GAME) {
-                emitGameSession(output, input)
+                sessionState.value?.emitGameSession(output, input)
             }
             delay(2000)
         }
-    }
-
-    private fun emitGameSession(output: ObjectOutputStream, input: ObjectInputStream) {
-        sessionState.value?.let { Json.encodeToString(it) }
-            ?.let { output.writeObject(it) }
-            ?.also { input.readObject() }
     }
 
     fun stopEmit() {
@@ -159,4 +156,10 @@ private fun emitState(
 ) {
     output.writeObject(state.title)
     input.readObject()
+}
+
+private fun GameSession.emitGameSession(output: ObjectOutputStream, input: ObjectInputStream) {
+    Json.encodeToString(this)
+        .let { output.writeObject(it) }
+        .also { input.readObject() }
 }

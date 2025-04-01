@@ -1,6 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui.game.monopoly
 
-import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
+import androidx.lifecycle.viewmodel.CreationExtras
 import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.monopoly.MonopolyGame
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
@@ -9,19 +9,19 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 class MonopolyGameViewModel(
     gameEnv: MonopolyGame = MonopolyGame(),
     sessionId: Long? = null,
-    sessionRepository: GameSessionRepository
-) : OrderedGameViewModel(gameEnv, sessionId, sessionRepository) {
+    extras: CreationExtras
+) : OrderedGameViewModel(gameEnv, sessionId, extras) {
     companion object : GameViewModelProducer<MonopolyGameViewModel> {
-        override fun createViewModel(game: Game, sessionRepository: GameSessionRepository) =
+        override fun createViewModel(game: Game, extras: CreationExtras) =
             MonopolyGameViewModel(
                 gameEnv = game as MonopolyGame,
-                sessionRepository = sessionRepository
+                extras = extras
             )
 
-        override fun createViewModel(sessionId: Long, sessionRepository: GameSessionRepository) =
+        override fun createViewModel(sessionId: Long, extras: CreationExtras) =
             MonopolyGameViewModel(
                 sessionId = sessionId,
-                sessionRepository = sessionRepository
+                extras = extras
             )
     }
 }

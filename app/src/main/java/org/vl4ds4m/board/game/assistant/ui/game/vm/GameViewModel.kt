@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
@@ -17,8 +18,13 @@ import org.vl4ds4m.board.game.assistant.network.GameEmitter
 abstract class GameViewModel(
     private val gameEnv: GameEnv,
     private val sessionId: Long?,
-    private val sessionRepository: GameSessionRepository
+    extras: CreationExtras
 ) : ViewModel(), Game by gameEnv {
+    private val sessionRepository: GameSessionRepository =
+        extras[APPLICATION_KEY]
+            .let { it as BoardGameAssistantApp }
+            .sessionRepository
+
     private val gameEmitter = GameEmitter(
         viewModelScope,
         gameEnv.initialized,
@@ -63,12 +69,11 @@ abstract class GameViewModel(
             initializer<GameViewModel> {
                 val app = get(APPLICATION_KEY)
                     .let { it as BoardGameAssistantApp }
-                val sessionRepository = app.sessionRepository
                 if (sessionId == null) {
                     val game = app.gameRepository.extract()
-                    producer.createViewModel(game, sessionRepository)
+                    producer.createViewModel(game, this)
                 } else {
-                    producer.createViewModel(sessionId, sessionRepository)
+                    producer.createViewModel(sessionId, this)
                 }
             }
         }

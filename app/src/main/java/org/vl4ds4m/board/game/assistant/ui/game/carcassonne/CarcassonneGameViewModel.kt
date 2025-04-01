@@ -1,7 +1,7 @@
 package org.vl4ds4m.board.game.assistant.ui.game.carcassonne
 
+import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
 import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneGame
 import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneProperty
@@ -11,8 +11,8 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 class CarcassonneGameViewModel(
     private val gameEnv: CarcassonneGame = CarcassonneGame(),
     sessionId: Long? = null,
-    sessionRepository: GameSessionRepository
-) : OrderedGameViewModel(gameEnv, sessionId, sessionRepository) {
+    extras: CreationExtras
+) : OrderedGameViewModel(gameEnv, sessionId, extras) {
     val onFinal: MutableStateFlow<Boolean> = gameEnv.finalStage
 
     fun addPoints(property: CarcassonneProperty, count: Int) {
@@ -24,16 +24,16 @@ class CarcassonneGameViewModel(
     }
 
     companion object : GameViewModelProducer<CarcassonneGameViewModel> {
-        override fun createViewModel(game: Game, sessionRepository: GameSessionRepository) =
+        override fun createViewModel(game: Game, extras: CreationExtras) =
             CarcassonneGameViewModel(
                 gameEnv = game as CarcassonneGame,
-                sessionRepository = sessionRepository
+                extras = extras
             )
 
-        override fun createViewModel(sessionId: Long, sessionRepository: GameSessionRepository) =
+        override fun createViewModel(sessionId: Long, extras: CreationExtras) =
             CarcassonneGameViewModel(
                 sessionId = sessionId,
-                sessionRepository = sessionRepository
+                extras = extras
             )
     }
 }

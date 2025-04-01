@@ -1,5 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui.game.vm
 
+import android.net.nsd.NsdManager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -20,19 +21,21 @@ abstract class GameViewModel(
     private val sessionId: Long?,
     extras: CreationExtras
 ) : ViewModel(), Game by gameEnv {
-    private val sessionRepository: GameSessionRepository =
-        extras[APPLICATION_KEY]
-            .let { it as BoardGameAssistantApp }
-            .sessionRepository
+    private val sessionRepository: GameSessionRepository
 
-    private val gameEmitter = GameEmitter(
-        viewModelScope,
-        gameEnv.initialized,
-        gameEnv.completed,
-        gameEnv::save
-    )
+    private val gameEmitter: GameEmitter
 
     init {
+        val app = extras[APPLICATION_KEY]
+            .let { it as BoardGameAssistantApp }
+        sessionRepository = app.sessionRepository
+        gameEmitter = GameEmitter(
+            viewModelScope,
+            gameEnv.initialized,
+            gameEnv.completed,
+            gameEnv::save,
+            app.applicationContext.getSystemService(NsdManager::class.java)
+        )
         if (sessionId != null) initialize()
     }
 

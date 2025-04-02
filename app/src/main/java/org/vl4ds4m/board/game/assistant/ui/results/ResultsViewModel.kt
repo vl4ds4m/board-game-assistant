@@ -1,14 +1,14 @@
 package org.vl4ds4m.board.game.assistant.ui.results
 
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.CreationExtras
+import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.SessionViewModel
 
 class ResultsViewModel private constructor(
-    extras: CreationExtras
-) : SessionViewModel(extras) {
+    app: BoardGameAssistantApp
+) : SessionViewModel(app) {
     override fun isMatched(session: GameSessionInfo) = session.completed
 
     suspend fun getSession(id: String): GameSession? = sessionRepository.loadSession(id)

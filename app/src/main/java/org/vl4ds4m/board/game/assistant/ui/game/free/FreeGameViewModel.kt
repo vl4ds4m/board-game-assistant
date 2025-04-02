@@ -1,6 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui.game.free
 
-import androidx.lifecycle.viewmodel.CreationExtras
+import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.simple.FreeGame
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
@@ -9,23 +9,17 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 class FreeGameViewModel private constructor(
     private val gameEnv: FreeGame = FreeGame(),
     sessionId: String? = null,
-    extras: CreationExtras
-) : GameViewModel(gameEnv, sessionId, extras) {
+    app: BoardGameAssistantApp
+) : GameViewModel(gameEnv, sessionId, app) {
     fun addPoints(points: Int) {
         gameEnv.addPoints(points)
     }
 
     companion object : GameViewModelProducer<FreeGameViewModel> {
-        override fun createViewModel(game: Game, extras: CreationExtras) =
-            FreeGameViewModel(
-                gameEnv = game as FreeGame,
-                extras = extras
-            )
+        override fun createViewModel(game: Game, app: BoardGameAssistantApp) =
+            FreeGameViewModel(gameEnv = game as FreeGame, app = app)
 
-        override fun createViewModel(sessionId: String, extras: CreationExtras) =
-            FreeGameViewModel(
-                sessionId = sessionId,
-                extras = extras
-            )
+        override fun createViewModel(sessionId: String, app: BoardGameAssistantApp) =
+            FreeGameViewModel(sessionId = sessionId, app = app)
     }
 }

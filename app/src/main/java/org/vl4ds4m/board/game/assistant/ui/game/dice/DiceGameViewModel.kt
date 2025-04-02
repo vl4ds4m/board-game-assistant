@@ -1,6 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui.game.dice
 
-import androidx.lifecycle.viewmodel.CreationExtras
+import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.game.DiceGame
 import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
@@ -9,23 +9,23 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 class DiceGameViewModel private constructor(
     private val gameEnv: DiceGame = DiceGame(),
     sessionId: String? = null,
-    extras: CreationExtras
-) : OrderedGameViewModel(gameEnv, sessionId, extras) {
+    app: BoardGameAssistantApp
+) : OrderedGameViewModel(gameEnv, sessionId, app) {
     fun addPoints(points: Int) {
         gameEnv.addPoints(points)
     }
 
     companion object : GameViewModelProducer<DiceGameViewModel> {
-        override fun createViewModel(game: Game, extras: CreationExtras) =
+        override fun createViewModel(game: Game, app: BoardGameAssistantApp) =
             DiceGameViewModel(
                 gameEnv = game as DiceGame,
-                extras = extras
+                app = app
             )
 
-        override fun createViewModel(sessionId: String, extras: CreationExtras) =
+        override fun createViewModel(sessionId: String, app: BoardGameAssistantApp) =
             DiceGameViewModel(
                 sessionId = sessionId,
-                extras = extras
+                app = app
             )
     }
 }

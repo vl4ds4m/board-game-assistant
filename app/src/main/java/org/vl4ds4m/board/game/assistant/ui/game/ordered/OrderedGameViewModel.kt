@@ -1,7 +1,7 @@
 package org.vl4ds4m.board.game.assistant.ui.game.ordered
 
-import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.flow.StateFlow
+import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
@@ -9,8 +9,8 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 abstract class OrderedGameViewModel(
     private val gameEnv: OrderedGameEnv,
     sessionId: String? = null,
-    extras: CreationExtras
-) : GameViewModel(gameEnv, sessionId, extras), OrderedGame {
+    app: BoardGameAssistantApp
+) : GameViewModel(gameEnv, sessionId, app), OrderedGame {
     override val nextPlayerId: StateFlow<Long?> = gameEnv.nextPlayerId
 
     override val orderedPlayerIds: StateFlow<List<Long>> = gameEnv.orderedPlayerIds

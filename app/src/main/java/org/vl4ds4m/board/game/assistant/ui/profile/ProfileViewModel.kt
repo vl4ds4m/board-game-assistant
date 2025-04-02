@@ -4,7 +4,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -33,9 +32,8 @@ class ProfileViewModel private constructor(
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer<ProfileViewModel> {
-                get(APPLICATION_KEY)
-                    .let { it as BoardGameAssistantApp }
-                    .let { ProfileViewModel(it.userDataRepository) }
+                val app = BoardGameAssistantApp.from(this)
+                ProfileViewModel(app.userDataRepository)
             }
         }
     }

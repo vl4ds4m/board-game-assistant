@@ -4,6 +4,8 @@ import android.app.Application
 import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -45,6 +47,10 @@ class BoardGameAssistantApp : Application() {
     val gameRepository = GameRepository()
 
     val userDataRepository by lazy { UserDataRepository(userDataStore, coroutineScope) }
+
+    companion object {
+        fun from(extras: CreationExtras) = extras[APPLICATION_KEY] as BoardGameAssistantApp
+    }
 }
 
 private fun prepopulateDatabase(repo: GameSessionRepository) {

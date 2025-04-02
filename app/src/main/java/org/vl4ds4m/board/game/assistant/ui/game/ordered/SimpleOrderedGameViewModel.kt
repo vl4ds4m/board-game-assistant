@@ -1,6 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui.game.ordered
 
-import androidx.lifecycle.viewmodel.CreationExtras
+import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.simple.SimpleOrderedGame
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
@@ -8,23 +8,23 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 class SimpleOrderedGameViewModel private constructor(
     private val gameEnv: SimpleOrderedGame = SimpleOrderedGame(),
     sessionId: String? = null,
-    extras: CreationExtras
-) : OrderedGameViewModel(gameEnv, sessionId, extras) {
+    app: BoardGameAssistantApp
+) : OrderedGameViewModel(gameEnv, sessionId, app) {
     fun addPoints(points: Int) {
         gameEnv.addPoints(points)
     }
 
     companion object : GameViewModelProducer<SimpleOrderedGameViewModel> {
-        override fun createViewModel(game: Game, extras: CreationExtras) =
+        override fun createViewModel(game: Game, app: BoardGameAssistantApp) =
             SimpleOrderedGameViewModel(
                 gameEnv = game as SimpleOrderedGame,
-                extras = extras
+                app = app
             )
 
-        override fun createViewModel(sessionId: String, extras: CreationExtras) =
+        override fun createViewModel(sessionId: String, app: BoardGameAssistantApp) =
             SimpleOrderedGameViewModel(
                 sessionId = sessionId,
-                extras = extras
+                app = app
             )
     }
 }

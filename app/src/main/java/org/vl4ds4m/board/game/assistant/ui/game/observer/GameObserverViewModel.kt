@@ -2,7 +2,6 @@ package org.vl4ds4m.board.game.assistant.ui.game.observer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -43,11 +42,8 @@ class GameObserverViewModel(
             sessionInfo: RemoteSessionInfo
         ): ViewModelProvider.Factory = viewModelFactory {
             initializer<GameObserverViewModel> {
-                get(APPLICATION_KEY).let {
-                    it as BoardGameAssistantApp
-                }.let { app ->
-                    GameObserverViewModel(sessionInfo, app.sessionRepository)
-                }
+                val app = BoardGameAssistantApp.from(this)
+                GameObserverViewModel(sessionInfo, app.sessionRepository)
             }
         }
     }

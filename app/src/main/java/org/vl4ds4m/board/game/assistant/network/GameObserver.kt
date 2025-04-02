@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.vl4ds4m.board.game.assistant.closeAndLog
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.short
 import org.vl4ds4m.board.game.assistant.title
@@ -78,8 +79,7 @@ class GameObserver(private val scope: CoroutineScope) {
 
     fun stopObserve() {
         socket?.let {
-            it.close()
-            Log.i(TAG, "Socket is closed")
+            it.closeAndLog(TAG, "Socket")
             socket = null
         }
     }

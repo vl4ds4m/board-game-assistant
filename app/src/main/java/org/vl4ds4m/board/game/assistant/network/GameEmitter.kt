@@ -6,12 +6,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.vl4ds4m.board.game.assistant.closeAndLog
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.title
@@ -26,7 +28,7 @@ class GameEmitter(
     private val sessionEmitter: SessionEmitter
 ) {
     private var serverSocket: ServerSocket? = null
-    private val playerSockets: MutableCollection<Socket> = mutableListOf()
+    private val playerSockets = MutableStateFlow<List<Socket>?>(null)
 
     private val emitterState = MutableStateFlow(NetworkGameState.REGISTRATION)
 
@@ -62,15 +64,15 @@ class GameEmitter(
             Log.e(TAG, "During start emit ServerSocket is still not null")
             closeServerSocket()
         }
-        playerSockets.takeIf { it.isNotEmpty() }
-            ?.let {
-                Log.e(TAG, "During start emit there are PlayersSockets")
-                closePlayerSockets()
-            }
+        playerSockets.value?.let {
+            Log.e(TAG, "During start emit PlayersSockets already initialized")
+            closePlayerSockets()
+        }
         val serverSocket = ServerSocket(0).also {
             Log.i(TAG, "Open ServerSocket(${it.localPort})")
             serverSocket = it
         }
+        playerSockets.value = listOf()
         sessionEmitter.register(id, name, serverSocket.localPort)
         scope.launch(Dispatchers.IO) {
             while (true) {
@@ -82,7 +84,7 @@ class GameEmitter(
                     break
                 }
                 Log.i(TAG, "Open PlayerSocket(${socket.inetAddress})")
-                playerSockets.add(socket)
+                if (!addPlayerSocket(socket)) break
                 scope.launch(Dispatchers.IO) {
                     try {
                         val input = ObjectInputStream(socket.getInputStream())
@@ -94,6 +96,16 @@ class GameEmitter(
                 }
             }
         }
+    }
+
+    private fun addPlayerSocket(socket: Socket): Boolean {
+        val result = playerSockets.value?.let {
+            playerSockets.compareAndSet(it, it + socket)
+        } ?: false
+        if (!result) {
+            socket.closeAndLog(TAG, "PlayerSocket(${socket.inetAddress})")
+        }
+        return result
     }
 
     private suspend fun emit(
@@ -129,18 +141,17 @@ class GameEmitter(
 
     private fun closeServerSocket() {
         serverSocket?.let {
-            it.close()
-            Log.i(TAG, "ServetSocket is closed")
+            it.closeAndLog(TAG, "ServetSocket")
             serverSocket = null
         }
     }
 
     private fun closePlayerSockets() {
-        playerSockets.forEach {
-            it.close()
-            Log.i(TAG, "PlayerSocket(${it.inetAddress}) is closed")
+        playerSockets.getAndUpdate {
+            null
+        }?.forEach {
+            it.closeAndLog(TAG, "PlayerSocket(${it.inetAddress})")
         }
-        playerSockets.clear()
     }
 }
 

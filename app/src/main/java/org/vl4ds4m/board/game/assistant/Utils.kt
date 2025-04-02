@@ -1,6 +1,9 @@
 package org.vl4ds4m.board.game.assistant
 
+import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.io.Closeable
+import java.io.IOException
 
 val Enum<*>.title: String get() = this.name
     .replaceFirstChar { it.uppercaseChar() }
@@ -28,5 +31,14 @@ inline fun <T> MutableStateFlow<T>.updateAndGetStates(function: (T) -> T): Pair<
         if (compareAndSet(prevValue, nextValue)) {
             return prevValue to nextValue
         }
+    }
+}
+
+fun Closeable.closeAndLog(tag: String, title: String) {
+    try {
+        close()
+        Log.i(tag, "$title is closed")
+    } catch (e: IOException) {
+        Log.w(tag, "Can't close $title: $e")
     }
 }

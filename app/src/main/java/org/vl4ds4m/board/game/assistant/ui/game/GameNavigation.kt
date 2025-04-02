@@ -58,7 +58,9 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
             viewModel = viewModel(factory = GameSetupViewModel.Factory),
             onBackClick = navigateUp,
             onSetupPlayers = { type ->
-                navController.navigate(Game(type.title, null))
+                Game(type = type.title, sessionId = null).let {
+                    navController.navigate(it)
+                }
                 navController.navigate(NewGamePlayers)
             }
         )
@@ -95,13 +97,13 @@ fun NavGraphBuilder.gameNavigation(navController: NavController) {
         )
     }
     composable<Game> { entry ->
-        val (type, sessionId) = entry.toRoute<Game>()
-            .run { GameType.valueOf(type) to sessionId }
         LocalActivity.current.let {
             it as MainActivity
         }.run {
             onBackPressedDispatcher.addCallback(entry) { navigateHome() }
         }
+        val (type, sessionId) = entry.toRoute<Game>()
+            .run { GameType.valueOf(type) to sessionId }
         GameScreen(
             type = type,
             sessionId = sessionId,

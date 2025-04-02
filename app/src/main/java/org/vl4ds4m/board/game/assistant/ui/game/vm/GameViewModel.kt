@@ -4,9 +4,7 @@ import android.net.nsd.NsdManager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
@@ -20,37 +18,39 @@ import java.util.UUID
 
 abstract class GameViewModel(
     private val gameEnv: GameEnv,
-    private val sessionId: String?,
-    extras: CreationExtras
+    sessionId: String?,
+    app: BoardGameAssistantApp
 ) : ViewModel(), Game by gameEnv {
-    private val sessionRepository: GameSessionRepository
+    private val sessionRepository: GameSessionRepository = app.sessionRepository
 
-    private val sessionEmitter: SessionEmitter
-
-    private val gameEmitter: GameEmitter
-
-    init {
-        val app = extras[APPLICATION_KEY]
-            .let { it as BoardGameAssistantApp }
-        sessionRepository = app.sessionRepository
-        sessionEmitter = SessionEmitter(
-            app.applicationContext.getSystemService(NsdManager::class.java)
-        )
-        gameEmitter = GameEmitter(gameEnv, viewModelScope, sessionEmitter)
-        if (sessionId != null) initialize()
+    private val gameEmitter: GameEmitter = SessionEmitter(
+        app.applicationContext.getSystemService(NsdManager::class.java)
+    ).let {
+        GameEmitter(gameEnv, viewModelScope, it)
     }
 
-    final override fun initialize() {
-        Log.d(TAG, "Initiate game process")
+    private val sessionId: String
+
+    init {
+        gameEnv.initializables.forEach { it.init(viewModelScope) }
+        this.sessionId = if (sessionId == null) {
+            UUID.randomUUID().toString()
+        } else {
+            initialize()
+            sessionId
+        }
         viewModelScope.launch {
             sessionId?.let { id ->
                 sessionRepository.loadSession(id)
                     ?.let { gameEnv.load(it) }
                     ?: Log.e(TAG, "Can't load game session[id = $id] as it doesn't exist")
             }
-            gameEnv.initializables.forEach { it.init(viewModelScope) }
-            gameEmitter.startEmit("${sessionId ?: 0L}", gameEnv.name.value)
+            gameEmitter.startEmit(this@GameViewModel.sessionId, gameEnv.name.value)
         }
+    }
+
+    final override fun initialize() {
+        Log.d(TAG, "Initiate game process")
         gameEnv.initialize()
     }
 
@@ -58,9 +58,8 @@ abstract class GameViewModel(
         if (initialized.value) {
             Log.d(TAG, "Complete game process")
             gameEnv.initializables.forEach { it.close() }
-            val id = sessionId ?: UUID.randomUUID().toString() // TODO CREATE BEFORE NET EXPOSURE
             gameEnv.save()
-                .let { sessionRepository.saveSession(it, id) }
+                .let { sessionRepository.saveSession(it, sessionId) }
         }
         gameEmitter.stopEmit()
         super.onCleared()
@@ -72,13 +71,12 @@ abstract class GameViewModel(
             producer: GameViewModelProducer<GameViewModel>
         ): ViewModelProvider.Factory = viewModelFactory {
             initializer<GameViewModel> {
-                val app = get(APPLICATION_KEY)
-                    .let { it as BoardGameAssistantApp }
+                val app = BoardGameAssistantApp.from(this)
                 if (sessionId == null) {
                     val game = app.gameRepository.extract()
-                    producer.createViewModel(game, this)
+                    producer.createViewModel(game, app)
                 } else {
-                    producer.createViewModel(sessionId, this)
+                    producer.createViewModel(sessionId, app)
                 }
             }
         }

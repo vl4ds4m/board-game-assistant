@@ -36,7 +36,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     HomeScreenContent(
-        sessions = viewModel.sessions.collectAsState(),
+        sessions = viewModel.localSessions.collectAsState(),
         remoteSessions = viewModel.remoteSessions.collectAsState(),
         clickNewGame = startNewGame,
         clickSession = proceedGame,

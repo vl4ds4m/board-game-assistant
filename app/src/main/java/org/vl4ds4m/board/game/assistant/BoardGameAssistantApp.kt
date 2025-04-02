@@ -45,32 +45,6 @@ class BoardGameAssistantApp : Application() {
     val gameRepository = GameRepository()
 
     val userDataRepository by lazy { UserDataRepository(userDataStore, coroutineScope) }
-
-    init {
-        coroutineScope.launch(Dispatchers.IO) {
-            kotlinx.coroutines.delay(5000)
-            Log.i("TEST", "Send fake remote session")
-            java.net.DatagramSocket().also { s ->
-                RemoteSessionInfo(
-                    111_111_111_111L, "abldfjls",
-                    s.localAddress.hostAddress!!, s.localPort
-                ).let {
-                    kotlinx.serialization.json.Json.run {
-                        encodeToString(RemoteSessionInfo.serializer(), it)
-                            .toByteArray()
-                    }
-                }.let {
-                    java.net.DatagramPacket(it, it.size,
-                        java.net.InetAddress.getLocalHost(),
-                        org.vl4ds4m.board.game.assistant.network.DISCOVER_REMOTE_GAMES_PORT)
-                }.let {
-                    s.send(it)
-                }
-            }.also {
-                it.close()
-            }
-        }
-    }
 }
 
 private fun prepopulateDatabase(repo: GameSessionRepository) {

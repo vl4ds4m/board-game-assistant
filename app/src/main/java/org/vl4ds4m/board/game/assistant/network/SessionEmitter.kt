@@ -10,6 +10,8 @@ class SessionEmitter(private val nsdManager: NsdManager) {
             serviceType = SERVICE_TYPE
             serviceName = SERVICE_NAME
             this.port = port
+            setAttribute(RemoteSessionInfo.TXT_ID, "123")
+            setAttribute(RemoteSessionInfo.TXT_NAME, "Test game")
         }.let {
             nsdManager.registerService(it, PROTOCOL_TYPE, listener)
         }

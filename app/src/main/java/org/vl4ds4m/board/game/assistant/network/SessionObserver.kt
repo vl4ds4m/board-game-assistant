@@ -1,82 +1,72 @@
 package org.vl4ds4m.board.game.assistant.network
 
+import android.net.nsd.NsdManager
+import android.net.nsd.NsdServiceInfo
 import android.util.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
-import org.vl4ds4m.board.game.assistant.updateList
-import java.net.DatagramPacket
-import java.net.DatagramSocket
+import org.vl4ds4m.board.game.assistant.updateMap
 
-class SessionObserver(private val scope: CoroutineScope) {
-    private var socket: DatagramSocket? = null
+class SessionObserver(private val nsdManager: NsdManager) {
+    val sessions = MutableStateFlow<Map<String, RemoteSessionInfo>>(mapOf())
 
-    private val mSessions: MutableStateFlow<List<RemoteSessionInfo>> =
-        MutableStateFlow(listOf())
-    val sessions: StateFlow<List<RemoteSessionInfo>> = mSessions.asStateFlow()
+    private val discoveryListener = object : NsdManager.DiscoveryListener {
+        override fun onStartDiscoveryFailed(serviceType: String?, errorCode: Int) {
+            Log.w(TAG, "Discovery start failed: ${errorCode.nsdError}")
+        }
 
-    init {
-        scope.launch {
-            while (true) {
-                delay(7_000)
-                mSessions.updateList {
-                    val iterator = listIterator()
-                    while (iterator.hasNext()) {
-                        val session = iterator.next()
-                        if (session.stale) iterator.remove()
-                        else session.stale = true
-                    }
+        override fun onStopDiscoveryFailed(serviceType: String?, errorCode: Int) {
+            Log.w(TAG, "Discovery stop failed: ${errorCode.nsdError}")
+        }
+
+        override fun onDiscoveryStarted(serviceType: String?) {
+            Log.i(TAG, "Discovery started")
+        }
+
+        override fun onDiscoveryStopped(serviceType: String?) {
+            Log.i(TAG, "Discovery stopped")
+        }
+
+        override fun onServiceFound(serviceInfo: NsdServiceInfo?) {
+            Log.i(TAG, "Service found: " +
+                serviceInfo?.run { "$serviceName ($serviceType)" })
+            val name = serviceInfo?.serviceName ?: return
+            val type = serviceInfo.serviceType
+            if (type.contains(SERVICE_TYPE) && name.contains(SERVICE_NAME)) {
+                Log.i(TAG, "Service '$name' is a game session invitation")
+                nsdManager.resolveService(serviceInfo, resolveListener)
+            }
+        }
+
+        override fun onServiceLost(serviceInfo: NsdServiceInfo?) {
+            Log.i(TAG, "Service lost: ${serviceInfo?.serviceName}")
+            serviceInfo?.serviceName?.let {
+                sessions.updateMap { remove(it) }
+            }
+        }
+    }
+
+    private val resolveListener get() = object : NsdManager.ResolveListener {
+        override fun onResolveFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {
+            Log.w(TAG, "Service resolution failed: ${errorCode.nsdError}")
+        }
+
+        override fun onServiceResolved(serviceInfo: NsdServiceInfo?) {
+            Log.i(TAG, "Service resolved: $serviceInfo")
+            serviceInfo ?: return
+            RemoteSessionInfo.from(serviceInfo)?.let {
+                sessions.updateMap {
+                    putIfAbsent(serviceInfo.serviceName, it)
                 }
             }
         }
     }
 
-    fun startObserve() {
-        socket?.let {
-            Log.e(TAG, "During start observe socket is still not null")
-            it.close()
-        }
-        val socket = DatagramSocket(DISCOVER_REMOTE_GAMES_PORT).also {
-            socket = it
-        }
-        scope.launch(Dispatchers.IO) {
-            try {
-                discoverSessions(socket)
-            } catch (e: Exception) {
-                Log.i(TAG, e.toString())
-            }
-        }
+    fun startDiscovery() {
+        nsdManager.discoverServices(SERVICE_TYPE, PROTOCOL_TYPE, discoveryListener)
     }
 
-    private fun discoverSessions(socket: DatagramSocket) {
-        val size = 1000
-        val buffer = ByteArray(size)
-        while (true) {
-            buffer.fill(0)
-            val packet = DatagramPacket(buffer, size)
-            socket.receive(packet)
-            val session = String(buffer, 0, packet.length)
-                .let { Json.decodeFromString<RemoteSessionInfo>(it) }
-            mSessions.updateList {
-                indexOfFirst { it.ip == session.ip }
-                    .takeIf { it != -1 }
-                    ?.also { set(it, session) }
-                    ?: add(session)
-            }
-        }
-    }
-
-    fun stopObserve() {
-        socket?.let {
-            it.close()
-            Log.i(TAG, "Socket is closed")
-            socket = null
-        }
+    fun stopDiscovery() {
+        nsdManager.stopServiceDiscovery(discoveryListener)
     }
 }
 

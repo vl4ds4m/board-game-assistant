@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.vl4ds4m.board.game.assistant.data.dao.GameSessionDao
-import org.vl4ds4m.board.game.assistant.data.dao.GameSessionNextIdDao
 import org.vl4ds4m.board.game.assistant.data.entity.GameActionEntity
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionData
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionEntity
@@ -32,7 +31,6 @@ import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
 
 class GameSessionRepository(
     private val sessionDao: GameSessionDao,
-    private val sessionNextIdDao: GameSessionNextIdDao,
     private val coroutineScope: CoroutineScope
 ) {
     fun getAllSessions(): Flow<List<GameSessionInfo>> = sessionDao.getAllSessions()
@@ -49,29 +47,17 @@ class GameSessionRepository(
             }
         }
 
-    suspend fun loadSession(id: Long): GameSession? = sessionDao.findSession(id)?.fromData()
+    suspend fun loadSession(id: String): GameSession? = sessionDao.findSession(id)?.fromData()
 
-    fun saveSession(session: GameSession, id: Long? = null) = coroutineScope.launch {
-        val existed: Boolean
-        run {
-            if (id != null) {
-                existed = true
-                id
-            } else {
-                existed = false
-                sessionNextIdDao.getAndIncrementSessionId()
+    fun saveSession(session: GameSession, id: String) = coroutineScope.launch {
+        GameSessionData(
+            entity = session.asEntity(id),
+            players = session.getPlayers(id),
+            actions = session.actions.mapIndexed { index, action ->
+                action.asEntity(id, index)
             }
-        }.let {
-            GameSessionData(
-                entity = session.asEntity(it),
-                players = session.getPlayers(it),
-                actions = session.actions.mapIndexed { index, action ->
-                    action.asEntity(it, index)
-                }
-            )
-        }.let {
-            if (existed) sessionDao.updateSession(it)
-            else sessionDao.insertSession(it)
+        ).let {
+            sessionDao.insertSession(it)
         }
     }
 }
@@ -137,7 +123,7 @@ private val GameSessionData.gameState: GameState?
         }
     }
 
-private fun GameSession.asEntity(id: Long) = GameSessionEntity(
+private fun GameSession.asEntity(id: String) = GameSessionEntity(
     id = id,
     completed = completed,
     type = type.title,
@@ -154,7 +140,7 @@ private fun GameSession.asEntity(id: Long) = GameSessionEntity(
         ?.finalStage
 )
 
-private fun GameSession.getPlayers(sessionId: Long): List<PlayerEntity> =
+private fun GameSession.getPlayers(sessionId: String): List<PlayerEntity> =
     when (type) {
         is Free -> players.toList()
             .sortedBy { (id, _) -> id }
@@ -182,7 +168,7 @@ private fun GameSession.getPlayers(sessionId: Long): List<PlayerEntity> =
             }
     }
 
-private fun GameAction.asEntity(sessionId: Long, position: Int): GameActionEntity =
+private fun GameAction.asEntity(sessionId: String, position: Int): GameActionEntity =
     when (this) {
         is CurrentPlayerChangeAction -> GameActionEntity(
             sessionId = sessionId,

@@ -7,7 +7,7 @@ data class NetworkPlayer(val name: String, val mac: String)
 
 @Serializable
 data class RemoteSessionInfo(
-    val id: Long,
+    val id: String,
     val name: String,
     val ip: String,
     val port: Int,

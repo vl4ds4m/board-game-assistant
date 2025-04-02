@@ -10,7 +10,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 
 class CarcassonneGameViewModel(
     private val gameEnv: CarcassonneGame = CarcassonneGame(),
-    sessionId: Long? = null,
+    sessionId: String? = null,
     extras: CreationExtras
 ) : OrderedGameViewModel(gameEnv, sessionId, extras) {
     val onFinal: MutableStateFlow<Boolean> = gameEnv.finalStage
@@ -30,7 +30,7 @@ class CarcassonneGameViewModel(
                 extras = extras
             )
 
-        override fun createViewModel(sessionId: Long, extras: CreationExtras) =
+        override fun createViewModel(sessionId: String, extras: CreationExtras) =
             CarcassonneGameViewModel(
                 sessionId = sessionId,
                 extras = extras

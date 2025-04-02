@@ -19,7 +19,7 @@ import androidx.room.ForeignKey
 )
 data class GameActionEntity(
     @ColumnInfo(name = SESSION_ID)
-    val sessionId: Long,
+    val sessionId: String,
 
     @ColumnInfo(name = POSITION)
     val position: Int,

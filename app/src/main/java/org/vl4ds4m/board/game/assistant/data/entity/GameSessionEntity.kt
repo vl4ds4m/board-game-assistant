@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 data class GameSessionEntity(
     @PrimaryKey
     @ColumnInfo(name = ID)
-    val id: Long,
+    val id: String,
 
     @ColumnInfo(name = COMPLETED)
     val completed: Boolean,

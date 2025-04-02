@@ -7,8 +7,8 @@ import org.vl4ds4m.board.game.assistant.game.Game
 interface GameViewModelProducer<out VM : GameViewModel> {
     fun createViewModel(game: Game, extras: CreationExtras): VM
 
-    fun createViewModel(sessionId: Long, extras: CreationExtras): VM
+    fun createViewModel(sessionId: String, extras: CreationExtras): VM
 
-    fun createFactory(sessionId: Long?): ViewModelProvider.Factory =
+    fun createFactory(sessionId: String?): ViewModelProvider.Factory =
         GameViewModel.createFactory(sessionId, this)
 }

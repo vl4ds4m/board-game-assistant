@@ -11,7 +11,7 @@ class ResultsViewModel private constructor(
 ) : SessionViewModel(extras) {
     override fun isMatched(session: GameSessionInfo) = session.completed
 
-    suspend fun getSession(id: Long): GameSession? = sessionRepository.loadSession(id)
+    suspend fun getSession(id: String): GameSession? = sessionRepository.loadSession(id)
 
     companion object {
         val Factory: ViewModelProvider.Factory = createFactory { ResultsViewModel(it) }

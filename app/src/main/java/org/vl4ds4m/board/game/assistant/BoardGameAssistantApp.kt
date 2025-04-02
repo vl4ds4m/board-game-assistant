@@ -33,7 +33,7 @@ class BoardGameAssistantApp : Application() {
     private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     val sessionRepository: GameSessionRepository by lazy {
-        GameSessionRepository(db.sessionDao(), db.sessionNextIdDao(), coroutineScope).also {
+        GameSessionRepository(db.sessionDao(), coroutineScope).also {
             // Test usage
             coroutineScope.launch {
                 db.clearAllTables()
@@ -49,8 +49,8 @@ class BoardGameAssistantApp : Application() {
 
 private fun prepopulateDatabase(repo: GameSessionRepository) {
     Log.i("AppDatabase", "Prepopulate app-database")
-    defaultGames.forEach {
-        repo.saveSession(it)
+    defaultGames.forEachIndexed { i, session ->
+        repo.saveSession(session, "local_${i + 1}")
     }
 }
 
@@ -160,6 +160,6 @@ val defaultGames: List<GameSession> = listOf(
 )
 
 val fakeRemoteSession = listOf(
-    RemoteSessionInfo(1, "Milki Way", "100.0.0.100", 11234),
-    RemoteSessionInfo(2, "Catch me if you can", "100.0.0.100", 11234)
+    RemoteSessionInfo("remote_1", "Milki Way", "100.0.0.100", 11234),
+    RemoteSessionInfo("remote_2", "Catch me if you can", "100.0.0.100", 11234)
 )

@@ -31,7 +31,7 @@ data object NewGameStart : GameRoute
 data object NewGamePlayers : GameRoute
 
 @Serializable
-data class Game(val type: String, val sessionId: Long?) : GameRoute
+data class Game(val type: String, val sessionId: String?) : GameRoute
 
 @Serializable
 data object GameSetting : GameRoute

@@ -7,7 +7,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 
 class SimpleOrderedGameViewModel private constructor(
     private val gameEnv: SimpleOrderedGame = SimpleOrderedGame(),
-    sessionId: Long? = null,
+    sessionId: String? = null,
     extras: CreationExtras
 ) : OrderedGameViewModel(gameEnv, sessionId, extras) {
     fun addPoints(points: Int) {
@@ -21,7 +21,7 @@ class SimpleOrderedGameViewModel private constructor(
                 extras = extras
             )
 
-        override fun createViewModel(sessionId: Long, extras: CreationExtras) =
+        override fun createViewModel(sessionId: String, extras: CreationExtras) =
             SimpleOrderedGameViewModel(
                 sessionId = sessionId,
                 extras = extras

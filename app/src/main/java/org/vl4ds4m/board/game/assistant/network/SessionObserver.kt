@@ -74,12 +74,10 @@ class SessionObserver(private val nsdManager: NsdManager) {
 private const val TAG = "SessionObserver"
 
 private val NsdServiceInfo.toRemoteSession: RemoteSessionInfo? get() {
-    val id = attributes[TXT_ID]?.let {
-        String(it).toLong()
-    } ?: return null
-    val name = attributes[TXT_NAME]?.let {
-        String(it)
-    } ?: return null
+    val id = attributes[TXT_ID]
+        ?.let { String(it) } ?: return null
+    val name = attributes[TXT_NAME]
+        ?.let { String(it) } ?: return null
     return RemoteSessionInfo(
         id = id,
         name = name,

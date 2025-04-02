@@ -69,7 +69,7 @@ fun GameScreen(
 @Composable
 fun GameScreen(
     type: GameType,
-    sessionId: Long?,
+    sessionId: String?,
     navActions: GameNavActions,
     modifier: Modifier = Modifier
 ) {

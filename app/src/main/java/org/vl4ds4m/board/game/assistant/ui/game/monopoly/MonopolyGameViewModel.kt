@@ -8,7 +8,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 
 class MonopolyGameViewModel(
     gameEnv: MonopolyGame = MonopolyGame(),
-    sessionId: Long? = null,
+    sessionId: String? = null,
     extras: CreationExtras
 ) : OrderedGameViewModel(gameEnv, sessionId, extras) {
     companion object : GameViewModelProducer<MonopolyGameViewModel> {
@@ -18,7 +18,7 @@ class MonopolyGameViewModel(
                 extras = extras
             )
 
-        override fun createViewModel(sessionId: Long, extras: CreationExtras) =
+        override fun createViewModel(sessionId: String, extras: CreationExtras) =
             MonopolyGameViewModel(
                 sessionId = sessionId,
                 extras = extras

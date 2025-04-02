@@ -8,7 +8,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 
 abstract class OrderedGameViewModel(
     private val gameEnv: OrderedGameEnv,
-    sessionId: Long? = null,
+    sessionId: String? = null,
     extras: CreationExtras
 ) : GameViewModel(gameEnv, sessionId, extras), OrderedGame {
     override val nextPlayerId: StateFlow<Long?> = gameEnv.nextPlayerId

@@ -8,7 +8,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 
 class DiceGameViewModel private constructor(
     private val gameEnv: DiceGame = DiceGame(),
-    sessionId: Long? = null,
+    sessionId: String? = null,
     extras: CreationExtras
 ) : OrderedGameViewModel(gameEnv, sessionId, extras) {
     fun addPoints(points: Int) {
@@ -22,7 +22,7 @@ class DiceGameViewModel private constructor(
                 extras = extras
             )
 
-        override fun createViewModel(sessionId: Long, extras: CreationExtras) =
+        override fun createViewModel(sessionId: String, extras: CreationExtras) =
             DiceGameViewModel(
                 sessionId = sessionId,
                 extras = extras

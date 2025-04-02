@@ -37,7 +37,9 @@ fun NavGraphBuilder.mainNavigation(navController: NavController) {
             viewModel = viewModel(factory = HomeViewModel.Factory),
             startNewGame = { navController.navigate(NewGameStart) },
             proceedGame = { id, type ->
-                navController.navigate(Game(type.title, id))
+                navController.navigate(
+                    Game(type = type.title, sessionId = id)
+                )
             },
             observeGame = { id, title, ip, port ->
                 RemoteSessionInfo(id, title, ip, port).let {

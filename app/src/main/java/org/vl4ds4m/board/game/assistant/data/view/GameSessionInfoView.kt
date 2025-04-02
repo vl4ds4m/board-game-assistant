@@ -20,7 +20,7 @@ import org.vl4ds4m.board.game.assistant.data.entity.GameSessionEntity
 )
 data class GameSessionInfoView(
     @ColumnInfo(name = GameSessionEntity.ID)
-    val id: Long,
+    val id: String,
 
     @ColumnInfo(name = GameSessionEntity.COMPLETED)
     val completed: Boolean,

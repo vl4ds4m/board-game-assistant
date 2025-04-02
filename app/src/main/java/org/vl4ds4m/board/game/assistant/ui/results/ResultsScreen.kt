@@ -24,7 +24,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 @Composable
 fun ResultsScreen(
     viewModel: ResultsViewModel,
-    clickSession: (Long) -> Unit,
+    clickSession: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     ResultsScreenContent(
@@ -37,7 +37,7 @@ fun ResultsScreen(
 @Composable
 fun ResultsScreenContent(
     sessions: State<List<GameSessionInfo>>,
-    clickSession: (Long) -> Unit,
+    clickSession: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -85,7 +85,7 @@ private fun ResultsScreenPreview() {
 private val sessionsInfo: List<GameSessionInfo> = defaultGames.filter { it.completed }
     .mapIndexed { i, s ->
         GameSessionInfo(
-            id = i.inc().toLong(),
+            id = i.inc().toString(),
             completed = s.completed,
             type = s.type,
             name = s.name,

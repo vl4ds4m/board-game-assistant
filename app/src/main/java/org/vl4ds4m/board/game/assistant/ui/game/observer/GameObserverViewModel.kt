@@ -18,7 +18,7 @@ class GameObserverViewModel(
     sessionInfo: RemoteSessionInfo,
     private val sessionRepository: GameSessionRepository
 ) : ViewModel() {
-    private val sessionId: Long = sessionInfo.id
+    private val sessionId: String = sessionInfo.id
 
     private val observer = GameObserver(viewModelScope)
 

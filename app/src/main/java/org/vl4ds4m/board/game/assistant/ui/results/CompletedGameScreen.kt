@@ -22,7 +22,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 @Composable
 fun CompletedGameScreen(
     viewModel: ResultsViewModel,
-    sessionId: Long,
+    sessionId: String,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier
 ) {

@@ -10,7 +10,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 
 @Composable
 fun FreeGameScreen(
-    sessionId: Long?,
+    sessionId: String?,
     navActions: GameNavActions,
     modifier: Modifier = Modifier,
 ) {

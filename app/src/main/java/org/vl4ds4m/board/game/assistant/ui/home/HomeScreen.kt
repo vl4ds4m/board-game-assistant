@@ -31,8 +31,8 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 fun HomeScreen(
     viewModel: HomeViewModel,
     startNewGame: () -> Unit,
-    proceedGame: (Long, GameType) -> Unit,
-    observeGame: (Long, String, String, Int) -> Unit,
+    proceedGame: (String, GameType) -> Unit,
+    observeGame: (String, String, String, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     HomeScreenContent(
@@ -50,8 +50,8 @@ fun HomeScreenContent(
     sessions: State<List<GameSessionInfo>>,
     remoteSessions: State<List<RemoteSessionInfo>>,
     clickNewGame: () -> Unit,
-    clickSession: (Long, GameType) -> Unit,
-    clickRemoteGame: (Long, String, String, Int) -> Unit,
+    clickSession: (String, GameType) -> Unit,
+    clickRemoteGame: (String, String, String, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -125,7 +125,7 @@ private fun HomeScreenPreview() {
 private val sessionsInfo: List<GameSessionInfo> = defaultGames.filter { !it.completed }
     .mapIndexed { i, s ->
         GameSessionInfo(
-            id = i.inc().toLong(),
+            id = i.inc().toString(),
             completed = s.completed,
             type = s.type,
             name = s.name,

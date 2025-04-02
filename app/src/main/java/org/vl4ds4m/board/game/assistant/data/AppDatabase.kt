@@ -5,17 +5,14 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import org.vl4ds4m.board.game.assistant.data.dao.GameSessionDao
-import org.vl4ds4m.board.game.assistant.data.dao.GameSessionNextIdDao
 import org.vl4ds4m.board.game.assistant.data.entity.GameActionEntity
 import org.vl4ds4m.board.game.assistant.data.entity.PlayerEntity
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionEntity
-import org.vl4ds4m.board.game.assistant.data.entity.GameSessionNextId
 import org.vl4ds4m.board.game.assistant.data.view.GameSessionInfoView
 
 @Database(
     entities = [
         GameSessionEntity::class,
-        GameSessionNextId::class,
         PlayerEntity::class,
         GameActionEntity::class
     ],
@@ -25,8 +22,6 @@ import org.vl4ds4m.board.game.assistant.data.view.GameSessionInfoView
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun sessionDao(): GameSessionDao
-
-    abstract fun sessionNextIdDao(): GameSessionNextIdDao
 
     companion object {
         @Volatile

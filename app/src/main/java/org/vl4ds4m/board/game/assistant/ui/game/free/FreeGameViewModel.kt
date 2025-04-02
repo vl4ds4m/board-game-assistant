@@ -8,7 +8,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 
 class FreeGameViewModel private constructor(
     private val gameEnv: FreeGame = FreeGame(),
-    sessionId: Long? = null,
+    sessionId: String? = null,
     extras: CreationExtras
 ) : GameViewModel(gameEnv, sessionId, extras) {
     fun addPoints(points: Int) {
@@ -22,7 +22,7 @@ class FreeGameViewModel private constructor(
                 extras = extras
             )
 
-        override fun createViewModel(sessionId: Long, extras: CreationExtras) =
+        override fun createViewModel(sessionId: String, extras: CreationExtras) =
             FreeGameViewModel(
                 sessionId = sessionId,
                 extras = extras

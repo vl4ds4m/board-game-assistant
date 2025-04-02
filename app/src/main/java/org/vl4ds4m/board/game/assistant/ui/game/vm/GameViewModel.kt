@@ -16,10 +16,11 @@ import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.network.GameEmitter
 import org.vl4ds4m.board.game.assistant.network.SessionEmitter
+import java.util.UUID
 
 abstract class GameViewModel(
     private val gameEnv: GameEnv,
-    private val sessionId: Long?,
+    private val sessionId: String?,
     extras: CreationExtras
 ) : ViewModel(), Game by gameEnv {
     private val sessionRepository: GameSessionRepository
@@ -57,8 +58,9 @@ abstract class GameViewModel(
         if (initialized.value) {
             Log.d(TAG, "Complete game process")
             gameEnv.initializables.forEach { it.close() }
+            val id = sessionId ?: UUID.randomUUID().toString() // TODO CREATE BEFORE NET EXPOSURE
             gameEnv.save()
-                .let { sessionRepository.saveSession(it, sessionId) }
+                .let { sessionRepository.saveSession(it, id) }
         }
         gameEmitter.stopEmit()
         super.onCleared()
@@ -66,7 +68,7 @@ abstract class GameViewModel(
 
     companion object {
         fun createFactory(
-            sessionId: Long?,
+            sessionId: String?,
             producer: GameViewModelProducer<GameViewModel>
         ): ViewModelProvider.Factory = viewModelFactory {
             initializer<GameViewModel> {

@@ -10,7 +10,7 @@ import org.vl4ds4m.board.game.assistant.ui.Results
 import org.vl4ds4m.board.game.assistant.ui.rememberTopmost
 
 @Serializable
-data class CompletedGame(val sessionId: Long)
+data class CompletedGame(val sessionId: String)
 
 fun NavGraphBuilder.resultsNavigation(navController: NavController) {
     composable<Results> {

@@ -21,7 +21,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 @Composable
 fun OrderedGameScreen(
     type: OrderedGameType,
-    sessionId: Long?,
+    sessionId: String?,
     navActions: GameNavActions,
     modifier: Modifier = Modifier
 ) {

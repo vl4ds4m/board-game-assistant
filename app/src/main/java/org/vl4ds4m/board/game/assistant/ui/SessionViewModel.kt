@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,7 +15,11 @@ import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 
-abstract class SessionViewModel(sessionRepository: GameSessionRepository) : ViewModel() {
+abstract class SessionViewModel(extras: CreationExtras) : ViewModel() {
+    val sessionRepository: GameSessionRepository = extras[APPLICATION_KEY]
+        .let { it as BoardGameAssistantApp }
+        .sessionRepository
+
     val sessions: StateFlow<List<GameSessionInfo>> by lazy {
         sessionRepository.getAllSessions()
             .map {
@@ -27,13 +32,9 @@ abstract class SessionViewModel(sessionRepository: GameSessionRepository) : View
 
     companion object {
         inline fun <reified VM : SessionViewModel> createFactory(
-            crossinline create: (GameSessionRepository) -> VM
+            crossinline create: (CreationExtras) -> VM
         ): ViewModelProvider.Factory = viewModelFactory {
-            initializer<VM> {
-                get(APPLICATION_KEY)
-                    .let { it as BoardGameAssistantApp }
-                    .let { create(it.sessionRepository) }
-            }
+            initializer<VM> { create(this) }
         }
     }
 }

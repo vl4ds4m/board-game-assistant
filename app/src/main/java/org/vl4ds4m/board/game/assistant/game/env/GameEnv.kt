@@ -264,12 +264,8 @@ open class GameEnv(override val type: GameType) : Game {
         players = players.value,
         currentPlayerId = currentPlayerId.value,
         nextNewPlayerId = nextNewPlayerId.get(),
-        startTime = startTime.also { time ->
-            time ?: Log.w(TAG, "Game has never been started before saving")
-        },
-        stopTime = stopTime.also { time ->
-            time ?: Log.w(TAG, "Game has never been stopped before saving")
-        },
+        startTime = startTime,
+        stopTime = stopTime,
         timeout = timeout.value,
         secondsUntilEnd = secondsToEnd.value,
         actions = actionsHistory.container,

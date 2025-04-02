@@ -5,13 +5,13 @@ import android.net.nsd.NsdServiceInfo
 import android.util.Log
 
 class SessionEmitter(private val nsdManager: NsdManager) {
-    fun register(port: Int) {
+    fun register(id: String, name: String, port: Int) {
         NsdServiceInfo().apply {
             serviceType = SERVICE_TYPE
             serviceName = SERVICE_NAME
             this.port = port
-            setAttribute(RemoteSessionInfo.TXT_ID, "123")
-            setAttribute(RemoteSessionInfo.TXT_NAME, "Test game")
+            setAttribute(RemoteSessionInfo.TXT_ID, id)
+            setAttribute(RemoteSessionInfo.TXT_NAME, name)
         }.let {
             nsdManager.registerService(it, PROTOCOL_TYPE, listener)
         }

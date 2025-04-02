@@ -1,6 +1,5 @@
 package org.vl4ds4m.board.game.assistant.network
 
-import android.net.nsd.NsdManager
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,9 +21,9 @@ import java.net.ServerSocket
 import java.net.Socket
 
 class GameEmitter(
-    private val scope: CoroutineScope,
     gameEnv: GameEnv,
-    nsdManager: NsdManager
+    private val scope: CoroutineScope,
+    private val sessionEmitter: SessionEmitter
 ) {
     private var serverSocket: ServerSocket? = null
     private val playerSockets: MutableCollection<Socket> = mutableListOf()
@@ -36,8 +35,6 @@ class GameEmitter(
     private val produceGameState: () -> GameSession = gameEnv::save
 
     private val lastUpdate = MutableStateFlow(false)
-
-    private val sessionEmitter = SessionEmitter(nsdManager)
 
     init {
         gameEnv.initialized.combine(gameEnv.completed) {
@@ -60,7 +57,7 @@ class GameEmitter(
         }
     }
 
-    fun startEmit() {
+    fun startEmit(id: String, name: String) {
         serverSocket?.let {
             Log.e(TAG, "During start emit ServerSocket is still not null")
             closeServerSocket()
@@ -74,7 +71,7 @@ class GameEmitter(
             Log.i(TAG, "Open ServerSocket(${it.localPort})")
             serverSocket = it
         }
-        sessionEmitter.register(serverSocket.localPort)
+        sessionEmitter.register(id, name, serverSocket.localPort)
         scope.launch(Dispatchers.IO) {
             while (true) {
                 val socket: Socket

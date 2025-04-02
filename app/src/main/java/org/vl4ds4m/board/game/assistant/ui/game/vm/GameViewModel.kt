@@ -15,6 +15,7 @@ import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
 import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.network.GameEmitter
+import org.vl4ds4m.board.game.assistant.network.SessionEmitter
 
 abstract class GameViewModel(
     private val gameEnv: GameEnv,
@@ -23,16 +24,18 @@ abstract class GameViewModel(
 ) : ViewModel(), Game by gameEnv {
     private val sessionRepository: GameSessionRepository
 
+    private val sessionEmitter: SessionEmitter
+
     private val gameEmitter: GameEmitter
 
     init {
         val app = extras[APPLICATION_KEY]
             .let { it as BoardGameAssistantApp }
         sessionRepository = app.sessionRepository
-        gameEmitter = GameEmitter(
-            viewModelScope, gameEnv,
+        sessionEmitter = SessionEmitter(
             app.applicationContext.getSystemService(NsdManager::class.java)
         )
+        gameEmitter = GameEmitter(gameEnv, viewModelScope, sessionEmitter)
         if (sessionId != null) initialize()
     }
 
@@ -45,8 +48,8 @@ abstract class GameViewModel(
                     ?: Log.e(TAG, "Can't load game session[id = $id] as it doesn't exist")
             }
             gameEnv.initializables.forEach { it.init(viewModelScope) }
+            gameEmitter.startEmit("${sessionId ?: 0L}", gameEnv.name.value)
         }
-        gameEmitter.startEmit()
         gameEnv.initialize()
     }
 

@@ -12,13 +12,14 @@ import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.network.GameObserver
 import org.vl4ds4m.board.game.assistant.network.NetworkGameState
-import java.net.InetSocketAddress
+import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 
 class GameObserverViewModel(
-    address: InetSocketAddress,
-    private val sessionId: Long,
+    sessionInfo: RemoteSessionInfo,
     private val sessionRepository: GameSessionRepository
 ) : ViewModel() {
+    private val sessionId: Long = sessionInfo.id
+
     private val observer = GameObserver(viewModelScope)
 
     val observerState: StateFlow<NetworkGameState> = observer.observerState
@@ -26,7 +27,7 @@ class GameObserverViewModel(
     val sessionState: StateFlow<GameSession?> = observer.sessionState
 
     init {
-        observer.startObserve(address)
+        observer.startObserve(sessionInfo)
     }
 
     override fun onCleared() {
@@ -39,14 +40,13 @@ class GameObserverViewModel(
 
     companion object {
         fun createFactory(
-            address: InetSocketAddress,
-            sessionId: Long
+            sessionInfo: RemoteSessionInfo
         ): ViewModelProvider.Factory = viewModelFactory {
             initializer<GameObserverViewModel> {
                 get(APPLICATION_KEY).let {
                     it as BoardGameAssistantApp
                 }.let { app ->
-                    GameObserverViewModel(address, sessionId, app.sessionRepository)
+                    GameObserverViewModel(sessionInfo, app.sessionRepository)
                 }
             }
         }

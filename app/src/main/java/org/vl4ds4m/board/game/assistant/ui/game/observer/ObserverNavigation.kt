@@ -8,21 +8,14 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.network.NetworkGameState
-import java.net.InetSocketAddress
-
-@Serializable
-data class GameObserver(val sessionId: Long, val initTitle: String, val ip: String, val port: Int)
+import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 
 fun NavGraphBuilder.observerNavigation(navController: NavController) {
-    composable<GameObserver> { entry ->
-        val route = entry.toRoute<GameObserver>()
+    composable<RemoteSessionInfo> { entry ->
+        val route = entry.toRoute<RemoteSessionInfo>()
         val viewModel = viewModel<GameObserverViewModel>(
-            factory = GameObserverViewModel.createFactory(
-                address = InetSocketAddress(route.ip, route.port),
-                sessionId = route.sessionId
-            )
+            factory = GameObserverViewModel.createFactory(route)
         )
         val observer = viewModel.observerState.collectAsState()
         val session = viewModel.sessionState.collectAsState()
@@ -30,7 +23,7 @@ fun NavGraphBuilder.observerNavigation(navController: NavController) {
         val title = remember {
             derivedStateOf {
                 session.value?.let { "${it.name} (${it.type.title})" }
-                    ?: route.initTitle
+                    ?: route.name
             }
         }
         when (observer.value) {

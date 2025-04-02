@@ -28,7 +28,7 @@ class GameObserver(private val scope: CoroutineScope) {
         MutableStateFlow(null)
     val sessionState: StateFlow<GameSession?> = mSessionState.asStateFlow()
 
-    fun startObserve(address: InetSocketAddress) {
+    fun startObserve(sessionInfo: RemoteSessionInfo) {
         socket?.let {
             Log.e(TAG, "During start observe socket is still not null")
             it.close()
@@ -39,7 +39,9 @@ class GameObserver(private val scope: CoroutineScope) {
         }
         scope.launch(Dispatchers.IO) {
             try {
-                socket.connect(address, 3000)
+                InetSocketAddress(sessionInfo.ip, sessionInfo.port).let {
+                    socket.connect(it, 3000)
+                }
                 Log.i(TAG, "Open Socket(local=${socket.localPort}, remote=${socket.port})")
                 val output = ObjectOutputStream(socket.getOutputStream())
                 val input = ObjectInputStream(socket.getInputStream())

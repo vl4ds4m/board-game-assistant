@@ -40,7 +40,7 @@ class GameSetupViewModel private constructor(
     }
 
     fun startGame(gameViewModel: GameViewModel) {
-        players.forEach { gameViewModel.addPlayer(it) }
+        players.forEach { gameViewModel.addPlayer(null, it) }
         gameViewModel.initialize()
     }
 

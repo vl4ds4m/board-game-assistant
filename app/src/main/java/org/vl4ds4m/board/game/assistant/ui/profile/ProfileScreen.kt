@@ -34,7 +34,7 @@ fun ProfileScreen(
 
 @Composable
 fun ProfileScreenContent(
-    userName: MutableState<String>,
+    userName: MutableState<String?>,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -55,7 +55,7 @@ fun ProfileScreenContent(
             modifier = Modifier.size(56.dp)
         )
         TextField(
-            value = userName.value,
+            value = userName.value ?: "",
             onValueChange = { userName.value = it },
             label = { Text("Name") },
             singleLine = true

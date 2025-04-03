@@ -81,16 +81,19 @@ private fun CompletedGameScreenPreview() {
                 mutableStateOf(
                     mapOf(
                         1L to Player(
+                            netDevId = null,
                             name = "Abv",
                             active = true,
                             state = Score(45)
                         ),
                         2L to Player(
+                            netDevId = null,
                             name = "Efo",
                             active = false,
                             state = Score(123)
                         ),
                         3L to Player(
+                            netDevId = null,
                             name = "Urt",
                             active = true,
                             state = Score(59)

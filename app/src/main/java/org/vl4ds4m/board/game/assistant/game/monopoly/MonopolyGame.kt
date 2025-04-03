@@ -27,8 +27,8 @@ class MonopolyGame : OrderedGameEnv(Monopoly) {
     private val afterStepField: StateFlow<MonopolyField?> =
         mAfterStepField.asStateFlow()
 
-    override fun addPlayer(name: String) {
-        addPlayer(name, MonopolyPlayerState())
+    override fun addPlayer(netDevId: String?, name: String) {
+        addPlayer(netDevId, name, MonopolyPlayerState())
     }
 
     override fun restoreAdditionalState(state: GameState?) {

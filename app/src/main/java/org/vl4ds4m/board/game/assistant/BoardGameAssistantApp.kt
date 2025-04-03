@@ -32,7 +32,7 @@ class BoardGameAssistantApp : Application() {
         applicationContext.userDataStore
     }
 
-    private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     val sessionRepository: GameSessionRepository by lazy {
         GameSessionRepository(db.sessionDao(), coroutineScope).also {
@@ -46,7 +46,14 @@ class BoardGameAssistantApp : Application() {
 
     val gameRepository = GameRepository()
 
-    val userDataRepository by lazy { UserDataRepository(userDataStore, coroutineScope) }
+    val userDataRepository: UserDataRepository by lazy {
+        UserDataRepository(userDataStore, coroutineScope)
+    }
+
+    fun initDependencies() {
+        sessionRepository
+        userDataRepository.setNetDevId()
+    }
 
     companion object {
         fun from(extras: CreationExtras) = extras[APPLICATION_KEY] as BoardGameAssistantApp
@@ -71,16 +78,19 @@ val defaultGames: List<GameSession> = listOf(
         name = "Uno 93",
         players = mapOf(
             1L to Player(
+                netDevId = null,
                 name = "Abc",
                 active = true,
                 state = Score(120)
             ),
             2L to Player(
+                netDevId = null,
                 name = "Def",
                 active = false,
                 state = Score(36)
             ),
             3L to Player(
+                netDevId = null,
                 name = "Foo",
                 active = true,
                 state = Score(154)
@@ -102,16 +112,19 @@ val defaultGames: List<GameSession> = listOf(
         name = "Poker Counts 28",
         players = mapOf(
             1L to Player(
+                netDevId = null,
                 name = "Bar",
                 active = true,
                 state = Score(1220)
             ),
             2L to Player(
+                netDevId = null,
                 name = "Conf",
                 active = true,
                 state = Score(376)
             ),
             3L to Player(
+                netDevId = null,
                 name = "Leak",
                 active = true,
                 state = Score(532)
@@ -133,21 +146,25 @@ val defaultGames: List<GameSession> = listOf(
         name = "Imaginarium 74",
         players = mapOf(
             1L to Player(
+                netDevId = null,
                 name = "Bar",
                 active = true,
                 state = Score(12)
             ),
             2L to Player(
+                netDevId = null,
                 name = "Conf",
                 active = true,
                 state = Score(37)
             ),
             3L to Player(
+                netDevId = null,
                 name = "Leak",
                 active = true,
                 state = Score(53)
             ),
             4L to Player(
+                netDevId = null,
                 name = "Flick",
                 active = true,
                 state = Score(32)

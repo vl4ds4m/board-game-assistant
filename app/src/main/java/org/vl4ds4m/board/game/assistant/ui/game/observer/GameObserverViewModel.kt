@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.StateFlow
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
+import org.vl4ds4m.board.game.assistant.data.repository.UserDataRepository
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.network.GameObserver
 import org.vl4ds4m.board.game.assistant.network.NetworkGameState
@@ -15,11 +16,12 @@ import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 
 class GameObserverViewModel(
     sessionInfo: RemoteSessionInfo,
+    userDataRepository: UserDataRepository,
     private val sessionRepository: GameSessionRepository
 ) : ViewModel() {
     private val sessionId: String = sessionInfo.id
 
-    private val observer = GameObserver(viewModelScope)
+    private val observer = GameObserver(userDataRepository, viewModelScope)
 
     val observerState: StateFlow<NetworkGameState> = observer.observerState
 
@@ -43,7 +45,11 @@ class GameObserverViewModel(
         ): ViewModelProvider.Factory = viewModelFactory {
             initializer<GameObserverViewModel> {
                 val app = BoardGameAssistantApp.from(this)
-                GameObserverViewModel(sessionInfo, app.sessionRepository)
+                GameObserverViewModel(
+                    sessionInfo,
+                    app.userDataRepository,
+                    app.sessionRepository
+                )
             }
         }
     }

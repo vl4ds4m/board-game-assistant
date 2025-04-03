@@ -16,7 +16,7 @@ import org.vl4ds4m.board.game.assistant.data.repository.UserDataRepository
 class ProfileViewModel private constructor(
     private val userDataRepository: UserDataRepository
 ) : ViewModel() {
-    val userName: MutableState<String> = mutableStateOf("")
+    val userName: MutableState<String?> = mutableStateOf(null)
 
     init {
         userDataRepository.userName.take(1)
@@ -25,7 +25,9 @@ class ProfileViewModel private constructor(
     }
 
     override fun onCleared() {
-        userDataRepository.editUserName(userName.value)
+        userName.value?.let {
+            userDataRepository.editUserName(it.trim())
+        }
         super.onCleared()
     }
 

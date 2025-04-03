@@ -50,15 +50,16 @@ open class GameEnv(override val type: GameType) : Game {
         )
     }
 
-    override fun addPlayer(name: String) {
-        addPlayer(name, Score())
+    override fun addPlayer(netDevId: String?, name: String) {
+        addPlayer(netDevId, name, Score())
     }
 
     private val nextNewPlayerId: AtomicLong = AtomicLong(0)
 
-    protected open fun addPlayer(name: String, state: PlayerState): Long {
+    protected open fun addPlayer(netDevId: String?, name: String, state: PlayerState): Long {
         val id = nextNewPlayerId.incrementAndGet()
         val player = Player(
+            netDevId = netDevId,
             name = name,
             active = true,
             state = state
@@ -92,6 +93,20 @@ open class GameEnv(override val type: GameType) : Game {
                 if (player.active && id != playerId) return@upd id
             }
             return@upd null
+        }
+    }
+
+    override fun bindPlayer(id: Long, netDevId: String) {
+        mPlayers.updateMap {
+            val player = get(id) ?: return
+            put(id, player.copy(netDevId = netDevId))
+        }
+    }
+
+    override fun unbindPlayer(id: Long) {
+        mPlayers.updateMap {
+            val player = get(id) ?: return
+            put(id, player.copy(netDevId = null))
         }
     }
 

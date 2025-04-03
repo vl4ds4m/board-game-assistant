@@ -62,7 +62,7 @@ fun PlayerSettingScreen(
         PlayerSettingScreenContent(
             players = players,
             currentPlayerId = viewModel.currentPlayerId.collectAsState(),
-            onPlayerAdd = { viewModel.addPlayer("New player") },
+            onPlayerAdd = { viewModel.addPlayer(null, "New player") },
             onPlayerOrderChange = onPlayerOrderChange,
             playerSettingActions = PlayerSettingActions(
                 onSelect = viewModel::changeCurrentPlayerId,
@@ -130,8 +130,8 @@ private fun PlayerSettingScreenPreview() {
             players = remember {
                 mutableStateOf(
                     listOf(
-                        1L to Player("Abc", true, Score()),
-                        2L to Player("Def", true, Score()),
+                        1L to Player(null, "Abc", true, Score()),
+                        2L to Player(null, "Def", true, Score()),
                     )
                 )
             },

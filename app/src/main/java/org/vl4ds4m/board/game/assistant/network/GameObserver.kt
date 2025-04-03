@@ -6,10 +6,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.vl4ds4m.board.game.assistant.closeAndLog
+import org.vl4ds4m.board.game.assistant.data.repository.UserDataRepository
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.short
 import org.vl4ds4m.board.game.assistant.title
@@ -18,7 +21,10 @@ import java.io.ObjectOutputStream
 import java.net.InetSocketAddress
 import java.net.Socket
 
-class GameObserver(private val scope: CoroutineScope) {
+class GameObserver(
+    private val userDataRepository: UserDataRepository,
+    private val scope: CoroutineScope
+) {
     private var socket: Socket? = null
 
     private val mObserverState: MutableStateFlow<NetworkGameState> =
@@ -54,10 +60,19 @@ class GameObserver(private val scope: CoroutineScope) {
         }
     }
 
-    private fun observe(output: ObjectOutputStream, input: ObjectInputStream) {
-        NetworkPlayer(FAKE_NAME, FAKE_MAC)
-            .let { Json.encodeToString(it) }
-            .let { output.writeObject(it) }
+    private suspend fun observe(
+        output: ObjectOutputStream,
+        input: ObjectInputStream
+    ): Unit = withContext(Dispatchers.IO) {
+        userDataRepository.run {
+            userName.first() to netDevId.first()
+        }.let { (name, id) ->
+            NetworkPlayer(name, id)
+        }.let {
+            Json.encodeToString(it)
+        }.let {
+            output.writeObject(it)
+        }
         while (true) {
             val state = when (val header = input.readObject() as String) {
                 NetworkGameState.REGISTRATION.title -> NetworkGameState.REGISTRATION
@@ -86,6 +101,3 @@ class GameObserver(private val scope: CoroutineScope) {
 }
 
 private const val TAG = "GameObserver"
-
-private const val FAKE_NAME = "Abc"
-private const val FAKE_MAC = "01:02:03:04:05:06"

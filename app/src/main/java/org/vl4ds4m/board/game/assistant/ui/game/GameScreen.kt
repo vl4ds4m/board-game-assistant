@@ -210,6 +210,7 @@ val fakePlayers = sequence {
     repeat(10) { yield("Copy" to 111) }
 }.mapIndexed { i, (name, score) ->
     (i + 1L) to Player(
+        netDevId = null,
         name = name,
         active = true,
         state = Score(score)

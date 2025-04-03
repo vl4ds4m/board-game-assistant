@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.vl4ds4m.board.game.assistant.closeAndLog
+import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.title
@@ -30,6 +31,8 @@ class GameEmitter(
     private var serverSocket: ServerSocket? = null
     private val playerSockets = MutableStateFlow<List<Socket>?>(null)
 
+    private val networkPlayer = MutableStateFlow<NetworkPlayer?>(null)
+
     private val emitterState = MutableStateFlow(NetworkGameState.REGISTRATION)
 
     private val sessionState = MutableStateFlow<GameSession?>(null)
@@ -41,11 +44,19 @@ class GameEmitter(
     init {
         gameEnv.initialized.combine(gameEnv.completed) {
             init, comp -> init to comp
-        }.onEach { (initialized, completed) ->
-            val state =
-                if (!initialized) NetworkGameState.REGISTRATION
-                else if (completed) NetworkGameState.END_GAME
-                else NetworkGameState.IN_GAME
+        }.combine(gameEnv.players) {
+            lifecycle, players -> lifecycle to players
+        }.combine(networkPlayer) {
+            env, player -> env to player
+        }.onEach { (env, networkPlayer) ->
+            val (lifecycle, players) = env
+            val (initialized, completed) = lifecycle
+            val state = getState(
+                initialized = initialized,
+                completed = completed,
+                players = players,
+                networkPlayer = networkPlayer
+            )
             emitterState.value = state
             lastUpdate.value = state == NetworkGameState.END_GAME
         }.launchIn(scope)
@@ -112,7 +123,7 @@ class GameEmitter(
         input: ObjectInputStream,
         output: ObjectOutputStream
     ): Unit = withContext(Dispatchers.IO) {
-        input.readObject()
+        networkPlayer.value = input.readObject()
             .let { it as String }
             .let { Json.decodeFromString<NetworkPlayer>(it) }
         while (true) {
@@ -156,6 +167,24 @@ class GameEmitter(
 }
 
 private const val TAG = "GameEmitter"
+
+private fun getState(
+    initialized: Boolean,
+    completed: Boolean,
+    players: Players,
+    networkPlayer: NetworkPlayer?
+): NetworkGameState = when {
+    !initialized -> NetworkGameState.REGISTRATION
+    completed -> NetworkGameState.END_GAME
+    else -> {
+        val bound = networkPlayer != null &&
+            players.values.any {
+                it.netDevId == networkPlayer.netDevId
+            }
+        if (bound) NetworkGameState.IN_GAME
+        else NetworkGameState.REGISTRATION
+    }
+}
 
 private fun emitState(
     state: NetworkGameState,

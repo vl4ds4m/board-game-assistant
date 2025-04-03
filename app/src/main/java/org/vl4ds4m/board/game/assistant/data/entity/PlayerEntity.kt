@@ -24,6 +24,9 @@ data class PlayerEntity(
     @ColumnInfo(name = ID)
     val id: Long,
 
+    @ColumnInfo(name = NET_DEV_ID)
+    val netDevId: String?,
+
     @ColumnInfo(name = NAME)
     val name: String,
 
@@ -40,6 +43,7 @@ data class PlayerEntity(
         const val TABLE_NAME = "players"
         const val SESSION_ID = "session_id"
         const val ID = "player_id"
+        const val NET_DEV_ID = "net_dev_id"
         const val NAME = "nickname"
         const val ACTIVE = "active"
         const val SCORE = "score"

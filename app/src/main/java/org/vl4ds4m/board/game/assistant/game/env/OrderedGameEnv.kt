@@ -48,8 +48,8 @@ open class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
         }
     }
 
-    override fun addPlayer(name: String, state: PlayerState): Long {
-        val id = super.addPlayer(name, state)
+    override fun addPlayer(netDevId: String?, name: String, state: PlayerState): Long {
+        val id = super.addPlayer(netDevId, name, state)
         mOrderedPlayerIds.updateList { add(id) }
         return id
     }

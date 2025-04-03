@@ -81,6 +81,7 @@ private fun GameSessionData.fromData() = GameSession(
 private fun List<PlayerEntity>.fromEntities(): Map<Long, Player> = buildMap {
     this@fromEntities.forEach {
         val player = Player(
+            netDevId = it.netDevId,
             name = it.name,
             active = it.active,
             state = Score(it.score)
@@ -148,6 +149,7 @@ private fun GameSession.getPlayers(sessionId: String): List<PlayerEntity> =
                 PlayerEntity(
                     sessionId = sessionId,
                     id = id,
+                    netDevId = player.netDevId,
                     name = player.name,
                     active = player.active,
                     score = player.state.score,
@@ -160,6 +162,7 @@ private fun GameSession.getPlayers(sessionId: String): List<PlayerEntity> =
                 PlayerEntity(
                     sessionId = sessionId,
                     id = id,
+                    netDevId = player.netDevId,
                     name = player.name,
                     active = player.active,
                     score = player.state.score,

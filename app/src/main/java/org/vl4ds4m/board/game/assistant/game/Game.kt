@@ -22,9 +22,13 @@ interface Game {
     val currentPlayer: Player?
         get() = currentPlayerId.value?.let { players.value[it] }
 
-    fun addPlayer(name: String)
+    fun addPlayer(netDevId: String?, name: String)
 
     fun removePlayer(id: Long)
+
+    fun bindPlayer(id: Long, netDevId: String)
+
+    fun unbindPlayer(id: Long)
 
     fun renamePlayer(id: Long, name: String)
 

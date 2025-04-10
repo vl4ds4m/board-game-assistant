@@ -32,7 +32,7 @@ class CarcassonneGame : OrderedGameEnv(Carcassonne) {
             CarcassonneProperty.ROAD -> points = count
         }
         if (points > 0) {
-            val player = currentPlayer ?: return
+            val (_, player) = currentPlayer ?: return
             val score = Score(player.state.score + points)
             val id = currentPlayerId.value ?: return
             changePlayerState(id, score)

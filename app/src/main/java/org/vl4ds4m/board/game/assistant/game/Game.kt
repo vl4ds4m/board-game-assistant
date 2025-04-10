@@ -19,8 +19,10 @@ interface Game {
 
     fun changeCurrentPlayerId(id: Long)
 
-    val currentPlayer: Player?
-        get() = currentPlayerId.value?.let { players.value[it] }
+    val currentPlayer: Pair<Long, Player>?
+        get() = currentPlayerId.value?.let { id ->
+            players.value[id]?.let { player -> id to player }
+        }
 
     fun addPlayer(netDevId: String?, name: String)
 

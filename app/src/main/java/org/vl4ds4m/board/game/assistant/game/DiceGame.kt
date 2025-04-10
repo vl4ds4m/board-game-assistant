@@ -8,7 +8,7 @@ class DiceGame : OrderedGameEnv(Dice) {
         if (points < 0 || points % 5 != 0) {
             return
         }
-        val player = currentPlayer ?: return
+        val (_, player) = currentPlayer ?: return
         val oldScore = player.state.score
         if (oldScore == 1000) {
             return

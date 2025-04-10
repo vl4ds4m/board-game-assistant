@@ -3,139 +3,114 @@ package org.vl4ds4m.board.game.assistant.game.monopoly
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
 import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.Player
-import org.vl4ds4m.board.game.assistant.game.data.GameState
-import org.vl4ds4m.board.game.assistant.game.data.MonopolyGameState
 import org.vl4ds4m.board.game.assistant.game.data.MonopolyPlayerState
+import org.vl4ds4m.board.game.assistant.game.env.Initializable
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
-import org.vl4ds4m.board.game.assistant.game.monopoly.entity.MonopolyEntity
-import org.vl4ds4m.board.game.assistant.game.monopoly.entity.Supplier
-import org.vl4ds4m.board.game.assistant.updateMap
 
-@Suppress("unused")
 class MonopolyGame : OrderedGameEnv(Monopoly) {
-    private val mEntityOwner: MutableStateFlow<Map<MonopolyEntity, Long>> =
-        MutableStateFlow(mapOf())
-    private val entityOwner: StateFlow<Map<MonopolyEntity, Long>> =
-        mEntityOwner.asStateFlow()
+    private val currentPlayerState: Pair<Long, MonopolyPlayerState>?
+        get() = currentPlayer?.let { (id, p) ->
+            p.monopolyState?.let { state -> id to state }
+        }
 
-    private var repeatCount: Int = 0
+    private val mCurrentField = MutableStateFlow<MonopolyField?>(null)
+    val currentField: StateFlow<MonopolyField?> = mCurrentField.asStateFlow()
 
-    private val mAfterStepField: MutableStateFlow<MonopolyField?> =
-        MutableStateFlow(null)
-    private val afterStepField: StateFlow<MonopolyField?> =
-        mAfterStepField.asStateFlow()
+    val currentFieldObserver: Initializable = Initializable { scope ->
+        players.combine(currentPlayerId) { players, currentId ->
+            mCurrentField.value = currentId?.let { id ->
+                players[id]?.monopolyState?.position?.let {
+                    monopolyFields[it]
+                }
+            }
+        }.launchIn(scope)
+    }
 
     override fun addPlayer(netDevId: String?, name: String) {
         addPlayer(netDevId, name, MonopolyPlayerState())
     }
 
-    override fun restoreAdditionalState(state: GameState?) {
-        super.restoreAdditionalState(state)
-        state.let {
-            it as? MonopolyGameState
-        }?.let {
-            this.mEntityOwner.value = it.entityOwner
-            this.repeatCount = it.repeatCount
-            this.mAfterStepField.value = it.afterStepField
+    fun addMoney(money: Int) {
+        currentPlayerId.value?.let {
+            addMoney(it, money)
         }
     }
 
-    override val additionalState
-        get() = MonopolyGameState(
-            super.additionalState,
-            entityOwner.value,
-            repeatCount,
-            afterStepField.value
-        )
+    private fun addMoney(playerId: Long, money: Int): MonopolyPlayerState? {
+        if (money <= 0) return null
+        val state = players.value[playerId]?.monopolyState ?: return null
+        return state.run {
+            copy(score = score + money)
+        }.also {
+            changePlayerState(playerId, it)
+        }
+    }
 
-    fun movePlayer(step1: Int, step2: Int) {
-        if (afterStepField.value != null) return
-        sequenceOf(step1, step2).forEach {
-            if (it !in 1..6) return
+    fun spendMoney(money: Int) {
+        currentPlayerId.value?.let {
+            spendMoney(it, money)
         }
-        val id = currentPlayerId.value ?: return
-        val state = players.value[id]?.monopolyState ?: return
-        val equalSteps = step1 == step2
-        if (state.inPrison) {
-            if (equalSteps) state.inPrison = false
-            else return
-        } else if (equalSteps) {
-            repeatCount++
-            if (repeatCount == 3) {
-                moveToPrison(state)
-                return
-            }
+    }
+
+    private fun spendMoney(playerId: Long, money: Int): MonopolyPlayerState? {
+        if (money <= 0) return null
+        val state = players.value[playerId]?.monopolyState ?: return null
+        if (state.score < money) return null
+        return state.run {
+            copy(score = score - money)
+        }.also {
+            changePlayerState(playerId, it)
         }
-        val step = step1 + step2
-        val pos = (state.position + step).let {
+    }
+
+    fun movePlayer(steps: Int) {
+        if (steps !in 2..12) return
+        val (id, state) = currentPlayerState ?: return
+        if (state.inPrison) return
+        var newCycle = false
+        val newPosState = (state.position + steps).let {
             if (it > MonopolyField.COUNT) {
-                state.score += Ahead.MONEY
+                newCycle = true
                 it % MonopolyField.COUNT
             } else {
                 it
             }
+        }.let {
+            state.copy(position = it)
         }
-        state.position = pos
-        val field = MonopolyFields[pos]!!
-        mAfterStepField.value = field
-        if (field is GoToPrison) {
-            moveToPrison(state)
-        }
+        changePlayerState(id, newPosState)
+        if (newCycle) addMoney(id, Ahead.MONEY)
     }
 
-    private fun moveToPrison(state: MonopolyPlayerState) {
-        state.position = GoToPrison.POSITION
-        state.inPrison = true
-        changeCurrentPlayerId()
+    fun moveToPrison() {
+        if (currentField.value != GoToPrison) return
+        val (id, state) = currentPlayerState ?: return
+        if (state.inPrison) return
+        val prisonPosState = state.copy(position = Prison.POSITION)
+        changePlayerState(id, prisonPosState)
+        changePlayerState(id, prisonPosState.copy(inPrison = true))
     }
 
-    override fun changeCurrentPlayerId() {
-        repeatCount = 0
-        mAfterStepField.value = null
-        changeCurrentPlayerId()
+    fun leavePrison(rescued: Boolean) {
+        val (id, state) = currentPlayerState ?: return
+        if (!state.inPrison) return
+        val beforeFreeState =
+            if (!rescued) spendMoney(id, Prison.FINE) ?: return
+            else state
+        changePlayerState(id, beforeFreeState.copy(inPrison = false))
     }
 
-    fun buyCurrentEntity() {
-        val entity = afterStepField.value as? MonopolyEntity ?: return
-        val id = currentPlayerId.value ?: return
-        buyEntity(id, entity, entity.cost)
-    }
-
-    private fun buyEntity(playerId: Long, entity: MonopolyEntity, cost: Int) {
-        if (cost <= 0) return
-        if (entity in entityOwner.value) return
-        if (playerId !in players.value) return
-        val state = players.value[playerId]?.monopolyState ?: return
-        if (state.score >= cost) {
-            state.score -= cost
-            state.entities += entity
-            mEntityOwner.updateMap {
-                put(entity, playerId)
-            }
-        }
-    }
-
-    fun payRent(factor: Int? = null) {
-        val payerId = currentPlayerId.value ?: return
-        val entity = afterStepField.value as? MonopolyEntity ?: return
-        if (entity is Supplier) {
-            factor ?: return
-            if (factor !in 2..12) return
-        }
-        val ownerId = entityOwner.value[entity] ?: return
-        if (ownerId == payerId) return
-        val payeeState = players.value[ownerId]?.monopolyState ?: return
-        val cost = when (entity) {
-            is Supplier -> entity.rent * factor!!
-            else -> entity.rent
-        }
-        val payerState = players.value[payerId]?.monopolyState ?: return
-        if (payerState.score >= cost) {
-            payerState.score -= cost
-            payeeState.score += cost
-        }
+    fun transferMoney(senderId: Long, receiverId: Long, money: Int) {
+        if (money <= 0) return
+        val senderState = players.value[senderId]?.monopolyState ?: return
+        if (senderState.score < money) return
+        if (receiverId !in players.value) return
+        spendMoney(senderId, money) ?: return
+        addMoney(receiverId, money) ?: return
     }
 }
 

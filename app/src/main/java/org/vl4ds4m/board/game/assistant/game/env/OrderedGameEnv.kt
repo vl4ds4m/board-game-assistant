@@ -1,7 +1,5 @@
 package org.vl4ds4m.board.game.assistant.game.env
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -85,24 +83,14 @@ open class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
         }
     }
 
-    private val nextPlayerIdObserver = object : Initializable {
-        private var job: Job? = null
-
-        override fun init(scope: CoroutineScope) {
-            close()
-            job = players.combine(orderedPlayerIds) { players, ids ->
-                players to ids
-            }.combine(currentPlayerId) { (players, ids), currentId ->
-                getNextActivePlayerId(players, ids, currentId).let {
-                    mNextPlayerId.value = it
-                }
-            }.launchIn(scope)
-        }
-
-        override fun close() {
-            job?.cancel()
-            job = null
-        }
+    private val nextPlayerIdObserver = Initializable { scope ->
+        players.combine(orderedPlayerIds) { players, ids ->
+            players to ids
+        }.combine(currentPlayerId) { (players, ids), currentId ->
+            getNextActivePlayerId(players, ids, currentId).let {
+                mNextPlayerId.value = it
+            }
+        }.launchIn(scope)
     }
 
     override val initializables: Array<Initializable> =

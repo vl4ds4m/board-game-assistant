@@ -21,7 +21,6 @@ import org.vl4ds4m.board.game.assistant.game.data.CarcassonneGameState
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 import org.vl4ds4m.board.game.assistant.game.data.GameState
-import org.vl4ds4m.board.game.assistant.game.data.MonopolyGameState
 import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
 import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.game.data.SimpleOrderedGameState
@@ -118,9 +117,8 @@ private val GameSessionData.gameState: GameState?
         val orderedPlayerIds = players.sortedBy { it.order }
             .map { it.id }
         return when (orderedGameType) {
-            is SimpleOrdered, Dice -> SimpleOrderedGameState(orderedPlayerIds)
+            is SimpleOrdered, Dice, Monopoly -> SimpleOrderedGameState(orderedPlayerIds)
             is Carcassonne -> CarcassonneGameState(orderedPlayerIds, entity.finalStage!!)
-            is Monopoly -> MonopolyGameState(orderedPlayerIds)
         }
     }
 

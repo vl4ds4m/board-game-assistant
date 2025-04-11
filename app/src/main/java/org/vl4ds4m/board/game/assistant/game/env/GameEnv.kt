@@ -229,12 +229,18 @@ open class GameEnv(override val type: GameType) : Game {
             is PlayerStateChangeAction -> {
                 mPlayers.updateMap {
                     compute(action.playerId) { _, v ->
-                        v?.copy(state = action.oldState)
+                        v?.run {
+                            copy(state = producePlayerState(state, action.oldState))
+                        }
                     }
                 }
             }
         }
     }
+
+    protected open fun producePlayerState(
+        source: PlayerState, provider: PlayerState
+    ): PlayerState = provider
 
     override fun repeat() {
         val action = actionsHistory.repeat() ?: return
@@ -245,7 +251,9 @@ open class GameEnv(override val type: GameType) : Game {
             is PlayerStateChangeAction -> {
                 mPlayers.updateMap {
                     compute(action.playerId) { _, v ->
-                        v?.copy(state = action.newState)
+                        v?.run {
+                            copy(state = producePlayerState(state, action.newState))
+                        }
                     }
                 }
             }

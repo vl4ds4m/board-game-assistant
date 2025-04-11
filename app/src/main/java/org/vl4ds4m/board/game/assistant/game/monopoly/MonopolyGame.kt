@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.launchIn
 import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.MonopolyPlayerState
+import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.game.env.Initializable
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 
@@ -32,6 +33,18 @@ class MonopolyGame : OrderedGameEnv(Monopoly) {
 
     override fun addPlayer(netDevId: String?, name: String) {
         addPlayer(netDevId, name, MonopolyPlayerState())
+    }
+
+    override fun producePlayerState(
+        source: PlayerState, provider: PlayerState
+    ): MonopolyPlayerState {
+        val init = source as MonopolyPlayerState
+        val prov = provider as MonopolyPlayerState
+        return when {
+            init.position != prov.position -> init.copy(position = prov.position)
+            init.inPrison != prov.inPrison -> init.copy(inPrison = prov.inPrison)
+            else -> init.copy(score = prov.score)
+        }
     }
 
     fun addMoney(money: Int) {

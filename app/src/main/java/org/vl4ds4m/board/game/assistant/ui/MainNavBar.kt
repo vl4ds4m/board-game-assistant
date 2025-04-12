@@ -16,8 +16,8 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun MainNavBar(
-    isRouteSelected: (MainRoute) -> Boolean,
-    onRouteNavigate: (MainRoute) -> Unit,
+    isRouteSelected: (TopRoute) -> Boolean,
+    onRouteNavigate: (TopRoute) -> Unit,
     modifier: Modifier = Modifier
 ) {
     NavigationBar(modifier) {
@@ -38,7 +38,7 @@ fun MainNavBar(
 }
 
 private class TopLevelDestination(
-    val route: MainRoute,
+    val route: TopRoute,
     val imageVector: ImageVector,
     val label: String
 )

@@ -1,10 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui
 
-import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -12,26 +8,24 @@ import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.game.Game
 import org.vl4ds4m.board.game.assistant.ui.game.NewGameStart
-import org.vl4ds4m.board.game.assistant.ui.game.gameNavigation
-import org.vl4ds4m.board.game.assistant.ui.game.observer.observerNavigation
 import org.vl4ds4m.board.game.assistant.ui.home.HomeScreen
 import org.vl4ds4m.board.game.assistant.ui.home.HomeViewModel
 import org.vl4ds4m.board.game.assistant.ui.profile.ProfileScreen
 import org.vl4ds4m.board.game.assistant.ui.profile.ProfileViewModel
 import org.vl4ds4m.board.game.assistant.ui.results.resultsNavigation
 
-sealed interface MainRoute
+sealed interface TopRoute
 
 @Serializable
-data object Home : MainRoute
+data object Home : TopRoute
 
 @Serializable
-data object Results : MainRoute
+data object Results : TopRoute
 
 @Serializable
-data object Profile : MainRoute
+data object Profile : TopRoute
 
-fun NavGraphBuilder.mainNavigation(navController: NavController) {
+fun NavGraphBuilder.topNavigation(navController: NavController) {
     composable<Home> {
         HomeScreen(
             viewModel = viewModel(factory = HomeViewModel.Factory),
@@ -51,18 +45,8 @@ fun NavGraphBuilder.mainNavigation(navController: NavController) {
             }
         )
     }
-    gameNavigation(navController)
-    observerNavigation(navController)
     composable<Profile> {
         ProfileScreen(viewModel = viewModel(factory = ProfileViewModel.Factory))
     }
     resultsNavigation(navController)
-}
-
-@Composable
-inline fun <reified T : Any> NavController.rememberTopmost(
-    key: NavBackStackEntry
-): NavBackStackEntry = remember(key) {
-    Log.d("Navigation", "Remember ${T::class.simpleName} navBackStackEntry")
-    getBackStackEntry<T>()
 }

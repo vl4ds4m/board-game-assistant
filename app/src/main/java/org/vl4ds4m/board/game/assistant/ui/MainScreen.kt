@@ -21,6 +21,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import org.vl4ds4m.board.game.assistant.ui.game.gameNavigation
+import org.vl4ds4m.board.game.assistant.ui.game.observer.observerNavigation
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -28,7 +30,7 @@ fun MainScreen() {
     val navController = rememberNavController()
     LaunchedEffect(Unit) { logCurrentBackStack(navController) }
     val currentEntry = navController.currentBackStackEntryAsState()
-    val onMainScreen: State<Boolean> = remember {
+    val onTopScreen = remember {
         derivedStateOf {
             listOf(Home, Results, Profile).any {
                 isCurrentDestination(currentEntry, it)
@@ -37,7 +39,7 @@ fun MainScreen() {
     }
     MainScreenContent(
         navController = navController,
-        onMainScreen = onMainScreen,
+        onTopScreen = onTopScreen,
         isNavItemSelected = { isCurrentDestination(currentEntry, it) }
     )
 }
@@ -45,12 +47,12 @@ fun MainScreen() {
 @Composable
 fun MainScreenContent(
     navController: NavHostController,
-    onMainScreen: State<Boolean>,
-    isNavItemSelected: (MainRoute) -> Boolean,
+    onTopScreen: State<Boolean>,
+    isNavItemSelected: (TopRoute) -> Boolean,
 ) {
     Scaffold(
         bottomBar = {
-            AnimatedVisibility(onMainScreen.value) {
+            AnimatedVisibility(onTopScreen.value) {
                 MainNavBar(
                     isRouteSelected = isNavItemSelected,
                     onRouteNavigate = { navController.navigateToTop(it) }
@@ -65,9 +67,19 @@ fun MainScreenContent(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            mainNavigation(navController)
+            topNavigation(navController)
+            gameNavigation(navController)
+            observerNavigation(navController)
         }
     }
+}
+
+@Composable
+inline fun <reified T : Any> NavController.rememberTopmost(
+    key: NavBackStackEntry
+): NavBackStackEntry = remember(key) {
+    Log.d("Navigation", "Remember ${T::class.simpleName} navBackStackEntry")
+    getBackStackEntry<T>()
 }
 
 @Preview
@@ -76,7 +88,7 @@ private fun MainScreenPreview() {
     BoardGameAssistantTheme {
         MainScreenContent(
             navController = rememberNavController(),
-            onMainScreen = remember { mutableStateOf(true) },
+            onTopScreen = remember { mutableStateOf(true) },
             isNavItemSelected = { Home::class.isInstance(it) }
         )
     }
@@ -84,12 +96,12 @@ private fun MainScreenPreview() {
 
 private fun isCurrentDestination(
     currentEntry: State<NavBackStackEntry?>,
-    route: MainRoute
+    route: TopRoute
 ): Boolean {
     return currentEntry.value?.destination?.hasRoute(route::class) ?: false
 }
 
-private fun <T : MainRoute> NavController.navigateToTop(route: T) {
+private fun <T : TopRoute> NavController.navigateToTop(route: T) {
     navigate(route) {
         popUpTo<Home>()
         launchSingleTop = true

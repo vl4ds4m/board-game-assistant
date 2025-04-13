@@ -30,6 +30,7 @@ import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.game.log.CurrentPlayerChangeAction
 import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
+import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistoryState
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameTopBar
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
@@ -45,7 +46,7 @@ fun GameScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     navActions: GameNavActions? = null,
-    history: GameHistory? = null,
+    history: GameHistoryState? = null,
     content: @Composable (Modifier) -> Unit
 ) {
     Scaffold(
@@ -121,11 +122,11 @@ fun GameScreen(
         navActions = navActions.copy(
             onGameComplete = viewModel::complete
         ),
-        history = GameHistory(
+        history = GameHistoryState(
             reverted = viewModel.reverted.collectAsState(),
             repeatable = viewModel.repeatable.collectAsState(),
-            onRevertAction = viewModel::revert,
-            onRepeatAction = viewModel::repeat
+            revert = viewModel::revert,
+            repeat = viewModel::repeat
         )
     ) { innerModifier ->
         GameScreenContent(
@@ -188,7 +189,7 @@ private fun GameScreenPreview() {
             onBackClick = {},
             modifier = Modifier.fillMaxSize(),
             navActions = GameNavActions.Empty,
-            history = GameHistory.Empty
+            history = GameHistoryState.Empty
         ) {
             GameScreenContent(
                 players = remember { mutableStateOf(fakePlayers) },

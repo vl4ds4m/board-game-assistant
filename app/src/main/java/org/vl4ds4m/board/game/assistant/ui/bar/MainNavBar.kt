@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.ui
+package org.vl4ds4m.board.game.assistant.ui.bar
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
@@ -12,6 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import org.vl4ds4m.board.game.assistant.ui.Home
+import org.vl4ds4m.board.game.assistant.ui.Profile
+import org.vl4ds4m.board.game.assistant.ui.Results
+import org.vl4ds4m.board.game.assistant.ui.TopRoute
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable

@@ -1,5 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui.game.component
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -29,7 +30,7 @@ fun GameTopBar(
     onArrowBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     navActions: GameNavActions? = null,
-    history: GameHistory? = null
+    history: GameHistoryState? = null
 ) {
     TopAppBar(
         title = { Text(title) },
@@ -48,7 +49,7 @@ fun GameTopBar(
             history?.let {
                 IconButton(
                     enabled = it.reverted.value,
-                    onClick = it.onRevertAction
+                    onClick = it.revert
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.undo_24px),
@@ -57,7 +58,7 @@ fun GameTopBar(
                 }
                 IconButton(
                     enabled = it.repeatable.value,
-                    onClick = it.onRepeatAction
+                    onClick = it.repeat
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.redo_24px),
@@ -120,7 +121,7 @@ private fun GameTopBarPreview() {
             title = "Some game",
             onArrowBackClick = {},
             navActions = GameNavActions.Empty,
-            history = GameHistory.Empty
+            history = GameHistoryState.Empty
         )
     }
 }
@@ -144,18 +145,41 @@ data class GameNavActions(
     }
 }
 
+@Composable
+fun RowScope.GameHistoryMenu(state: GameHistoryState) {
+    IconButton(
+        enabled = state.reverted.value,
+        onClick = state.revert
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.undo_24px),
+            contentDescription = "Revert"
+        )
+    }
+    IconButton(
+        enabled = state.repeatable.value,
+        onClick = state.repeat
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.redo_24px),
+            contentDescription = "Repeat"
+        )
+    }
+}
+
 @Immutable
-data class GameHistory(
+data class GameHistoryState(
     val reverted: State<Boolean>,
     val repeatable: State<Boolean>,
-    val onRevertAction: () -> Unit,
-    val onRepeatAction: () -> Unit
+    val revert: () -> Unit,
+    val repeat: () -> Unit
 ) {
     companion object {
-        val Empty = GameHistory(
+        val Empty = GameHistoryState(
             reverted = mutableStateOf(false),
             repeatable = mutableStateOf(false),
-            onRevertAction = {}, onRepeatAction = {}
+            revert = {},
+            repeat = {}
         )
     }
 }

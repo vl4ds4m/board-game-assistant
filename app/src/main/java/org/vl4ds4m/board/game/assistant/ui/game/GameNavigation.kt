@@ -2,6 +2,7 @@ package org.vl4ds4m.board.game.assistant.ui.game
 
 import androidx.activity.addCallback
 import androidx.activity.compose.LocalActivity
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -11,6 +12,7 @@ import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.ui.Home
 import org.vl4ds4m.board.game.assistant.ui.MainActivity
+import org.vl4ds4m.board.game.assistant.ui.bar.TopBarParams
 import org.vl4ds4m.board.game.assistant.ui.game.component.DiceImitationScreen
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.end.EndGameScreen
@@ -45,7 +47,10 @@ data object DiceImitation : GameRoute
 @Serializable
 data object End : GameRoute
 
-fun NavGraphBuilder.gameNavigation(navController: NavController) {
+fun NavGraphBuilder.gameNavigation(
+    navController: NavController,
+    topBarUiState: MutableState<TopBarParams>
+) {
     val navigateUp: () -> Unit = { navController.navigateUp() }
     val navigateHome: () -> Unit = {
         navController.navigate(Home) {

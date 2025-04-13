@@ -1,11 +1,13 @@
 package org.vl4ds4m.board.game.assistant.ui
 
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
+import org.vl4ds4m.board.game.assistant.ui.bar.TopBarParams
 import org.vl4ds4m.board.game.assistant.ui.game.Game
 import org.vl4ds4m.board.game.assistant.ui.game.NewGameStart
 import org.vl4ds4m.board.game.assistant.ui.home.HomeScreen
@@ -25,7 +27,10 @@ data object Results : TopRoute
 @Serializable
 data object Profile : TopRoute
 
-fun NavGraphBuilder.topNavigation(navController: NavController) {
+fun NavGraphBuilder.topNavigation(
+    navController: NavController,
+    topBarUiState: MutableState<TopBarParams>
+) {
     composable<Home> {
         HomeScreen(
             viewModel = viewModel(factory = HomeViewModel.Factory),
@@ -48,5 +53,5 @@ fun NavGraphBuilder.topNavigation(navController: NavController) {
     composable<Profile> {
         ProfileScreen(viewModel = viewModel(factory = ProfileViewModel.Factory))
     }
-    resultsNavigation(navController)
+    resultsNavigation(navController, topBarUiState)
 }

@@ -1,5 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui.game.observer
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
@@ -10,8 +11,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import org.vl4ds4m.board.game.assistant.network.NetworkGameState
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
+import org.vl4ds4m.board.game.assistant.ui.bar.TopBarParams
 
-fun NavGraphBuilder.observerNavigation(navController: NavController) {
+fun NavGraphBuilder.observerNavigation(
+    navController: NavController,
+    topBarUiState: MutableState<TopBarParams>
+) {
     composable<RemoteSessionInfo> { entry ->
         val route = entry.toRoute<RemoteSessionInfo>()
         val viewModel = viewModel<GameObserverViewModel>(

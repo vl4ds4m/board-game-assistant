@@ -1,15 +1,17 @@
 package org.vl4ds4m.board.game.assistant.ui.home
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -25,6 +27,7 @@ import org.vl4ds4m.board.game.assistant.fakeRemoteSession
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
+import org.vl4ds4m.board.game.assistant.ui.component.GameSessionCard
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -55,53 +58,100 @@ fun PlayScreenContent(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Row(
-            modifier = Modifier.weight(1f),
-            verticalAlignment = Alignment.CenterVertically
+        Text(
+            text = "Game sessions",
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            style = MaterialTheme.typography.headlineMedium
+        )
+        HorizontalDivider()
+        Button(
+            onClick = clickNewGame,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
-            Button(clickNewGame) {
-                Text("Start a new game")
-            }
-        }
-        Text("Continue these")
-        LazyColumn(
-            modifier = Modifier
-                .weight(3f)
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp)
-        ) {
-            sessions.value.sortedByDescending { it.startTime }
-                .onEachIndexed { index, session ->
-                    item(session.id) {
-                        Text(
-                            text = "${index + 1}. ${session.name}",
-                            modifier = Modifier
-                                .padding(vertical = 16.dp)
-                                .clickable { clickSession(session.id, session.type) }
-                        )
-                    }
-                }
+            Text(
+                text = "Start a new game",
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
         HorizontalDivider()
-        Text("Connect to exists")
-        LazyColumn(
-            modifier = Modifier
-                .weight(3f)
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp)
-        ) {
-            itemsIndexed(remoteSessions.value) { index, session ->
-                Text(
-                    text = "${index + 1}. ${session.name}",
-                    modifier = Modifier
-                        .padding(vertical = 16.dp)
-                        .clickable {
-                            session.run { clickRemoteGame(id, name, ip, port) }
-                        }
-                )
+        Text(
+            text = "Continue the game",
+            modifier = Modifier.padding(start = 16.dp),
+            style = MaterialTheme.typography.titleMedium
+        )
+        if (sessions.value.isEmpty()) {
+            Text(
+                text = "No games to continue",
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .wrapContentSize()
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                itemsIndexed(
+                    items = sessions.value.sortedByDescending {
+                        it.startTime
+                    },
+                    key = { _, session -> session.id }
+                ) { index, session ->
+                    GameSessionCard(
+                        text = "${index + 1}. ${session.name}",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                clickSession(session.id, session.type)
+                            }
+                    )
+                }
+            }
+        }
+        HorizontalDivider()
+        Text(
+            text = "Join to the game",
+            modifier = Modifier.padding(start = 16.dp),
+            style = MaterialTheme.typography.titleMedium
+        )
+        if (remoteSessions.value.isEmpty()) {
+            Text(
+                text = "No games to join",
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .wrapContentSize()
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                itemsIndexed(
+                    items = remoteSessions.value,
+                    key = { _, session -> session.id }
+                ) { index, session ->
+                    GameSessionCard(
+                        text = "${index + 1}. ${session.name}",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                session.run {
+                                    clickRemoteGame(id, name, ip, port)
+                                }
+                            }
+                    )
+                }
             }
         }
     }
@@ -109,11 +159,25 @@ fun PlayScreenContent(
 
 @Preview
 @Composable
-private fun PlayScreenPreview() {
+private fun PlayScreenWithSessionsPreview() {
+    PlayScreenPreview(sessionsInfo, fakeRemoteSession)
+}
+
+@Preview
+@Composable
+private fun PlayScreenNoSessionsPreview() {
+    PlayScreenPreview(listOf(), listOf())
+}
+
+@Composable
+private fun PlayScreenPreview(
+    localSessions: List<GameSessionInfo>,
+    remoteSession: List<RemoteSessionInfo>
+) {
     BoardGameAssistantTheme {
         PlayScreenContent(
-            sessions = remember { mutableStateOf(sessionsInfo) },
-            remoteSessions = remember { mutableStateOf(fakeRemoteSession) },
+            sessions = remember { mutableStateOf(localSessions) },
+            remoteSessions = remember { mutableStateOf(remoteSession) },
             clickNewGame = {},
             clickSession = { _, _ -> },
             clickRemoteGame = { _, _, _, _ -> },

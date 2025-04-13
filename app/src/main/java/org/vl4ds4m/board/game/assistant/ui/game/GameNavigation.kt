@@ -10,7 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.game.GameType
-import org.vl4ds4m.board.game.assistant.ui.Home
+import org.vl4ds4m.board.game.assistant.ui.Play
 import org.vl4ds4m.board.game.assistant.ui.MainActivity
 import org.vl4ds4m.board.game.assistant.ui.bar.TopBarParams
 import org.vl4ds4m.board.game.assistant.ui.game.component.DiceImitationScreen
@@ -53,8 +53,8 @@ fun NavGraphBuilder.gameNavigation(
 ) {
     val navigateUp: () -> Unit = { navController.navigateUp() }
     val navigateHome: () -> Unit = {
-        navController.navigate(Home) {
-            popUpTo<Home>()
+        navController.navigate(Play) {
+            popUpTo<Play>()
             launchSingleTop = true
         }
     }

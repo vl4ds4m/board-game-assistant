@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
-import org.vl4ds4m.board.game.assistant.ui.Home
+import org.vl4ds4m.board.game.assistant.ui.Play
 import org.vl4ds4m.board.game.assistant.ui.Profile
 import org.vl4ds4m.board.game.assistant.ui.Results
 import org.vl4ds4m.board.game.assistant.ui.TopRoute
@@ -49,7 +49,7 @@ private class TopLevelDestination(
 
 private val topLevelDestinations = listOf(
     TopLevelDestination(Results, Icons.AutoMirrored.Default.List, "Results"),
-    TopLevelDestination(Home, Icons.Default.Home, "Home"),
+    TopLevelDestination(Play, Icons.Default.Home, "Play"),
     TopLevelDestination(Profile, Icons.Default.Person, "Profile")
 )
 
@@ -58,7 +58,7 @@ private val topLevelDestinations = listOf(
 private fun MainNavBarPreview() {
     BoardGameAssistantTheme {
         MainNavBar(
-            isRouteSelected = { it is Home },
+            isRouteSelected = { it is Play },
             onRouteNavigate = {},
         )
     }

@@ -40,7 +40,7 @@ fun MainScreen() {
     val currentEntry = navController.currentBackStackEntryAsState()
     val onTopScreen = remember {
         derivedStateOf {
-            listOf(Home, Results, Profile).any {
+            listOf(Play, Results, Profile).any {
                 isCurrentDestination(currentEntry, it)
             }
         }
@@ -85,7 +85,7 @@ fun MainScreenContent(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Home,
+            startDestination = Play,
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
@@ -111,7 +111,7 @@ private fun isCurrentDestination(
 
 private fun <T : TopRoute> NavController.navigateToTop(route: T) {
     navigate(route) {
-        popUpTo<Home>()
+        popUpTo<Play>()
         launchSingleTop = true
     }
 }
@@ -150,12 +150,12 @@ private fun MainScreenPreview(onTopScreen: Boolean) {
         MainScreenContent(
             navController = rememberNavController(),
             onTopScreen = remember { mutableStateOf(onTopScreen) },
-            isCurrentRoute = { onTopScreen && (it is Home) },
+            isCurrentRoute = { onTopScreen && (it is Play) },
             topBarUiState = remember {
                 mutableStateOf(TopBarParams.Example)
             }
         ) {
-            composable<Home> {
+            composable<Play> {
                 Text(
                     text = "Screen content",
                     modifier = Modifier

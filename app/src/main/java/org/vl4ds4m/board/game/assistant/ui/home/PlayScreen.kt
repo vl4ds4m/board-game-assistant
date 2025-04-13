@@ -28,14 +28,14 @@ import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
-fun HomeScreen(
+fun PlayScreen(
     viewModel: HomeViewModel,
     startNewGame: () -> Unit,
     proceedGame: (String, GameType) -> Unit,
     observeGame: (String, String, String, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    HomeScreenContent(
+    PlayScreenContent(
         sessions = viewModel.localSessions.collectAsState(),
         remoteSessions = viewModel.remoteSessions.collectAsState(),
         clickNewGame = startNewGame,
@@ -46,7 +46,7 @@ fun HomeScreen(
 }
 
 @Composable
-fun HomeScreenContent(
+fun PlayScreenContent(
     sessions: State<List<GameSessionInfo>>,
     remoteSessions: State<List<RemoteSessionInfo>>,
     clickNewGame: () -> Unit,
@@ -109,9 +109,9 @@ fun HomeScreenContent(
 
 @Preview
 @Composable
-private fun HomeScreenPreview() {
+private fun PlayScreenPreview() {
     BoardGameAssistantTheme {
-        HomeScreenContent(
+        PlayScreenContent(
             sessions = remember { mutableStateOf(sessionsInfo) },
             remoteSessions = remember { mutableStateOf(fakeRemoteSession) },
             clickNewGame = {},

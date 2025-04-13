@@ -1,53 +1,47 @@
 package org.vl4ds4m.board.game.assistant.ui.game.setup
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.game.Dice
 import org.vl4ds4m.board.game.assistant.game.GameType
-import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun NewGameStartScreen(
     viewModel: GameSetupViewModel,
-    onBackClick: () -> Unit,
     onSetupPlayers: (GameType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    GameScreen(
-        topBarTitle = "New game",
-        onBackClick = onBackClick,
+    NewGameStartScreenContent(
+        vmType = viewModel.type,
+        vmName = viewModel.name,
+        onSetupPlayers = {
+            viewModel.createGame()
+            onSetupPlayers(viewModel.type.value!!)
+        },
         modifier = modifier
-    ) { innerModifier ->
-        NewGameStartScreenContent(
-            vmType = viewModel.type,
-            vmName = viewModel.name,
-            onSetupPlayers = {
-                viewModel.createGame()
-                onSetupPlayers(viewModel.type.value!!)
-            },
-            modifier = innerModifier
-        )
-    }
+    )
 }
 
 @Composable
@@ -59,11 +53,9 @@ fun NewGameStartScreenContent(
 ) {
     val (type, onTypeChanged) = vmType
     val (name, onNameChanged) = vmName
-    var expanded by remember { mutableStateOf(false) }
     Column(
-        modifier = modifier.padding(48.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier.padding(64.dp),
+        verticalArrangement = Arrangement.spacedBy(36.dp),
     ) {
         TextField(
             value = name,
@@ -71,21 +63,38 @@ fun NewGameStartScreenContent(
             label = { Text("Name") },
             singleLine = true
         )
-        Spacer(Modifier.height(48.dp))
-        FilledTonalButton({ expanded = true }) {
-            Text(type?.title ?: "Select game")
-            DropdownMenu(expanded, { expanded = false }) {
-                for (entry in GameType.entries) {
-                    DropdownMenuItem(
-                        text = { Text(entry.title) },
-                        onClick = { onTypeChanged(entry); expanded = false }
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            GameType.entries.forEach {
+                Card(
+                    modifier = Modifier
+                        .height(40.dp)
+                        .fillMaxWidth()
+                        .clickable {
+                            onTypeChanged(it)
+                        },
+                    colors = if (type == it) {
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    } else {
+                        CardDefaults.cardColors()
+                    }
+                ) {
+                    Text(
+                        text = it.title,
+                        modifier = Modifier
+                            .padding(start = 20.dp)
+                            .fillMaxHeight()
+                            .wrapContentHeight()
                     )
                 }
             }
         }
-        Spacer(Modifier.height(48.dp))
         Button(
             onClick = onSetupPlayers,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
             enabled = name.isNotBlank() && type != null
         ) {
             Text("Continue")
@@ -98,8 +107,8 @@ fun NewGameStartScreenContent(
 private fun NewGameStartScreenPreview() {
     BoardGameAssistantTheme {
         NewGameStartScreenContent(
-            vmType = remember { mutableStateOf(null) },
-            vmName = remember { mutableStateOf("") },
+            vmType = remember { mutableStateOf(Dice) },
+            vmName = remember { mutableStateOf("My game") },
             onSetupPlayers = {},
             modifier = Modifier.fillMaxSize()
         )

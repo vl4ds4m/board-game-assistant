@@ -59,9 +59,13 @@ fun NavGraphBuilder.gameNavigation(
         }
     }
     composable<NewGameStart> {
+        topBarUiState.value = TopBarParams(
+            title = "New game: creation",
+            navigateBack = navigateUp,
+            actions = listOf()
+        )
         NewGameStartScreen(
             viewModel = viewModel(factory = GameSetupViewModel.Factory),
-            onBackClick = navigateUp,
             onSetupPlayers = { type ->
                 Game(type = type.title, sessionId = null).let {
                     navController.navigate(it)
@@ -87,6 +91,11 @@ fun NavGraphBuilder.gameNavigation(
                 launchSingleTop = true
             }
         }
+        topBarUiState.value = TopBarParams(
+            title = "New game: players",
+            navigateBack = onBackClick,
+            actions = listOf()
+        )
         LocalActivity.current.let {
             it as MainActivity
         }.run {
@@ -94,7 +103,6 @@ fun NavGraphBuilder.gameNavigation(
         }
         NewGamePlayersScreen(
             viewModel = setupViewModel,
-            onBackClick = onBackClick,
             onStartGame = {
                 setupViewModel.startGame(gameViewModel)
                 navController.navigateUp()

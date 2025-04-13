@@ -22,31 +22,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayerCard
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun NewGamePlayersScreen(
     viewModel: GameSetupViewModel,
-    onBackClick: () -> Unit,
     onStartGame: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    GameScreen(
-        topBarTitle = "New game",
-        onBackClick = onBackClick,
+    NewGamePlayersScreenContent(
+        players = viewModel.players,
+        onAddPlayer = viewModel::addPlayer,
+        onRenamePlayer = viewModel::renamePlayer,
+        onRemovePlayer = viewModel::removePlayerAt,
+        onStartGame = onStartGame,
         modifier = modifier
-    ) { innerModifier ->
-        NewGamePlayersScreenContent(
-            players = viewModel.players,
-            onAddPlayer = viewModel::addPlayer,
-            onRenamePlayer = viewModel::renamePlayer,
-            onRemovePlayer = viewModel::removePlayerAt,
-            onStartGame = onStartGame,
-            modifier = innerModifier
-        )
-    }
+    )
 }
 
 @Composable

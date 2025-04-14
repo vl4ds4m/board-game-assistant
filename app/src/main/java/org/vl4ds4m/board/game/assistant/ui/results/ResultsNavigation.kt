@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.ui.Results
-import org.vl4ds4m.board.game.assistant.ui.bar.TopBarParams
+import org.vl4ds4m.board.game.assistant.ui.component.TopBarParams
 import org.vl4ds4m.board.game.assistant.ui.rememberTopmost
 
 @Serializable

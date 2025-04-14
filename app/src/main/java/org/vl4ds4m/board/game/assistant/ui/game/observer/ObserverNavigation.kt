@@ -11,7 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import org.vl4ds4m.board.game.assistant.network.NetworkGameState
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
-import org.vl4ds4m.board.game.assistant.ui.bar.TopBarParams
+import org.vl4ds4m.board.game.assistant.ui.component.TopBarParams
 
 fun NavGraphBuilder.observerNavigation(
     navController: NavController,

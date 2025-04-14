@@ -26,9 +26,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import org.vl4ds4m.board.game.assistant.ui.bar.MainNavBar
-import org.vl4ds4m.board.game.assistant.ui.bar.MainTopBar
-import org.vl4ds4m.board.game.assistant.ui.bar.TopBarParams
+import org.vl4ds4m.board.game.assistant.ui.component.MainNavBar
+import org.vl4ds4m.board.game.assistant.ui.component.MainTopBar
+import org.vl4ds4m.board.game.assistant.ui.component.TopBarParams
 import org.vl4ds4m.board.game.assistant.ui.game.gameNavigation
 import org.vl4ds4m.board.game.assistant.ui.game.observer.observerNavigation
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme

@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.ui.Play
 import org.vl4ds4m.board.game.assistant.ui.MainActivity
-import org.vl4ds4m.board.game.assistant.ui.bar.TopBarParams
+import org.vl4ds4m.board.game.assistant.ui.component.TopBarParams
 import org.vl4ds4m.board.game.assistant.ui.game.component.DiceImitationScreen
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.end.EndGameScreen

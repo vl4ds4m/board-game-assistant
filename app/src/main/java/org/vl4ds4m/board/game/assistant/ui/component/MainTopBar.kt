@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.ui.bar
+package org.vl4ds4m.board.game.assistant.ui.component
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons

@@ -10,8 +10,6 @@ class GameRepository {
     }
 
     fun extract(): Game {
-        return instance?.also {
-            instance = null
-        } ?: throw IllegalStateException("Game doesn't exist")
+        return instance ?: throw IllegalStateException("Game doesn't exist")
     }
 }

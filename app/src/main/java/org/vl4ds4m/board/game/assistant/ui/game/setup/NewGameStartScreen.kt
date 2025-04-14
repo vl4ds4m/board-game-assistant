@@ -37,8 +37,8 @@ fun NewGameStartScreen(
         vmType = viewModel.type,
         vmName = viewModel.name,
         onSetupPlayers = {
-            viewModel.createGame()
-            onSetupPlayers(viewModel.type.value!!)
+            viewModel.createGame(it)
+            onSetupPlayers(it)
         },
         modifier = modifier
     )
@@ -48,7 +48,7 @@ fun NewGameStartScreen(
 fun NewGameStartScreenContent(
     vmType: MutableState<GameType?>,
     vmName: MutableState<String>,
-    onSetupPlayers: () -> Unit,
+    onSetupPlayers: (GameType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val (type, onTypeChanged) = vmType
@@ -93,7 +93,9 @@ fun NewGameStartScreenContent(
             }
         }
         Button(
-            onClick = onSetupPlayers,
+            onClick = {
+                type?.let(onSetupPlayers)
+            },
             modifier = Modifier.align(Alignment.CenterHorizontally),
             enabled = name.isNotBlank() && type != null
         ) {

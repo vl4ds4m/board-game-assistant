@@ -103,8 +103,9 @@ fun NavGraphBuilder.gameNavigation(
         }
         NewGamePlayersScreen(
             viewModel = setupViewModel,
+            gameViewModel = gameViewModel,
             onStartGame = {
-                setupViewModel.startGame(gameViewModel)
+                setupViewModel.startGame()
                 navController.navigateUp()
             }
         )

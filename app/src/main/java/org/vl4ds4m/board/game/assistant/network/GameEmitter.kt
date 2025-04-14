@@ -5,6 +5,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.launchIn
@@ -18,6 +20,7 @@ import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.title
+import org.vl4ds4m.board.game.assistant.updateList
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.net.ServerSocket
@@ -28,14 +31,16 @@ class GameEmitter(
     private val scope: CoroutineScope,
     private val sessionEmitter: SessionEmitter
 ) {
+    private val mRemotePlayers = MutableStateFlow<List<NetworkPlayer>>(listOf())
+    val remotePlayers: StateFlow<List<NetworkPlayer>> = mRemotePlayers.asStateFlow()
+
     private var serverSocket: ServerSocket? = null
     private val playerSockets = MutableStateFlow<List<Socket>?>(null)
-
-    private val networkPlayer = MutableStateFlow<NetworkPlayer?>(null)
 
     private val emitterState = MutableStateFlow(NetworkGameState.REGISTRATION)
 
     private val sessionState = MutableStateFlow<GameSession?>(null)
+    private val players: StateFlow<Players> = gameEnv.players
 
     private val produceGameState: () -> GameSession = gameEnv::save
 
@@ -44,19 +49,12 @@ class GameEmitter(
     init {
         gameEnv.initialized.combine(gameEnv.completed) {
             init, comp -> init to comp
-        }.combine(gameEnv.players) {
-            lifecycle, players -> lifecycle to players
-        }.combine(networkPlayer) {
-            env, player -> env to player
-        }.onEach { (env, networkPlayer) ->
-            val (lifecycle, players) = env
-            val (initialized, completed) = lifecycle
-            val state = getState(
-                initialized = initialized,
-                completed = completed,
-                players = players,
-                networkPlayer = networkPlayer
-            )
+        }.onEach { (initialized, completed) ->
+            val state = when {
+                !initialized -> NetworkGameState.REGISTRATION
+                completed -> NetworkGameState.END_GAME
+                else -> NetworkGameState.IN_GAME
+            }
             emitterState.value = state
             lastUpdate.value = state == NetworkGameState.END_GAME
         }.launchIn(scope)
@@ -123,24 +121,65 @@ class GameEmitter(
         input: ObjectInputStream,
         output: ObjectOutputStream
     ): Unit = withContext(Dispatchers.IO) {
-        networkPlayer.value = input.readObject()
+        val networkPlayer = input.readObject()
             .let { it as String }
             .let { Json.decodeFromString<NetworkPlayer>(it) }
-        while (true) {
-            val state = emitterState.value
-            if (state == NetworkGameState.END_GAME && lastUpdate.value) {
-                emitState(NetworkGameState.IN_GAME, output, input)
-                produceGameState().also {
-                    it.emitGameSession(output, input)
-                    sessionState.value = it
+            .also {
+                mRemotePlayers.updateList { add(it) }
+            }
+        try {
+            while (true) {
+                val state = emitterState.value
+                if (state == NetworkGameState.END_GAME && lastUpdate.value) {
+                    sessionState.value = produceGameState().also {
+                        emitInGameState(it, networkPlayer, output, input)
+                    }
+                    lastUpdate.value = false
                 }
-                lastUpdate.value = false
+                if (state == NetworkGameState.IN_GAME) {
+                    sessionState.value?.let {
+                        emitInGameState(it, networkPlayer, output, input)
+                    }
+                } else {
+                    emitState(
+                        state, output, input,
+                        players.value.isBound(networkPlayer),
+                    )
+                }
+                delay(2000)
             }
-            emitState(state, output, input)
-            if (state == NetworkGameState.IN_GAME) {
-                sessionState.value?.emitGameSession(output, input)
+        } finally {
+            mRemotePlayers.updateList {
+                removeIf { it.netDevId == networkPlayer.netDevId }
             }
-            delay(2000)
+        }
+    }
+
+    private fun emitState(
+        state: NetworkGameState,
+        output: ObjectOutputStream,
+        input: ObjectInputStream,
+        bound: Boolean
+    ) {
+        val actualState =
+            if (bound) state
+            else NetworkGameState.REGISTRATION
+        output.writeObject(actualState.title)
+        input.readObject()
+    }
+
+    private fun emitInGameState(
+        session: GameSession,
+        networkPlayer: NetworkPlayer,
+        output: ObjectOutputStream,
+        input: ObjectInputStream
+    ) {
+        val bound = session.players.isBound(networkPlayer)
+        emitState(NetworkGameState.IN_GAME, output, input, bound)
+        if (bound) {
+            Json.encodeToString(session)
+                .let { output.writeObject(it) }
+                .also { input.readObject() }
         }
     }
 
@@ -166,37 +205,10 @@ class GameEmitter(
     }
 }
 
+private fun Players.isBound(
+    networkPlayer: NetworkPlayer
+): Boolean = values.any {
+    it.netDevId == networkPlayer.netDevId
+}
+
 private const val TAG = "GameEmitter"
-
-private fun getState(
-    initialized: Boolean,
-    completed: Boolean,
-    players: Players,
-    networkPlayer: NetworkPlayer?
-): NetworkGameState = when {
-    !initialized -> NetworkGameState.REGISTRATION
-    completed -> NetworkGameState.END_GAME
-    else -> {
-        val bound = networkPlayer != null &&
-            players.values.any {
-                it.netDevId == networkPlayer.netDevId
-            }
-        if (bound) NetworkGameState.IN_GAME
-        else NetworkGameState.REGISTRATION
-    }
-}
-
-private fun emitState(
-    state: NetworkGameState,
-    output: ObjectOutputStream,
-    input: ObjectInputStream
-) {
-    output.writeObject(state.title)
-    input.readObject()
-}
-
-private fun GameSession.emitGameSession(output: ObjectOutputStream, input: ObjectInputStream) {
-    Json.encodeToString(this)
-        .let { output.writeObject(it) }
-        .also { input.readObject() }
-}

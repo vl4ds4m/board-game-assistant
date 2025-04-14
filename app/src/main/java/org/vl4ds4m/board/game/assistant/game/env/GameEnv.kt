@@ -68,7 +68,9 @@ open class GameEnv(override val type: GameType) : Game {
         mCurrentPlayerId.updateAndGetStates {
             it?.run { return id } ?: id
         }.let {
-            addActionForCurrentIdUpdate(it)
+            if (initialized.value) {
+                addActionForCurrentIdUpdate(it)
+            }
         }
         return id
     }
@@ -183,7 +185,8 @@ open class GameEnv(override val type: GameType) : Game {
 
     private val timer: Timer = Timer()
 
-    override fun initialize() {
+    final override fun initialize() {
+        Log.i(TAG, "Initialize game")
         mInitialized.value = true
     }
 

@@ -9,7 +9,6 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.data.repository.GameRepository
 import org.vl4ds4m.board.game.assistant.game.GameType
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 
 class GameSetupViewModel private constructor(
     private val gameRepository: GameRepository
@@ -17,17 +16,15 @@ class GameSetupViewModel private constructor(
     val type = mutableStateOf<GameType?>(null)
     val name = mutableStateOf("")
 
-    fun createGame() {
-        type.value?.createGame()
-            ?.also { it.name.value = name.value }
-            ?.let { gameRepository.put(it) }
+    fun createGame(type: GameType) {
+        type.createGame()
+            .also { it.name.value = name.value }
+            .let { gameRepository.put(it) }
     }
 
     private val mPlayers = mutableStateListOf<NewPlayer>()
 
     val players: List<NewPlayer> = mPlayers
-
-    val remotePlayers: List<NewPlayer> = listOf() // TODO Implement
 
     fun addPlayer(name: String, netDevId: String?) {
         mPlayers.add(
@@ -57,9 +54,12 @@ class GameSetupViewModel private constructor(
         mPlayers.add(index + 1, player)
     }
 
-    fun startGame(gameViewModel: GameViewModel) {
-        players.forEach { gameViewModel.addPlayer(it.netDevId, it.name) }
-        gameViewModel.initialize()
+    fun startGame() {
+        val game = gameRepository.extract()
+        players.forEach {
+            game.addPlayer(it.netDevId, it.name)
+        }
+        game.initialize()
     }
 
     companion object {

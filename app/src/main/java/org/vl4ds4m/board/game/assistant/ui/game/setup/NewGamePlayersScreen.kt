@@ -18,23 +18,39 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.map
 import org.vl4ds4m.board.game.assistant.ui.component.NewPlayerCard
 import org.vl4ds4m.board.game.assistant.ui.component.NewRemotePlayerCard
+import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun NewGamePlayersScreen(
     viewModel: GameSetupViewModel,
+    gameViewModel: GameViewModel,
     onStartGame: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val remotePlayers = gameViewModel.remotePlayers.map { list ->
+        list.map {
+            NewPlayer(
+                name = it.name,
+                netDevId = it.netDevId
+            )
+        }
+    }.collectAsState(listOf())
     NewGamePlayersScreenContent(
         players = viewModel.players,
-        remotePlayers = viewModel.remotePlayers,
+        remotePlayers = remotePlayers,
         addPlayer = viewModel::addPlayer,
         renamePlayer = viewModel::renamePlayer,
         removePlayer = viewModel::removePlayerAt,
@@ -48,7 +64,7 @@ fun NewGamePlayersScreen(
 @Composable
 fun NewGamePlayersScreenContent(
     players: List<NewPlayer>,
-    remotePlayers: List<NewPlayer>,
+    remotePlayers: State<List<NewPlayer>>,
     addPlayer: (String, String?) -> Unit,
     renamePlayer: (Int, String) -> Unit,
     removePlayer: (Int) -> Unit,
@@ -127,7 +143,14 @@ fun NewGamePlayersScreenContent(
         modifier = Modifier.padding(start = 16.dp),
         style = MaterialTheme.typography.titleMedium
     )
-    if (remotePlayers.isEmpty()) {
+    val newRemotePlayers = remember {
+        derivedStateOf {
+            remotePlayers.value.filterNot { newPlayer ->
+                players.any { it.netDevId == newPlayer.netDevId }
+            }
+        }
+    }
+    if (newRemotePlayers.value.isEmpty()) {
         Text(
             text = "No online players",
             modifier = Modifier
@@ -143,7 +166,7 @@ fun NewGamePlayersScreenContent(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(remotePlayers) { player ->
+            items(newRemotePlayers.value) { player ->
                 NewRemotePlayerCard(
                     name = player.name,
                     add = {
@@ -168,14 +191,15 @@ private fun NewGameWithoutPlayersScreenPreview() {
 }
 
 private val previewPlayers get() = listOf(
-    NewPlayer("Abc", null),
-    NewPlayer("Sdg44", "sdf5"),
-    NewPlayer("Def", null),
+    NewPlayer("Player A", null),
+    NewPlayer("Player B", "456"),
+    NewPlayer("Player C", null),
 )
 
 private val previewRemotePlayers get() = listOf(
-    NewPlayer("Abc", "123"),
-    NewPlayer("Def", "456"),
+    NewPlayer("Remote Player A", "123"),
+    NewPlayer("Remote Player B", "456"),
+    NewPlayer("Remote Player C", "789"),
 )
 
 @Composable
@@ -186,7 +210,7 @@ private fun NewGamePlayersScreenPreview(
     BoardGameAssistantTheme {
         NewGamePlayersScreenContent(
             players = players,
-            remotePlayers = remotePlayers,
+            remotePlayers = remember { mutableStateOf(remotePlayers) },
             addPlayer = { _, _ -> },
             renamePlayer = { _, _ -> },
             removePlayer = {},

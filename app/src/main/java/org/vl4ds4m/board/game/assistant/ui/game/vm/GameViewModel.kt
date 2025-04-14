@@ -7,12 +7,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
 import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.network.GameEmitter
+import org.vl4ds4m.board.game.assistant.network.NetworkPlayer
 import org.vl4ds4m.board.game.assistant.network.SessionEmitter
 import java.util.UUID
 
@@ -29,6 +31,8 @@ abstract class GameViewModel(
         GameEmitter(gameEnv, viewModelScope, it)
     }
 
+    val remotePlayers: StateFlow<List<NetworkPlayer>> = gameEmitter.remotePlayers
+
     private val sessionId: String
 
     init {
@@ -36,7 +40,7 @@ abstract class GameViewModel(
         this.sessionId = if (sessionId == null) {
             UUID.randomUUID().toString()
         } else {
-            initialize()
+            gameEnv.initialize()
             sessionId
         }
         viewModelScope.launch {
@@ -47,11 +51,6 @@ abstract class GameViewModel(
             }
             gameEmitter.startEmit(this@GameViewModel.sessionId, gameEnv.name.value)
         }
-    }
-
-    final override fun initialize() {
-        Log.d(TAG, "Initiate game process")
-        gameEnv.initialize()
     }
 
     override fun onCleared() {

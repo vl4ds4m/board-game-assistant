@@ -23,24 +23,42 @@ class GameSetupViewModel private constructor(
             ?.let { gameRepository.put(it) }
     }
 
-    private val mPlayers = mutableStateListOf<String>()
+    private val mPlayers = mutableStateListOf<NewPlayer>()
 
-    val players: List<String> = mPlayers
+    val players: List<NewPlayer> = mPlayers
 
-    fun addPlayer(name: String) {
-        mPlayers.add(name)
+    val remotePlayers: List<NewPlayer> = listOf() // TODO Implement
+
+    fun addPlayer(name: String, netDevId: String?) {
+        mPlayers.add(
+            NewPlayer(name = name, netDevId = netDevId)
+        )
     }
 
     fun renamePlayer(index: Int, newName: String) {
-        mPlayers[index] = newName
+        if (index !in players.indices) return
+        mPlayers[index] = mPlayers[index].copy(name = newName)
     }
 
     fun removePlayerAt(index: Int) {
+        if (index !in players.indices) return
         mPlayers.removeAt(index)
     }
 
+    fun movePlayerUp(index: Int) {
+        if (index !in players.indices || index == 0) return
+        val player = mPlayers.removeAt(index)
+        mPlayers.add(index - 1, player)
+    }
+
+    fun movePlayerDown(index: Int) {
+        if (index !in players.indices || index == players.lastIndex) return
+        val player = mPlayers.removeAt(index)
+        mPlayers.add(index + 1, player)
+    }
+
     fun startGame(gameViewModel: GameViewModel) {
-        players.forEach { gameViewModel.addPlayer(null, it) }
+        players.forEach { gameViewModel.addPlayer(it.netDevId, it.name) }
         gameViewModel.initialize()
     }
 

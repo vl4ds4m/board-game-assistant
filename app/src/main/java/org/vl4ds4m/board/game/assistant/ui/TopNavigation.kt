@@ -10,8 +10,8 @@ import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.bar.TopBarParams
 import org.vl4ds4m.board.game.assistant.ui.game.Game
 import org.vl4ds4m.board.game.assistant.ui.game.NewGameStart
-import org.vl4ds4m.board.game.assistant.ui.home.PlayScreen
-import org.vl4ds4m.board.game.assistant.ui.home.HomeViewModel
+import org.vl4ds4m.board.game.assistant.ui.play.PlayScreen
+import org.vl4ds4m.board.game.assistant.ui.play.PlayViewModel
 import org.vl4ds4m.board.game.assistant.ui.profile.ProfileScreen
 import org.vl4ds4m.board.game.assistant.ui.profile.ProfileViewModel
 import org.vl4ds4m.board.game.assistant.ui.results.resultsNavigation
@@ -33,7 +33,7 @@ fun NavGraphBuilder.topNavigation(
 ) {
     composable<Play> {
         PlayScreen(
-            viewModel = viewModel(factory = HomeViewModel.Factory),
+            viewModel = viewModel(factory = PlayViewModel.Factory),
             startNewGame = { navController.navigate(NewGameStart) },
             proceedGame = { id, type ->
                 Game(type = type.title, sessionId = id).let {

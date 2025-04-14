@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.ui.home
+package org.vl4ds4m.board.game.assistant.ui.play
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,7 +32,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun PlayScreen(
-    viewModel: HomeViewModel,
+    viewModel: PlayViewModel,
     startNewGame: () -> Unit,
     proceedGame: (String, GameType) -> Unit,
     observeGame: (String, String, String, Int) -> Unit,

@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.ui.home
+package org.vl4ds4m.board.game.assistant.ui.play
 
 import android.net.nsd.NsdManager
 import androidx.lifecycle.ViewModelProvider
@@ -14,7 +14,7 @@ import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 import org.vl4ds4m.board.game.assistant.network.SessionObserver
 import org.vl4ds4m.board.game.assistant.ui.SessionViewModel
 
-class HomeViewModel private constructor(
+class PlayViewModel private constructor(
     app: BoardGameAssistantApp
 ) : SessionViewModel(app) {
     override fun isMatched(session: GameSessionInfo) = !session.completed
@@ -40,6 +40,6 @@ class HomeViewModel private constructor(
     }
 
     companion object {
-        val Factory: ViewModelProvider.Factory = createFactory { HomeViewModel(it) }
+        val Factory: ViewModelProvider.Factory = createFactory { PlayViewModel(it) }
     }
 }

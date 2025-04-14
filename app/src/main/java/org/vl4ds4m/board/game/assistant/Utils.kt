@@ -4,6 +4,9 @@ import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.io.Closeable
 import java.io.IOException
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 val Enum<*>.title: String get() = this.name
     .replaceFirstChar { it.uppercaseChar() }
@@ -42,3 +45,6 @@ fun Closeable.closeAndLog(tag: String, title: String) {
         Log.w(tag, "Can't close $title: $e")
     }
 }
+
+val Long.localTime: LocalDateTime get() = Instant.ofEpochMilli(this)
+    .let { LocalDateTime.ofInstant(it, ZoneId.systemDefault()) }

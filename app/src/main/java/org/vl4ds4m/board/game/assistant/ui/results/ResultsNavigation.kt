@@ -27,12 +27,17 @@ fun NavGraphBuilder.resultsNavigation(
         )
     }
     composable<CompletedGame> { entry ->
+        topBarUiState.value = TopBarParams(
+            title = "Game results",
+            navigateBack = { navController.navigateUp() },
+            actions = listOf()
+        )
         val sessionId = entry.toRoute<CompletedGame>().sessionId
         val resultsEntry = navController.rememberTopmost<Results>(entry)
         CompletedGameScreen(
+            topBarUiState = topBarUiState,
             viewModel = viewModel(resultsEntry),
-            sessionId = sessionId,
-            navigateUp = { navController.navigateUp() }
+            sessionId = sessionId
         )
     }
 }

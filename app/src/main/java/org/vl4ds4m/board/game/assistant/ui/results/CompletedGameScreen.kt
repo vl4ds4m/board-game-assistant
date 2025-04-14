@@ -1,107 +1,170 @@
 package org.vl4ds4m.board.game.assistant.ui.results
 
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.game.Free
+import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.Player
+import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.Score
-import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
+import org.vl4ds4m.board.game.assistant.localTime
+import org.vl4ds4m.board.game.assistant.ui.component.TopBarParams
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 @Composable
 fun CompletedGameScreen(
+    topBarUiState: MutableState<TopBarParams>,
     viewModel: ResultsViewModel,
     sessionId: String,
-    navigateUp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val session = produceState<GameSession?>(null, viewModel, sessionId) {
+    produceState<GameSession?>(null) {
         value = viewModel.getSession(sessionId).also {
-            it ?: Log.e(
+            it?.also {
+                topBarUiState.value = topBarUiState.value.copy(
+                    title = "'$it' results"
+                )
+            } ?: Log.e(
                 "GameResults",
                 "Can't load completed session[id = $sessionId]"
             )
         }
+    }.value?.also {
+        CompletedGameScreenContent(
+            type = it.type,
+            players = it.players,
+            startTime = it.startTime,
+            stopTime = it.stopTime,
+            modifier = modifier
+        )
+    } ?: run {
+        Text(
+            text = "Wait for loading ...",
+            modifier = modifier
+                .fillMaxSize()
+                .wrapContentSize()
+        )
     }
-    val name = remember {
-        derivedStateOf { session.value?.name ?: "..." }
-    }
-    val players = remember {
-        derivedStateOf { session.value?.players ?: mapOf() }
-    }
-    CompletedGameScreenContent(
-        name = name,
-        players = players,
-        navigateUp = navigateUp,
-        modifier = modifier
-    )
 }
 
 @Composable
 fun CompletedGameScreenContent(
-    name: State<String>,
-    players: State<Map<Long, Player>>,
-    navigateUp: () -> Unit,
+    type: GameType,
+    players: Players,
+    startTime: Long?,
+    stopTime: Long?,
     modifier: Modifier = Modifier
 ) {
-    GameScreen(
-        topBarTitle = name.value,
-        onBackClick = navigateUp,
-        modifier = modifier
-    ) { innerModifier ->
+    Column(
+        modifier = modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Param(
+            name  = "Type",
+            value = type.title
+        )
+        Param(
+            name = "Player count",
+            value = players.size.toString()
+        )
+        Param(
+            name = "Start time",
+            value = startTime?.localTime?.formatted ?: "no data"
+        )
+        Param(
+            name = "Stop time",
+            value = stopTime?.localTime?.formatted ?: "no data"
+        )
+        HorizontalDivider()
+        Text(
+            text = "Players rating",
+            modifier = Modifier.padding(start = 16.dp),
+            style = MaterialTheme.typography.titleMedium
+        )
         PlayersRating(
-            players = players,
+            players = rememberUpdatedState(players),
             currentPlayerId = remember { mutableStateOf(null) },
             onSelectPlayer = null,
-            modifier = innerModifier.padding(16.dp)
+            modifier = modifier
+                .padding(horizontal = 16.dp)
+                .weight(1f)
         )
     }
 }
+
+@Composable
+private fun Param(name: String, value: String) {
+    Row(
+        modifier = Modifier.padding(horizontal = 16.dp)
+    ) {
+        Text(
+            text = "$name: ",
+            fontWeight = FontWeight.Normal,
+            style = MaterialTheme.typography.titleMedium
+        )
+        Text(
+            text = value,
+            fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.titleMedium
+        )
+    }
+}
+
+private val LocalDateTime.formatted: String get() =
+    DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+        .format(this)
 
 @Preview
 @Composable
 private fun CompletedGameScreenPreview() {
     BoardGameAssistantTheme {
         CompletedGameScreenContent(
-            name = remember {
-                mutableStateOf("Some game")
-            },
-            players = remember {
-                mutableStateOf(
-                    mapOf(
-                        1L to Player(
-                            netDevId = null,
-                            name = "Abv",
-                            active = true,
-                            state = Score(45)
-                        ),
-                        2L to Player(
-                            netDevId = null,
-                            name = "Efo",
-                            active = false,
-                            state = Score(123)
-                        ),
-                        3L to Player(
-                            netDevId = null,
-                            name = "Urt",
-                            active = true,
-                            state = Score(59)
-                        )
-                    )
+            type = Free,
+            players = mapOf(
+                1L to Player(
+                    netDevId = null,
+                    name = "Abv",
+                    active = true,
+                    state = Score(45)
+                ),
+                2L to Player(
+                    netDevId = null,
+                    name = "Efo",
+                    active = false,
+                    state = Score(123)
+                ),
+                3L to Player(
+                    netDevId = null,
+                    name = "Urt",
+                    active = true,
+                    state = Score(59)
                 )
-            },
-            navigateUp = {},
+            ),
+            startTime = System.currentTimeMillis() - 11_000,
+            stopTime = System.currentTimeMillis(),
             modifier = Modifier.fillMaxSize()
         )
     }

@@ -20,7 +20,7 @@ fun GameSessionCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.height(30.dp)
+        modifier = modifier.height(50.dp)
     ) {
         Text(
             text = text,

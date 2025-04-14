@@ -201,7 +201,7 @@ fun PlayerInGameCard(
 ) {
     Card(
         modifier = modifier
-            .height(80.dp)
+            .height(60.dp)
             .fillMaxWidth()
             .clickable(
                 enabled = onSelect != null,

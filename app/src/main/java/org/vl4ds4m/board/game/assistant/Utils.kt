@@ -48,3 +48,13 @@ fun Closeable.closeAndLog(tag: String, title: String) {
 
 val Long.localTime: LocalDateTime get() = Instant.ofEpochMilli(this)
     .let { LocalDateTime.ofInstant(it, ZoneId.systemDefault()) }
+
+fun prettyTime(seconds: Int): String {
+    val minutes = seconds / 60
+    val sec = seconds % 60
+    return String.format(
+        java.util.Locale.getDefault(),
+        "%02d:%02d",
+        minutes, sec
+    )
+}

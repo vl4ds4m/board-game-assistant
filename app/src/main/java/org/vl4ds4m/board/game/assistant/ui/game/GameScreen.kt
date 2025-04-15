@@ -73,7 +73,11 @@ fun GameScreen(
                 repeat = viewModel::repeat
             )
         )
-        GameMenu(navActions)
+        GameMenu(
+            navActions.copy(
+                completeGame = viewModel::complete
+            )
+        )
     }
     LifecycleStartEffect(viewModel) {
         viewModel.start()

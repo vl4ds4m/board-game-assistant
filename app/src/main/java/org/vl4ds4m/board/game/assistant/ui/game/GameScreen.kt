@@ -3,9 +3,12 @@ package org.vl4ds4m.board.game.assistant.ui.game
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -39,7 +42,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistoryState
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenu
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
-import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreCounter
+import org.vl4ds4m.board.game.assistant.ui.game.component.StandardCounter
 import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameScreen
@@ -129,6 +132,7 @@ fun GameScreenContent(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        HorizontalDivider()
         val activePlayers = remember {
             derivedStateOf {
                 players.value.filterValues { it.active }
@@ -138,21 +142,29 @@ fun GameScreenContent(
             players = activePlayers,
             currentPlayerId = currentPlayerId,
             onSelectPlayer = selectPlayer,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(3f)
+                .padding(horizontal = 16.dp)
         )
+        HorizontalDivider()
         GameHistory(
             players = players,
             actions = actions,
             modifier = Modifier
-                .weight(0.5f)
+                .weight(1f)
+                .padding(horizontal = 16.dp)
                 .fillMaxWidth()
         )
+        HorizontalDivider()
         Box(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
             masterActions()
         }
+        Spacer(Modifier.size(24.dp))
     }
 }
 
@@ -165,7 +177,13 @@ private fun GameScreenPreview() {
             currentPlayerId = remember { mutableStateOf(1) },
             actions = remember { mutableStateOf(fakeActions) },
             selectPlayer = null,
-            masterActions = { ScoreCounter({}) },
+            masterActions = {
+                StandardCounter(
+                    addPoints = {},
+                    applyEnabled = null,
+                    selectNextPlayer = {}
+                )
+            },
             modifier = Modifier.fillMaxSize()
         )
     }

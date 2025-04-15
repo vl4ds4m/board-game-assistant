@@ -9,6 +9,5 @@ class SimpleOrderedGame : OrderedGameEnv(SimpleOrdered) {
     fun addPoints(points: Int) {
         val id = currentPlayerId.value ?: return
         scoreAdder.addPoints(id, points)
-        changeCurrentPlayerId()
     }
 }

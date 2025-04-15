@@ -1,5 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui.game.dice
 
+import kotlinx.coroutines.flow.StateFlow
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.game.DiceGame
 import org.vl4ds4m.board.game.assistant.game.Game
@@ -11,6 +12,8 @@ class DiceGameViewModel private constructor(
     sessionId: String? = null,
     app: BoardGameAssistantApp
 ) : OrderedGameViewModel(gameEnv, sessionId, app) {
+    val addEnabled: StateFlow<Boolean> = gameEnv.addEnabled
+
     fun addPoints(points: Int) {
         gameEnv.addPoints(points)
     }

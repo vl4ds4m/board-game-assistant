@@ -3,7 +3,6 @@ package org.vl4ds4m.board.game.assistant.ui.game
 import androidx.activity.addCallback
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -14,7 +13,7 @@ import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.ui.Play
 import org.vl4ds4m.board.game.assistant.ui.MainActivity
-import org.vl4ds4m.board.game.assistant.ui.component.TopBarParams
+import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
 import org.vl4ds4m.board.game.assistant.ui.game.component.DiceImitationScreen
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.end.EndGameScreen
@@ -51,7 +50,7 @@ data object End : GameRoute
 
 fun NavGraphBuilder.gameNavigation(
     navController: NavController,
-    topBarUiState: MutableState<TopBarParams>
+    topBarUiState: TopBarUiState
 ) {
     val navigateUp: () -> Unit = { navController.navigateUp() }
     val navigateHome: () -> Unit = {
@@ -61,10 +60,9 @@ fun NavGraphBuilder.gameNavigation(
         }
     }
     composable<NewGameStart> {
-        topBarUiState.value = TopBarParams(
+        topBarUiState.update(
             title = "New game: creation",
-            navigateBack = navigateUp,
-            actions = listOf()
+            navigateBack = navigateUp
         )
         NewGameStartScreen(
             viewModel = viewModel(factory = GameSetupViewModel.Factory),
@@ -93,10 +91,9 @@ fun NavGraphBuilder.gameNavigation(
                 launchSingleTop = true
             }
         }
-        topBarUiState.value = TopBarParams(
+        topBarUiState.update(
             title = "New game: players",
-            navigateBack = onBackClick,
-            actions = listOf()
+            navigateBack = onBackClick
         )
         LocalActivity.current.let {
             it as MainActivity
@@ -135,38 +132,42 @@ fun NavGraphBuilder.gameNavigation(
         )
     }
     composable<GameSetting> { entry ->
+        topBarUiState.update(
+            title = "Game settings",
+            navigateBack = navigateUp
+        )
         val gameEntry = navController.rememberTopmost<Game>(entry)
         CompositionLocalProvider(LocalViewModelStoreOwner provides gameEntry) {
-            GameSettingScreen(
-                topBarUiState = topBarUiState,
-                onBackClick = navigateUp
-            )
+            GameSettingScreen()
         }
     }
     composable<PlayerSetting> { entry ->
+        topBarUiState.update(
+            title = "Player Settings",
+            navigateBack = navigateUp
+        )
         val gameEntry = navController.rememberTopmost<Game>(entry)
         CompositionLocalProvider(LocalViewModelStoreOwner provides gameEntry) {
-            PlayerSettingScreen(
-                topBarUiState = topBarUiState,
-                onBackClick = navigateUp
-            )
+            PlayerSettingScreen()
         }
     }
     composable<DiceImitation> {
-        topBarUiState.value = TopBarParams(
+        topBarUiState.update(
             title = "Dice Imitation",
-            navigateBack = navigateUp,
-            actions = listOf()
+            navigateBack = navigateUp
         )
         DiceImitationScreen()
     }
     composable<End> { entry ->
         val gameEntry = navController.rememberTopmost<Game>(entry)
-        EndGameScreen(
-            viewModel = viewModel(gameEntry),
-            topBarUiState = topBarUiState,
-            onBackClick = navigateUp,
-            onHomeNavigate = navigateHome
+        val viewModel = viewModel<GameViewModel>(gameEntry)
+        topBarUiState.update(
+            title = "Game end",
+            navigateBack = {
+                viewModel.returnGame()
+                navigateUp()
+            }
         )
+        EndGameScreen(navigateHome)
     }
 }

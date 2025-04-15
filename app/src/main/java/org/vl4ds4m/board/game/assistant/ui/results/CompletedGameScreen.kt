@@ -11,7 +11,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -27,7 +26,7 @@ import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.localTime
-import org.vl4ds4m.board.game.assistant.ui.component.TopBarParams
+import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 import java.time.LocalDateTime
@@ -36,16 +35,22 @@ import java.time.format.FormatStyle
 
 @Composable
 fun CompletedGameScreen(
-    topBarUiState: MutableState<TopBarParams>,
+    topBarUiState: TopBarUiState,
     viewModel: ResultsViewModel,
     sessionId: String,
+    navigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     produceState<GameSession?>(null) {
+        topBarUiState.update(
+            title = "Game results",
+            navigateBack = navigateBack
+        )
         value = viewModel.getSession(sessionId).also {
             it?.also {
-                topBarUiState.value = topBarUiState.value.copy(
-                    title = "'$it' results"
+                topBarUiState.update(
+                    title = "'${it.name}' results",
+                    navigateBack = navigateBack
                 )
             } ?: Log.e(
                 "GameResults",

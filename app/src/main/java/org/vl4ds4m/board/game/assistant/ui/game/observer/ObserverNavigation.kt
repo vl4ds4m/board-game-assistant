@@ -1,6 +1,5 @@
 package org.vl4ds4m.board.game.assistant.ui.game.observer
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
@@ -11,11 +10,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import org.vl4ds4m.board.game.assistant.network.NetworkGameState
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
-import org.vl4ds4m.board.game.assistant.ui.component.TopBarParams
+import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
 
 fun NavGraphBuilder.observerNavigation(
     navController: NavController,
-    topBarUiState: MutableState<TopBarParams>
+    topBarUiState: TopBarUiState
 ) {
     composable<RemoteSessionInfo> { entry ->
         val route = entry.toRoute<RemoteSessionInfo>()
@@ -31,7 +30,7 @@ fun NavGraphBuilder.observerNavigation(
                     ?: route.name
             }
         }
-        topBarUiState.value = TopBarParams(
+        topBarUiState.update(
             title = title.value,
             navigateBack = onBackClick
         )
@@ -57,9 +56,7 @@ fun NavGraphBuilder.observerNavigation(
                     actions = actions
                 )
             }
-            NetworkGameState.END_GAME -> {
-                ObserverEndScreen()
-            }
+            NetworkGameState.END_GAME -> ObserverEndScreen()
             NetworkGameState.EXIT -> onBackClick()
         }
     }

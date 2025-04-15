@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -32,14 +31,15 @@ import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.game.log.CurrentPlayerChangeAction
 import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
-import org.vl4ds4m.board.game.assistant.ui.component.TopBarParams
+import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
 import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
+import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistoryManager
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistoryState
+import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenu
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreCounter
-import org.vl4ds4m.board.game.assistant.ui.game.component.gameTopBarParams
 import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameScreen
@@ -51,7 +51,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 fun GameScreen(
     type: GameType,
     sessionId: String?,
-    topBarUiState: MutableState<TopBarParams>,
+    topBarUiState: TopBarUiState,
     navActions: GameNavActions,
     modifier: Modifier = Modifier
 ) {
@@ -61,18 +61,20 @@ fun GameScreen(
             producer = type.viewModelProducer
         )
     )
-    topBarUiState.value = gameTopBarParams(
+    topBarUiState.update(
         title = viewModel.name.collectAsState().value,
-        navActions = navActions.copy(
-            completeGame = viewModel::complete
-        ),
-        history = GameHistoryState(
-            reverted = viewModel.reverted.collectAsState(),
-            repeatable = viewModel.repeatable.collectAsState(),
-            revert = viewModel::revert,
-            repeat = viewModel::repeat
+        navigateBack = navActions.navigateBack
+    ) {
+        GameHistoryManager(
+            GameHistoryState(
+                reverted = viewModel.reverted.collectAsState(),
+                repeatable = viewModel.repeatable.collectAsState(),
+                revert = viewModel::revert,
+                repeat = viewModel::repeat
+            )
         )
-    )
+        GameMenu(navActions)
+    }
     LifecycleStartEffect(viewModel) {
         viewModel.start()
         onStopOrDispose {

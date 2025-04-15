@@ -10,9 +10,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
@@ -20,20 +20,18 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTopBar(
-    uiState: State<TopBarParams>,
+    uiState: TopBarUiState,
     modifier: Modifier = Modifier
 ) {
-    val params = uiState.value
     TopAppBar(
         title = {
             Text(
-                text = params.title
+                text = uiState.title.value
             )
         },
-        modifier = modifier,
         navigationIcon = {
             IconButton(
-                onClick = params.navigateBack
+                onClick = uiState.navigateBack.value
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -41,29 +39,48 @@ fun MainTopBar(
                 )
             }
         },
-        actions = {
-            params.actions.forEach { action ->
-                action()
-            }
-        }
+        actions = uiState.actions.value,
+        modifier = modifier
     )
 }
 
-data class TopBarParams(
-    val title: String,
-    val navigateBack: () -> Unit,
-    val actions: List<BarAction> = listOf()
+typealias BarActions = @Composable (RowScope.() -> Unit)
+
+@Stable
+class TopBarUiState private constructor(
+    title: String,
+    navigateBack: () -> Unit,
+    actions: BarActions
 ) {
+    private val mTitle = mutableStateOf(title)
+    private val mNavigateBack = mutableStateOf(navigateBack)
+    private val mActions = mutableStateOf(actions)
+
+    val title: State<String> = mTitle
+    val navigateBack: State<() -> Unit> = mNavigateBack
+    val actions: State<BarActions> = mActions
+
+    fun update(
+        title: String? = null,
+        navigateBack: (() -> Unit)? = null,
+        actions: BarActions? = null
+    ) {
+        mTitle.value = title ?: ""
+        mNavigateBack.value = navigateBack ?: {}
+        mActions.value = actions ?: {}
+    }
+
     companion object {
-        val Empty = TopBarParams(
+        val Empty get() = TopBarUiState(
             title = "",
-            navigateBack = {}
+            navigateBack = {},
+            actions = {}
         )
 
-        val Example get() = TopBarParams(
+        val Example get() = TopBarUiState(
             title = "Screen title",
             navigateBack = {},
-            actions = listOf {
+            actions = {
                 IconButton(
                     onClick = {}
                 ) {
@@ -77,16 +94,10 @@ data class TopBarParams(
     }
 }
 
-typealias BarAction = @Composable (RowScope.() -> Unit)
-
 @Preview
 @Composable
 private fun MainTopBarPreview() {
     BoardGameAssistantTheme {
-        MainTopBar(
-            uiState = remember {
-                mutableStateOf(TopBarParams.Example)
-            }
-        )
+        MainTopBar(TopBarUiState.Example)
     }
 }

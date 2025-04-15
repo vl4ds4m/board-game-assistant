@@ -13,7 +13,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -28,21 +27,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.Score
-import org.vl4ds4m.board.game.assistant.ui.component.TopBarParams
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
-fun PlayerSettingScreen(
-    topBarUiState: MutableState<TopBarParams>,
-    onBackClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    topBarUiState.value = TopBarParams(
-        title = "Player Settings",
-        navigateBack = onBackClick
-    )
+fun PlayerSettingScreen(modifier: Modifier = Modifier) {
     val viewModel = viewModel<GameViewModel>()
     val onPlayerOrderChange: ((Long, Int) -> Unit)?
     val players = viewModel.players.let { flow ->

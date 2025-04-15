@@ -14,20 +14,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.painterResource
 import org.vl4ds4m.board.game.assistant.R
-import org.vl4ds4m.board.game.assistant.ui.component.TopBarParams
-
-fun gameTopBarParams(
-    title: String,
-    navActions: GameNavActions,
-    history: GameHistoryState
-) = TopBarParams(
-    title = title,
-    navigateBack = navActions.navigateBack,
-    actions = buildList {
-        add { GameHistoryManager(history) }
-        add { GameMenu(navActions) }
-    }
-)
 
 @Composable
 fun GameHistoryManager(state: GameHistoryState) {
@@ -90,17 +76,7 @@ data class GameNavActions(
     val openPlayerSetting: () -> Unit,
     val openDiceImitation: () -> Unit,
     val completeGame: () -> Unit
-) {
-    companion object {
-        val Empty = GameNavActions(
-            navigateBack = {},
-            openGameSetting = {},
-            openPlayerSetting = {},
-            openDiceImitation = {},
-            completeGame = {}
-        )
-    }
-}
+)
 
 @Immutable
 data class GameHistoryState(
@@ -108,13 +84,4 @@ data class GameHistoryState(
     val repeatable: State<Boolean>,
     val revert: () -> Unit,
     val repeat: () -> Unit
-) {
-    companion object {
-        val Empty = GameHistoryState(
-            reverted = mutableStateOf(false),
-            repeatable = mutableStateOf(false),
-            revert = {},
-            repeat = {}
-        )
-    }
-}
+)

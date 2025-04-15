@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -22,21 +23,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.Score
-import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
+import org.vl4ds4m.board.game.assistant.ui.component.TopBarParams
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun PlayerSettingScreen(
-    viewModel: GameViewModel,
+    topBarUiState: MutableState<TopBarParams>,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    topBarUiState.value = TopBarParams(
+        title = "Player Settings",
+        navigateBack = onBackClick
+    )
+    val viewModel = viewModel<GameViewModel>()
     val onPlayerOrderChange: ((Long, Int) -> Unit)?
     val players = viewModel.players.let { flow ->
         if (viewModel is OrderedGameViewModel) {
@@ -54,26 +61,20 @@ fun PlayerSettingScreen(
             flow.map { it.toList() }
         }
     }.collectAsState(listOf())
-    GameScreen(
-        topBarTitle = "Player Settings",
-        onBackClick = onBackClick,
+    PlayerSettingScreenContent(
+        players = players,
+        currentPlayerId = viewModel.currentPlayerId.collectAsState(),
+        onPlayerAdd = { viewModel.addPlayer(null, "New player") },
+        onPlayerOrderChange = onPlayerOrderChange,
+        playerSettingActions = PlayerSettingActions(
+            onSelect = viewModel::changeCurrentPlayerId,
+            onRename = viewModel::renamePlayer,
+            onRemove = viewModel::removePlayer,
+            onFreeze = viewModel::freezePlayer,
+            onUnfreeze = viewModel::unfreezePlayer
+        ),
         modifier = modifier
-    ) { innerModifier ->
-        PlayerSettingScreenContent(
-            players = players,
-            currentPlayerId = viewModel.currentPlayerId.collectAsState(),
-            onPlayerAdd = { viewModel.addPlayer(null, "New player") },
-            onPlayerOrderChange = onPlayerOrderChange,
-            playerSettingActions = PlayerSettingActions(
-                onSelect = viewModel::changeCurrentPlayerId,
-                onRename = viewModel::renamePlayer,
-                onRemove = viewModel::removePlayer,
-                onFreeze = viewModel::freezePlayer,
-                onUnfreeze = viewModel::unfreezePlayer
-            ),
-            modifier = innerModifier
-        )
-    }
+    )
 }
 
 @Composable

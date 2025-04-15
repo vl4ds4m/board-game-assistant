@@ -31,11 +31,12 @@ fun NavGraphBuilder.observerNavigation(
                     ?: route.name
             }
         }
+        topBarUiState.value = TopBarParams(
+            title = title.value,
+            navigateBack = onBackClick
+        )
         when (observer.value) {
-            NetworkGameState.REGISTRATION -> ObserverStartupScreen(
-                title = title.value,
-                onBackClick = onBackClick
-            )
+            NetworkGameState.REGISTRATION -> ObserverStartupScreen()
             NetworkGameState.IN_GAME -> {
                 val players = remember {
                     derivedStateOf { session.value?.players ?: mapOf() }
@@ -51,18 +52,13 @@ fun NavGraphBuilder.observerNavigation(
                     }
                 }
                 ObserverGameScreen(
-                    title = title,
                     players = players,
                     currentPlayerId = currentPlayerId,
-                    actions = actions,
-                    onBackClick = onBackClick
+                    actions = actions
                 )
             }
             NetworkGameState.END_GAME -> {
-                ObserverEndScreen(
-                    title = title.value,
-                    onBackClick = onBackClick
-                )
+                ObserverEndScreen()
             }
             NetworkGameState.EXIT -> onBackClick()
         }

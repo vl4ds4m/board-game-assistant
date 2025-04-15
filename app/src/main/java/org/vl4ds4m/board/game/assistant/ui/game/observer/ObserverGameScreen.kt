@@ -14,48 +14,39 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.Players
-import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun ObserverGameScreen(
-    title: State<String>,
     players: State<Players>,
     currentPlayerId: State<Long?>,
     actions: State<Actions>,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    GameScreen(
-        topBarTitle = title.value,
-        onBackClick = onBackClick,
-        modifier = modifier
-    ) { innerModifier ->
-        Column(
-            modifier = innerModifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            val activePlayers = remember {
-                derivedStateOf {
-                    players.value.filterValues { it.active }
-                }
+    Column(
+        modifier = modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        val activePlayers = remember {
+            derivedStateOf {
+                players.value.filterValues { it.active }
             }
-            PlayersRating(
-                players = activePlayers,
-                currentPlayerId = currentPlayerId,
-                onSelectPlayer = null,
-                modifier = Modifier.weight(1f)
-            )
-            GameHistory(
-                players = players,
-                actions = actions,
-                modifier = Modifier
-                    .weight(0.5f)
-                    .fillMaxWidth()
-            )
         }
+        PlayersRating(
+            players = activePlayers,
+            currentPlayerId = currentPlayerId,
+            onSelectPlayer = null,
+            modifier = Modifier.weight(1f)
+        )
+        GameHistory(
+            players = players,
+            actions = actions,
+            modifier = Modifier
+                .weight(0.5f)
+                .fillMaxWidth()
+        )
     }
 }
 
@@ -64,11 +55,9 @@ fun ObserverGameScreen(
 private fun ObserverGameScreenPreview() {
     BoardGameAssistantTheme {
         ObserverGameScreen(
-            title = remember { mutableStateOf("Some game") },
             players = remember { mutableStateOf(mapOf()) },
             currentPlayerId = remember { mutableStateOf(null) },
-            actions = remember { mutableStateOf(listOf()) },
-            onBackClick = {}
+            actions = remember { mutableStateOf(listOf()) }
         )
     }
 }

@@ -2,7 +2,9 @@ package org.vl4ds4m.board.game.assistant.ui.game
 
 import androidx.activity.addCallback
 import androidx.activity.compose.LocalActivity
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -118,39 +120,51 @@ fun NavGraphBuilder.gameNavigation(
         }
         val (type, sessionId) = entry.toRoute<Game>()
             .run { GameType.valueOf(type) to sessionId }
+        val navActions = GameNavActions(
+            navigateBack = navigateHome,
+            openGameSetting = { navController.navigate(GameSetting) },
+            openPlayerSetting = { navController.navigate(PlayerSetting) },
+            openDiceImitation = { navController.navigate(DiceImitation) },
+            completeGame = { navController.navigate(End) },
+        )
         GameScreen(
             type = type,
             sessionId = sessionId,
-            navActions = GameNavActions(
-                onBackClick = navigateHome,
-                onGameSettingOpen = { navController.navigate(GameSetting) },
-                onPlayerSettingOpen = { navController.navigate(PlayerSetting) },
-                navigateDiceImitation = { navController.navigate(DiceImitation) },
-                onGameComplete = { navController.navigate(End) },
-            )
+            topBarUiState = topBarUiState,
+            navActions = navActions
         )
     }
     composable<GameSetting> { entry ->
         val gameEntry = navController.rememberTopmost<Game>(entry)
-        GameSettingScreen(
-            viewModel = viewModel(gameEntry),
-            onBackClick = navigateUp
-        )
+        CompositionLocalProvider(LocalViewModelStoreOwner provides gameEntry) {
+            GameSettingScreen(
+                topBarUiState = topBarUiState,
+                onBackClick = navigateUp
+            )
+        }
     }
     composable<PlayerSetting> { entry ->
         val gameEntry = navController.rememberTopmost<Game>(entry)
-        PlayerSettingScreen(
-            viewModel = viewModel(gameEntry),
-            onBackClick = navigateUp
-        )
+        CompositionLocalProvider(LocalViewModelStoreOwner provides gameEntry) {
+            PlayerSettingScreen(
+                topBarUiState = topBarUiState,
+                onBackClick = navigateUp
+            )
+        }
     }
     composable<DiceImitation> {
-        DiceImitationScreen(navigateUp)
+        topBarUiState.value = TopBarParams(
+            title = "Dice Imitation",
+            navigateBack = navigateUp,
+            actions = listOf()
+        )
+        DiceImitationScreen()
     }
     composable<End> { entry ->
         val gameEntry = navController.rememberTopmost<Game>(entry)
         EndGameScreen(
             viewModel = viewModel(gameEntry),
+            topBarUiState = topBarUiState,
             onBackClick = navigateUp,
             onHomeNavigate = navigateHome
         )

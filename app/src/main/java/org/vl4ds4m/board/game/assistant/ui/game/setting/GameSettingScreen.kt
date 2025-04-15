@@ -11,6 +11,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -20,38 +21,38 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.map
-import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
+import org.vl4ds4m.board.game.assistant.ui.component.TopBarParams
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun GameSettingScreen(
-    viewModel: GameViewModel,
+    topBarUiState: MutableState<TopBarParams>,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    GameScreen(
-        topBarTitle = "Game settings",
-        onBackClick = onBackClick,
+    topBarUiState.value = TopBarParams(
+        title = "Game settings",
+        navigateBack = onBackClick
+    )
+    val viewModel = viewModel<GameViewModel>()
+    GameSettingScreenContent(
+        name = viewModel.name.collectAsState(""),
+        onNameChange = { viewModel.name.value = it },
+        timeout = viewModel.timeout.collectAsState(),
+        onTimeoutChange = { viewModel.timeout.value = it },
+        secondsToEnd = viewModel.secondsToEnd.map {
+            if (it <= 0) ""
+            else it.toString()
+        }.collectAsState(""),
+        onSecondsToEndChange = { text ->
+            val seconds = text.toIntOrNull() ?: 0
+            viewModel.changeSecondsToEnd(seconds)
+        },
         modifier = modifier
-    ) { innerModifier ->
-        GameSettingScreenContent(
-            name = viewModel.name.collectAsState(""),
-            onNameChange = { viewModel.name.value = it },
-            timeout = viewModel.timeout.collectAsState(),
-            onTimeoutChange = { viewModel.timeout.value = it },
-            secondsToEnd = viewModel.secondsToEnd.map {
-                if (it <= 0) ""
-                else it.toString()
-            }.collectAsState(""),
-            onSecondsToEndChange = { text ->
-                val seconds = text.toIntOrNull() ?: 0
-                viewModel.changeSecondsToEnd(seconds)
-            },
-            modifier = innerModifier
-        )
-    }
+    )
 }
 
 @Composable

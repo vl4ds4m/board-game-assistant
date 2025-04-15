@@ -52,13 +52,12 @@ fun MainTopBar(
 data class TopBarParams(
     val title: String,
     val navigateBack: () -> Unit,
-    val actions: List<BarAction>
+    val actions: List<BarAction> = listOf()
 ) {
     companion object {
         val Empty = TopBarParams(
             title = "",
-            navigateBack = {},
-            actions = listOf()
+            navigateBack = {}
         )
 
         val Example get() = TopBarParams(

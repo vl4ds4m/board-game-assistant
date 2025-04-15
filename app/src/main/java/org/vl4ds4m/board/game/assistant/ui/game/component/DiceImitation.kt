@@ -33,29 +33,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 import kotlin.random.Random
 import kotlin.random.nextInt
 
 @Composable
-fun DiceImitationScreen(
-    navigateUp: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    GameScreen(
-        topBarTitle = "Dice Imitation",
-        onBackClick = navigateUp,
-        modifier = modifier
-    ) { innerModifier ->
-        DiceImitationScreenContent(innerModifier.padding(16.dp))
-    }
-}
-
-@Composable
-fun DiceImitationScreenContent(modifier: Modifier = Modifier) {
+fun DiceImitationScreen(modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .padding(16.dp)
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         val dice = rememberSaveable(
@@ -140,9 +127,6 @@ fun DiceImitationScreenContent(modifier: Modifier = Modifier) {
 @Composable
 private fun DiceImitationScreenPreview() {
     BoardGameAssistantTheme {
-        DiceImitationScreen(
-            navigateUp = {},
-            modifier = Modifier.fillMaxSize()
-        )
+        DiceImitationScreen(Modifier.fillMaxSize())
     }
 }

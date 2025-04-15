@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -19,108 +19,52 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleStartEffect
-import kotlinx.coroutines.flow.StateFlow
+import androidx.lifecycle.viewmodel.compose.viewModel
 import org.vl4ds4m.board.game.assistant.game.Actions
+import org.vl4ds4m.board.game.assistant.game.Carcassonne
+import org.vl4ds4m.board.game.assistant.game.Dice
 import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.GameType
-import org.vl4ds4m.board.game.assistant.game.OrderedGameType
+import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.game.log.CurrentPlayerChangeAction
 import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
+import org.vl4ds4m.board.game.assistant.ui.component.TopBarParams
+import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistoryState
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
-import org.vl4ds4m.board.game.assistant.ui.game.component.GameTopBar
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreCounter
+import org.vl4ds4m.board.game.assistant.ui.game.component.gameTopBarParams
+import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameScreen
+import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameScreen
+import org.vl4ds4m.board.game.assistant.ui.game.ordered.SimpleOrderedGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun GameScreen(
-    topBarTitle: String,
-    onBackClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    navActions: GameNavActions? = null,
-    history: GameHistoryState? = null,
-    content: @Composable (Modifier) -> Unit
-) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            GameTopBar(
-                title = topBarTitle,
-                onArrowBackClick = onBackClick,
-                navActions = navActions,
-                history = history
-            )
-        }
-    ) { innerPadding ->
-        val m = Modifier
-            .padding(innerPadding)
-            .fillMaxSize()
-        content(m)
-    }
-}
-
-@Composable
-fun GameScreen(
     type: GameType,
     sessionId: String?,
+    topBarUiState: MutableState<TopBarParams>,
     navActions: GameNavActions,
     modifier: Modifier = Modifier
 ) {
-    when (type) {
-        is Free -> {
-            FreeGameScreen(
-                sessionId = sessionId,
-                navActions = navActions,
-                modifier = modifier
-            )
-        }
-        is OrderedGameType -> {
-            OrderedGameScreen(
-                type = type,
-                sessionId = sessionId,
-                navActions = navActions,
-                modifier = modifier
-            )
-        }
-    }
-}
-
-@Composable
-fun GameScreen(
-    viewModel: GameViewModel,
-    onNameFormat: (String) -> String,
-    currentPlayerId: StateFlow<Long?>,
-    onSelectPlayer: ((Long) -> Unit)?,
-    masterActions: @Composable () -> Unit,
-    navActions: GameNavActions,
-    modifier: Modifier = Modifier
-) {
-    LifecycleStartEffect(Unit) {
-        viewModel.start()
-        onStopOrDispose {
-            viewModel.stop()
-        }
-    }
-    LaunchedEffect(Unit) {
-        viewModel.completed.collect { completed ->
-            if (completed) navActions.onGameComplete()
-        }
-    }
-    val name = viewModel.name.collectAsState()
-    GameScreen(
-        topBarTitle = onNameFormat(name.value),
-        onBackClick = navActions.onBackClick,
-        modifier = modifier,
+    val viewModel = viewModel<GameViewModel>(
+        factory = GameViewModel.createFactory(
+            sessionId = sessionId,
+            producer = type.viewModelProducer
+        )
+    )
+    topBarUiState.value = gameTopBarParams(
+        title = viewModel.name.collectAsState().value,
         navActions = navActions.copy(
-            onGameComplete = viewModel::complete
+            completeGame = viewModel::complete
         ),
         history = GameHistoryState(
             reverted = viewModel.reverted.collectAsState(),
@@ -128,16 +72,42 @@ fun GameScreen(
             revert = viewModel::revert,
             repeat = viewModel::repeat
         )
-    ) { innerModifier ->
-        GameScreenContent(
-            players = viewModel.players.collectAsState(),
-            currentPlayerId = currentPlayerId.collectAsState(),
-            actions = viewModel.actions.collectAsState(),
-            onSelectPlayer = onSelectPlayer,
-            masterActions = masterActions,
-            modifier = innerModifier
-        )
+    )
+    LifecycleStartEffect(viewModel) {
+        viewModel.start()
+        onStopOrDispose {
+            viewModel.stop()
+        }
     }
+    LaunchedEffect(viewModel, navActions) {
+        viewModel.completed.collect { completed ->
+            if (completed) navActions.completeGame()
+        }
+    }
+    when (type) {
+        is Free          -> FreeGameScreen(modifier)
+        is SimpleOrdered -> SimpleOrderedGameScreen(modifier)
+        is Dice          -> DiceGameScreen(modifier)
+        is Carcassonne   -> CarcassonneGameScreen(modifier)
+        is Monopoly      -> MonopolyGameScreen(modifier)
+    }
+}
+
+@Composable
+fun GameScreen(
+    selectPlayer: ((Long) -> Unit)?,
+    modifier: Modifier = Modifier,
+    masterActions: @Composable () -> Unit
+) {
+    val viewModel = viewModel<GameViewModel>()
+    GameScreenContent(
+        players = viewModel.players.collectAsState(),
+        currentPlayerId = viewModel.currentPlayerId.collectAsState(),
+        actions = viewModel.actions.collectAsState(),
+        selectPlayer = selectPlayer,
+        masterActions = masterActions,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -145,7 +115,7 @@ fun GameScreenContent(
     players: State<Players>,
     currentPlayerId: State<Long?>,
     actions: State<Actions>,
-    onSelectPlayer: ((Long) -> Unit)?,
+    selectPlayer: ((Long) -> Unit)?,
     masterActions: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -161,7 +131,7 @@ fun GameScreenContent(
         PlayersRating(
             players = activePlayers,
             currentPlayerId = currentPlayerId,
-            onSelectPlayer = onSelectPlayer,
+            onSelectPlayer = selectPlayer,
             modifier = Modifier.weight(1f)
         )
         GameHistory(
@@ -184,22 +154,14 @@ fun GameScreenContent(
 @Composable
 private fun GameScreenPreview() {
     BoardGameAssistantTheme {
-        GameScreen(
-            topBarTitle = "Some game",
-            onBackClick = {},
-            modifier = Modifier.fillMaxSize(),
-            navActions = GameNavActions.Empty,
-            history = GameHistoryState.Empty
-        ) {
-            GameScreenContent(
-                players = remember { mutableStateOf(fakePlayers) },
-                currentPlayerId = remember { mutableStateOf(1) },
-                actions = remember { mutableStateOf(fakeActions) },
-                onSelectPlayer = null,
-                masterActions = { ScoreCounter({}) },
-                modifier = it
-            )
-        }
+        GameScreenContent(
+            players = remember { mutableStateOf(fakePlayers) },
+            currentPlayerId = remember { mutableStateOf(1) },
+            actions = remember { mutableStateOf(fakeActions) },
+            selectPlayer = null,
+            masterActions = { ScoreCounter({}) },
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
 

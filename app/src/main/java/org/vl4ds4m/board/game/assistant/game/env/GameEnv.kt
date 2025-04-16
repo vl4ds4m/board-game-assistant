@@ -30,24 +30,24 @@ open class GameEnv(override val type: GameType) : Game {
     protected val mCurrentPlayerId: MutableStateFlow<Long?> = MutableStateFlow(null)
     override val currentPlayerId: StateFlow<Long?> = mCurrentPlayerId.asStateFlow()
 
-    private val actionsHistory = GameActionsHistory()
+    private val history = GameActionsHistory()
 
     override fun changeCurrentPlayerId(id: Long) {
-        players.value[id]?.takeIf { it.active } ?: return
-        mCurrentPlayerId.updateAndGetStates { currentId ->
-            if (currentId == id) return
-            id
-        }.let {
-            addActionForCurrentIdUpdate(it)
-        }
+        players.value[id]
+            ?.takeIf { it.active }
+            ?: return
+        val ids = mCurrentPlayerId.updateAndGetStates { id }
+        addActionForCurrentIdUpdate(ids)
     }
 
-    protected fun addActionForCurrentIdUpdate(states: States<Long?>) {
-        val (old, new) = states
-        actionsHistory += CurrentPlayerChangeAction(
-            oldPlayerId = old,
-            newPlayerId = new
-        )
+    protected fun addActionForCurrentIdUpdate(ids: States<Long?>) {
+        val (old, new) = ids
+        if (old != new) {
+            history += CurrentPlayerChangeAction(
+                oldPlayerId = old,
+                newPlayerId = new
+            )
+        }
     }
 
     override fun addPlayer(netDevId: String?, name: String) {
@@ -65,36 +65,30 @@ open class GameEnv(override val type: GameType) : Game {
             state = state
         )
         mPlayers.updateMap { put(id, player) }
-        mCurrentPlayerId.updateAndGetStates {
-            it?.run { return id } ?: id
-        }.let {
-            if (initialized.value) {
-                addActionForCurrentIdUpdate(it)
-            }
+        val ids = mCurrentPlayerId.updateAndGetStates { it ?: id }
+        if (initialized.value) {
+            addActionForCurrentIdUpdate(ids)
         }
         return id
     }
 
     override fun removePlayer(id: Long) {
         val (players, _) = remove(id) ?: return
-        updateCurrentIdOnEqual(id, players)?.let {
-            addActionForCurrentIdUpdate(it)
-        }
+        val ids = updateCurrentIdOnEqual(id, players) ?: return
+        addActionForCurrentIdUpdate(ids)
     }
 
-    protected fun remove(id: Long): States<Players>? {
-        return mPlayers.updateMap {
-            remove(id) ?: return null
-        }
+    protected fun remove(id: Long): States<Players>? = mPlayers.updateMap {
+        remove(id) ?: return null
     }
 
-    private fun updateCurrentIdOnEqual(playerId: Long, players: Players): States<Long?>? {
-        return mCurrentPlayerId.updateAndGetStates upd@{
-            if (it != playerId) return null
-            players.forEach { (id, player) ->
-                if (player.active && id != playerId) return@upd id
-            }
-            return@upd null
+    private fun updateCurrentIdOnEqual(
+        playerId: Long,
+        players: Players
+    ): States<Long?>? = mCurrentPlayerId.updateAndGetStates { currentId ->
+        if (currentId != playerId) return null
+        players.firstNotNullOfOrNull { (id, player) ->
+            id.takeIf { player.active && id != playerId }
         }
     }
 
@@ -122,9 +116,8 @@ open class GameEnv(override val type: GameType) : Game {
 
     override fun freezePlayer(id: Long) {
         val (players, _) = freeze(id) ?: return
-        updateCurrentIdOnEqual(id, players)?.let {
-            addActionForCurrentIdUpdate(it)
-        }
+        val ids = updateCurrentIdOnEqual(id, players) ?: return
+        addActionForCurrentIdUpdate(ids)
     }
 
     protected fun freeze(playerId: Long): States<Players>? {
@@ -141,42 +134,35 @@ open class GameEnv(override val type: GameType) : Game {
             if (player.active) return
             put(id, player.copy(active = true))
         }
-        mCurrentPlayerId.updateAndGetStates {
-            it?.run { return } ?: id
-        }.let {
-            addActionForCurrentIdUpdate(it)
-        }
+        val ids = mCurrentPlayerId.updateAndGetStates { it ?: id }
+        addActionForCurrentIdUpdate(ids)
     }
 
     override fun changePlayerState(id: Long, state: PlayerState) {
-        mPlayers.updateMap {
+        val (oldPlayers, newPlayers) = mPlayers.updateMap {
             val player = get(id) ?: return
             if (player.state == state) return
             put(id, player.copy(state = state))
-        }.let {
-            val (old, new) = it.run {
-                first[id]!!.state to second[id]!!.state
-            }
-            actionsHistory += PlayerStateChangeAction(
-                playerId = id,
-                oldState = old,
-                newState = new,
-            )
         }
+        history += PlayerStateChangeAction(
+            playerId = id,
+            oldState = oldPlayers[id]!!.state,
+            newState = newPlayers[id]!!.state,
+        )
     }
 
     private var startTime: Long? = null
     private var stopTime: Long? = null
 
-    override val timeout: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    override val timeout = MutableStateFlow(false)
 
-    private val mSecondsToEnd: MutableStateFlow<Int> = MutableStateFlow(0)
+    private val mSecondsToEnd = MutableStateFlow(0)
     override val secondsToEnd: StateFlow<Int> = mSecondsToEnd.asStateFlow()
 
-    private val mInitialized: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val mInitialized = MutableStateFlow(false)
     override val initialized: StateFlow<Boolean> = mInitialized.asStateFlow()
 
-    private val mCompleted: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val mCompleted = MutableStateFlow(false)
     override val completed: StateFlow<Boolean> = mCompleted.asStateFlow()
 
     override fun changeSecondsToEnd(seconds: Int) {
@@ -217,14 +203,14 @@ open class GameEnv(override val type: GameType) : Game {
         mCompleted.value = false
     }
 
-    override val reverted: StateFlow<Boolean> = actionsHistory.reverted
+    override val reverted: StateFlow<Boolean> = history.reverted
 
-    override val repeatable: StateFlow<Boolean> = actionsHistory.repeatable
+    override val repeatable: StateFlow<Boolean> = history.repeatable
 
-    override val actions = actionsHistory.actions
+    override val actions = history.actions
 
     override fun revert() {
-        val action = actionsHistory.revert() ?: return
+        val action = history.revert() ?: return
         when (action) {
             is CurrentPlayerChangeAction -> {
                 mCurrentPlayerId.value = action.oldPlayerId
@@ -246,7 +232,7 @@ open class GameEnv(override val type: GameType) : Game {
     ): PlayerState = provider
 
     override fun repeat() {
-        val action = actionsHistory.repeat() ?: return
+        val action = history.repeat() ?: return
         when (action) {
             is CurrentPlayerChangeAction -> {
                 mCurrentPlayerId.value = action.newPlayerId
@@ -275,7 +261,7 @@ open class GameEnv(override val type: GameType) : Game {
         stopTime = it.stopTime
         timeout.value = it.timeout
         mSecondsToEnd.value = it.secondsUntilEnd
-        actionsHistory.setup(it.actions, it.currentActionPosition)
+        history.setup(it.actions, it.currentActionPosition)
         restoreAdditionalState(it.additional)
     }
 
@@ -294,8 +280,8 @@ open class GameEnv(override val type: GameType) : Game {
         stopTime = stopTime,
         timeout = timeout.value,
         secondsUntilEnd = secondsToEnd.value,
-        actions = actionsHistory.actionsContainer,
-        currentActionPosition = actionsHistory.nextActionIndex,
+        actions = history.actionsContainer,
+        currentActionPosition = history.nextActionIndex,
         additional = additionalState
     )
 

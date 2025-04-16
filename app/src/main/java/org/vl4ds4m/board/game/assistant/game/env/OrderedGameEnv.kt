@@ -52,43 +52,38 @@ open class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
     }
 
     override fun removePlayer(id: Long) {
-        val (players, _) = remove(id) ?: return
         val (ids, _) = mOrderedPlayerIds.updateList {
             val index = indexOf(id)
             if (index == -1) return
             removeAt(index)
         }
-        updateCurrentIdOnEqual(id, players, ids)?.let {
-            addActionForCurrentIdUpdate(it)
-        }
+        val (players, _) = remove(id) ?: return
+        val states = updateCurrentIdOnEqual(id, players, ids) ?: return
+        addActionForCurrentIdUpdate(states)
     }
 
     private fun updateCurrentIdOnEqual(
         playerId: Long,
         players: Players,
         ids: List<Long>
-    ): States<Long?>? {
-        return mCurrentPlayerId.updateAndGetStates { currentId ->
-            if (currentId != playerId) return null
-            getNextActivePlayerId(players, ids, currentId)
-                .takeUnless { it == currentId }
-        }
+    ): States<Long?>? = mCurrentPlayerId.updateAndGetStates { currentId ->
+        if (currentId != playerId) return null
+        getNextActivePlayerId(players, ids, currentId)
+            .takeIf { it != currentId }
     }
 
     override fun freezePlayer(id: Long) {
         val (players, _) = freeze(id) ?: return
-        updateCurrentIdOnEqual(id, players, orderedPlayerIds.value)?.let {
-            addActionForCurrentIdUpdate(it)
-        }
+        val ids = updateCurrentIdOnEqual(id, players, orderedPlayerIds.value) ?: return
+        addActionForCurrentIdUpdate(ids)
     }
 
     private val nextPlayerIdObserver = Initializable { scope ->
-        players.combine(orderedPlayerIds) { players, ids ->
-            players to ids
-        }.combine(currentPlayerId) { (players, ids), currentId ->
-            getNextActivePlayerId(players, ids, currentId).let {
-                mNextPlayerId.value = it
-            }
+        players.combine(orderedPlayerIds) { ps, ids ->
+            ps to ids
+        }.combine(currentPlayerId) { (ps, ids), id ->
+            val nextId = getNextActivePlayerId(ps, ids, id)
+            mNextPlayerId.value = nextId
         }.launchIn(scope)
     }
 

@@ -1,27 +1,10 @@
 package org.vl4ds4m.board.game.assistant.game.carcassonne
 
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.vl4ds4m.board.game.assistant.game.Carcassonne
-import org.vl4ds4m.board.game.assistant.game.data.CarcassonneGameState
-import org.vl4ds4m.board.game.assistant.game.data.GameState
 import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 
 class CarcassonneGame : OrderedGameEnv(Carcassonne) {
-    val finalStage: MutableStateFlow<Boolean> = MutableStateFlow(false)
-
-    override fun restoreAdditionalState(state: GameState?) {
-        super.restoreAdditionalState(state)
-        state.let {
-            it as? CarcassonneGameState
-        }?.let {
-            finalStage.value = it.finalStage
-        }
-    }
-
-    override val additionalState
-        get() = CarcassonneGameState(super.additionalState, finalStage.value)
-
     fun addPoints(property: CarcassonneProperty, count: Int, final: Boolean) {
         if (count <= 0) return
         var points = 0

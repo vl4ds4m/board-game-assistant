@@ -9,22 +9,17 @@ import org.vl4ds4m.board.game.assistant.data.entity.GameActionEntity
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionData
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionEntity
 import org.vl4ds4m.board.game.assistant.data.entity.PlayerEntity
-import org.vl4ds4m.board.game.assistant.game.Carcassonne
-import org.vl4ds4m.board.game.assistant.game.Dice
 import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.OrderedGameType
 import org.vl4ds4m.board.game.assistant.game.Player
-import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
-import org.vl4ds4m.board.game.assistant.game.data.CarcassonneGameState
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 import org.vl4ds4m.board.game.assistant.game.data.GameState
 import org.vl4ds4m.board.game.assistant.game.data.MonopolyPlayerState
 import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
 import org.vl4ds4m.board.game.assistant.game.data.Score
-import org.vl4ds4m.board.game.assistant.game.data.SimpleOrderedGameState
 import org.vl4ds4m.board.game.assistant.game.log.CurrentPlayerChangeAction
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
 import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
@@ -132,20 +127,12 @@ private fun List<GameActionEntity>.fromEntities(gameType: GameType): List<GameAc
     }
 
 private val GameSessionData.gameState: GameState?
-    get() {
-        val orderedGameType = GameType.valueOf(entity.type)
-            .let {
-                when (it) {
-                    is Free -> return null
-                    is OrderedGameType -> it
-                }
-            }
-        val orderedPlayerIds = players.sortedBy { it.order }
+    get() = when (GameType.valueOf(entity.type)) {
+        Free -> null
+        is OrderedGameType -> players
+            .sortedBy { it.order }
             .map { it.id }
-        return when (orderedGameType) {
-            is SimpleOrdered, Dice, Monopoly -> SimpleOrderedGameState(orderedPlayerIds)
-            is Carcassonne -> CarcassonneGameState(orderedPlayerIds, entity.finalStage!!)
-        }
+            .let { OrderedGameState(it) }
     }
 
 private fun GameSession.asEntity(id: String) = GameSessionEntity(
@@ -159,15 +146,12 @@ private fun GameSession.asEntity(id: String) = GameSessionEntity(
     stopTime = stopTime,
     timeout = timeout,
     secondsUntilEnd = secondsUntilEnd,
-    currentActionPosition = currentActionPosition,
-    finalStage = additional?.takeIf { type is Carcassonne }
-        ?.let { it as CarcassonneGameState }
-        ?.finalStage
+    currentActionPosition = currentActionPosition
 )
 
 private fun GameSession.getPlayers(sessionId: String): List<PlayerEntity> =
     when (type) {
-        is Free -> players.toList()
+        Free -> players.toList()
             .sortedBy { (id, _) -> id }
             .mapIndexed { index, (id, player) ->
                 createPlayerEntity(sessionId, id, player, index)

@@ -19,8 +19,8 @@ import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
+import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
 import org.vl4ds4m.board.game.assistant.game.data.Score
-import org.vl4ds4m.board.game.assistant.game.data.SimpleOrderedGameState
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 
 class BoardGameAssistantApp : Application() {
@@ -104,7 +104,7 @@ val defaultGames: List<GameSession> = listOf(
         secondsUntilEnd = 0,
         actions = listOf(),
         currentActionPosition = 0,
-        additional = SimpleOrderedGameState(listOf(1, 2, 3))
+        additional = OrderedGameState(listOf(1, 2, 3))
     ),
     GameSession(
         completed = false,
@@ -178,7 +178,7 @@ val defaultGames: List<GameSession> = listOf(
         secondsUntilEnd = 0,
         actions = listOf(),
         currentActionPosition = 0,
-        additional = SimpleOrderedGameState(listOf(1, 2, 3, 4))
+        additional = OrderedGameState(listOf(1, 2, 3, 4))
     )
 )
 

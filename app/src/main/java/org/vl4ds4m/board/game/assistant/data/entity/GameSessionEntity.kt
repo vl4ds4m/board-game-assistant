@@ -39,9 +39,6 @@ data class GameSessionEntity(
 
     @ColumnInfo(name = CURRENT_ACTION_POSITION)
     val currentActionPosition: Int,
-
-    @ColumnInfo(name = FINAL_STAGE)
-    val finalStage: Boolean? // Carcassonne property
 ) {
     companion object {
         const val TABLE_NAME = "sessions"
@@ -56,6 +53,5 @@ data class GameSessionEntity(
         const val TIMEOUT = "timeout"
         const val SECONDS_UNTIL_END = "seconds_until_end"
         const val CURRENT_ACTION_POSITION = "current_action_position"
-        const val FINAL_STAGE = "final_stage"
     }
 }

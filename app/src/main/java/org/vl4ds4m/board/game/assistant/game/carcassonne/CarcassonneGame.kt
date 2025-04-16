@@ -19,7 +19,6 @@ class CarcassonneGame : OrderedGameEnv(Carcassonne) {
             val score = Score(player.state.score + points)
             val id = currentPlayerId.value ?: return
             changePlayerState(id, score)
-            changeCurrentPlayerId()
         }
     }
 }

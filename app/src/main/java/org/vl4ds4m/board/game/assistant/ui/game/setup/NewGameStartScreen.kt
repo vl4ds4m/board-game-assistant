@@ -56,6 +56,7 @@ fun NewGameStartScreenContent(
     Column(
         modifier = modifier.padding(64.dp),
         verticalArrangement = Arrangement.spacedBy(36.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TextField(
             value = name,
@@ -96,7 +97,6 @@ fun NewGameStartScreenContent(
             onClick = {
                 type?.let(onSetupPlayers)
             },
-            modifier = Modifier.align(Alignment.CenterHorizontally),
             enabled = name.isNotBlank() && type != null
         ) {
             Text("Continue")

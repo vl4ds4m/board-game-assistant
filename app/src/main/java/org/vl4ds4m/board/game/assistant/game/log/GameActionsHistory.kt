@@ -8,47 +8,47 @@ import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 
 class GameActionsHistory {
-    private var mContainer: MutableList<GameAction> = mutableListOf()
-    val container: Actions get() = mContainer
+    private var mActionsContainer = mutableListOf<GameAction>()
+    val actionsContainer: Actions
+        get() = mActionsContainer
 
-    private var history: MutableListIterator<GameAction> = mContainer.listIterator()
-    val currentPosition: Int get() = history.nextIndex()
+    private var history: MutableListIterator<GameAction> = mActionsContainer.listIterator()
 
-    private val mActions: MutableStateFlow<Actions> = MutableStateFlow(listOf())
+    val nextActionIndex: Int
+        get() = history.nextIndex()
+
+    private val mActions = MutableStateFlow<Actions>(listOf())
     val actions: StateFlow<Actions> = mActions.asStateFlow()
 
-    private val mReverted: MutableStateFlow<Boolean> =
-        MutableStateFlow(false)
+    private val mReverted = MutableStateFlow(false)
     val reverted: StateFlow<Boolean> = mReverted.asStateFlow()
 
-    private val mRepeatable: MutableStateFlow<Boolean> =
-        MutableStateFlow(false)
+    private val mRepeatable = MutableStateFlow(false)
     val repeatable: StateFlow<Boolean> = mRepeatable.asStateFlow()
     
-    fun setup(container: Actions, currentPosition: Int? = null) {
-        val index = when (currentPosition) {
-            null -> container.size
-            !in 0..container.size -> {
+    fun setup(actions: Actions, nextActionIndex: Int) {
+        val index = when (nextActionIndex) {
+            in 0 .. actions.size -> nextActionIndex
+            else -> {
                 Log.w(
                     GameEnv.TAG,
                     "Invalid current position of GameActionsHistory" +
-                            " during initialization. The position is set on the end"
+                        " during initialization. The position is set on the end"
                 )
-                container.size
+                actions.size
             }
-            else -> currentPosition
         }
-        mContainer = container.toMutableList()
-        history = mContainer.listIterator(index)
+        mActionsContainer = actions.toMutableList()
+        history = mActionsContainer.listIterator(index)
         updateActions()
-        mReverted.value = history.hasPrevious()
-        mRepeatable.value = history.hasNext()
     }
 
     private fun updateActions() {
-        mActions.value = mContainer.asSequence()
-            .take(currentPosition)
+        mActions.value = mActionsContainer.asSequence()
+            .take(nextActionIndex)
             .toList()
+        mReverted.value = history.hasPrevious()
+        mRepeatable.value = history.hasNext()
     }
 
     operator fun plusAssign(action: GameAction) {
@@ -58,8 +58,6 @@ class GameActionsHistory {
         }
         history.add(action)
         updateActions()
-        mReverted.value = true
-        mRepeatable.value = false
     }
 
     fun revert(): GameAction? {
@@ -72,8 +70,6 @@ class GameActionsHistory {
         }
         val action = history.previous()
         updateActions()
-        mReverted.value = history.hasPrevious()
-        mRepeatable.value = true
         return action
     }
 
@@ -87,8 +83,6 @@ class GameActionsHistory {
         }
         val action = history.next()
         updateActions()
-        mReverted.value = true
-        mRepeatable.value = history.hasNext()
         return action
     }
 }

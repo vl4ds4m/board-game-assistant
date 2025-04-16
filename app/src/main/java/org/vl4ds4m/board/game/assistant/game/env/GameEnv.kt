@@ -294,8 +294,8 @@ open class GameEnv(override val type: GameType) : Game {
         stopTime = stopTime,
         timeout = timeout.value,
         secondsUntilEnd = secondsToEnd.value,
-        actions = actionsHistory.container,
-        currentActionPosition = actionsHistory.currentPosition,
+        actions = actionsHistory.actionsContainer,
+        currentActionPosition = actionsHistory.nextActionIndex,
         additional = additionalState
     )
 

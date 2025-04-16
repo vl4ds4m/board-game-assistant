@@ -9,16 +9,12 @@ import org.vl4ds4m.board.game.assistant.data.entity.GameActionEntity
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionData
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionEntity
 import org.vl4ds4m.board.game.assistant.data.entity.PlayerEntity
-import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.Monopoly
-import org.vl4ds4m.board.game.assistant.game.OrderedGameType
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
-import org.vl4ds4m.board.game.assistant.game.data.GameState
 import org.vl4ds4m.board.game.assistant.game.data.MonopolyPlayerState
-import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
 import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.game.log.CurrentPlayerChangeAction
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
@@ -42,28 +38,32 @@ class GameSessionRepository(
             }
         }
 
-    suspend fun loadSession(id: String): GameSession? = sessionDao.findSession(id)?.fromData()
+    suspend fun loadSession(id: String): GameSession? =
+        sessionDao.findSession(id)?.gameSession()
 
-    fun saveSession(session: GameSession, id: String) = coroutineScope.launch {
-        GameSessionData(
-            entity = session.asEntity(id),
-            players = session.getPlayers(id),
-            actions = session.actions.mapIndexed { index, action ->
-                action.asEntity(session.type, id, index)
+    fun saveSession(session: GameSession, id: String) {
+        coroutineScope.launch {
+            GameSessionData(
+                entity = session.asEntity(id),
+                players = session.getPlayers(id),
+                actions = session.actions.mapIndexed { index, action ->
+                    action.asEntity(session.type, id, index)
+                }
+            ).let {
+                sessionDao.insertSession(it)
             }
-        ).let {
-            sessionDao.insertSession(it)
         }
     }
 }
 
-private fun GameSessionData.fromData(): GameSession {
+private fun GameSessionData.gameSession(): GameSession {
     val gameType = GameType.valueOf(entity.type)
     return GameSession(
         completed = entity.completed,
         type = gameType,
         name = entity.name,
         players = players.fromEntities(gameType),
+        orderedPlayerIds = orderedPlayerIds,
         currentPlayerId = entity.currentPlayerId,
         nextNewPlayerId = entity.nextNewPlayerId,
         startTime = entity.startTime,
@@ -71,8 +71,7 @@ private fun GameSessionData.fromData(): GameSession {
         timeout = entity.timeout,
         secondsUntilEnd = entity.secondsUntilEnd,
         actions = actions.fromEntities(gameType),
-        currentActionPosition = entity.currentActionPosition,
-        additional = gameState
+        currentActionPosition = entity.currentActionPosition
     )
 }
 
@@ -94,6 +93,9 @@ private fun List<PlayerEntity>.fromEntities(type: GameType): Map<Long, Player> =
         put(it.id, player)
     }
 }
+
+private val GameSessionData.orderedPlayerIds
+    get() = players.sortedBy { it.order }.map { it.id }
 
 private fun List<GameActionEntity>.fromEntities(gameType: GameType): List<GameAction> = sortedBy { it.position }
     .map {
@@ -126,15 +128,6 @@ private fun List<GameActionEntity>.fromEntities(gameType: GameType): List<GameAc
         }
     }
 
-private val GameSessionData.gameState: GameState?
-    get() = when (GameType.valueOf(entity.type)) {
-        Free -> null
-        is OrderedGameType -> players
-            .sortedBy { it.order }
-            .map { it.id }
-            .let { OrderedGameState(it) }
-    }
-
 private fun GameSession.asEntity(id: String) = GameSessionEntity(
     id = id,
     completed = completed,
@@ -150,26 +143,18 @@ private fun GameSession.asEntity(id: String) = GameSessionEntity(
 )
 
 private fun GameSession.getPlayers(sessionId: String): List<PlayerEntity> =
-    when (type) {
-        Free -> players.toList()
-            .sortedBy { (id, _) -> id }
-            .mapIndexed { index, (id, player) ->
-                createPlayerEntity(sessionId, id, player, index)
+    orderedPlayerIds.mapIndexed { index, id ->
+        val player = players[id]!!
+        when (type) {
+            is Monopoly -> {
+                val state = player.state as MonopolyPlayerState
+                createPlayerEntity(
+                    sessionId, id, player, index,
+                    state.position, state.inPrison
+                )
             }
-        is OrderedGameType -> additional.let { it as OrderedGameState }
-            .orderedPlayerIds.mapIndexed { index, id ->
-                val player = players[id]!!
-                when (type) {
-                    is Monopoly -> {
-                        val state = player.state as MonopolyPlayerState
-                        createPlayerEntity(
-                            sessionId, id, player, index,
-                            state.position, state.inPrison
-                        )
-                    }
-                    else -> createPlayerEntity(sessionId, id, player, index)
-                }
-            }
+            else -> createPlayerEntity(sessionId, id, player, index)
+        }
     }
 
 private fun createPlayerEntity(

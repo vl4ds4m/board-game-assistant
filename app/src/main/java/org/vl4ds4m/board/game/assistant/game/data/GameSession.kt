@@ -11,6 +11,7 @@ data class GameSession(
     val type: GameType,
     val name: String,
     val players: Players,
+    val orderedPlayerIds: List<Long>,
     val currentPlayerId: Long?,
     val nextNewPlayerId: Long,
     val startTime: Long?,
@@ -18,6 +19,5 @@ data class GameSession(
     val timeout: Boolean,
     val secondsUntilEnd: Int,
     val actions: Actions,
-    val currentActionPosition: Int,
-    val additional: GameState?
+    val currentActionPosition: Int
 )

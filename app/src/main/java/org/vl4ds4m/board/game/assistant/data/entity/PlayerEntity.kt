@@ -37,7 +37,7 @@ data class PlayerEntity(
     val score: Int,
 
     @ColumnInfo(name = ORDER)
-    val order: Int, // Ordered game property
+    val order: Int,
 
     @ColumnInfo(name = POSITION)
     val position: Int?, // Monopoly property

@@ -19,7 +19,6 @@ import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
-import org.vl4ds4m.board.game.assistant.game.data.OrderedGameState
 import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 
@@ -96,6 +95,7 @@ val defaultGames: List<GameSession> = listOf(
                 state = Score(154)
             )
         ),
+        orderedPlayerIds = listOf(1, 2, 3),
         currentPlayerId = 1L,
         nextNewPlayerId = 10L,
         startTime = initialTime + 40_000,
@@ -103,8 +103,7 @@ val defaultGames: List<GameSession> = listOf(
         timeout = false,
         secondsUntilEnd = 0,
         actions = listOf(),
-        currentActionPosition = 0,
-        additional = OrderedGameState(listOf(1, 2, 3))
+        currentActionPosition = 0
     ),
     GameSession(
         completed = false,
@@ -130,6 +129,7 @@ val defaultGames: List<GameSession> = listOf(
                 state = Score(532)
             )
         ),
+        orderedPlayerIds = listOf(3, 1, 2),
         currentPlayerId = 2L,
         nextNewPlayerId = 10L,
         startTime = initialTime + 20_000,
@@ -137,8 +137,7 @@ val defaultGames: List<GameSession> = listOf(
         timeout = false,
         secondsUntilEnd = 0,
         actions = listOf(),
-        currentActionPosition = 0,
-        additional = null
+        currentActionPosition = 0
     ),
     GameSession(
         type = SimpleOrdered,
@@ -170,6 +169,7 @@ val defaultGames: List<GameSession> = listOf(
                 state = Score(32)
             )
         ),
+        orderedPlayerIds = listOf(1, 2, 3, 4),
         currentPlayerId = 3L,
         nextNewPlayerId = 10L,
         startTime = initialTime + 30_000,
@@ -177,8 +177,7 @@ val defaultGames: List<GameSession> = listOf(
         timeout = false,
         secondsUntilEnd = 0,
         actions = listOf(),
-        currentActionPosition = 0,
-        additional = OrderedGameState(listOf(1, 2, 3, 4))
+        currentActionPosition = 0
     )
 )
 

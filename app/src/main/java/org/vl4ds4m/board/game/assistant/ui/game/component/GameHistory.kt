@@ -33,7 +33,7 @@ fun GameHistory(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         items(actions.value) { action ->
-            when (action) {
+            when (action) { // TODO Implement Game specific log
                 is CurrentPlayerChangeAction -> {
                     val old = getPlayerName(players.value, action.oldPlayerId)
                     val new = getPlayerName(players.value, action.newPlayerId)

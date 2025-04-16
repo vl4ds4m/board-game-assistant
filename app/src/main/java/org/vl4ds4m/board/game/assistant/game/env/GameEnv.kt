@@ -263,7 +263,7 @@ open class GameEnv(override val type: GameType) : Game {
         }
     }
 
-    open val initializables = arrayOf<Initializable>(timer)
+    open val initializables: Array<Initializable> = arrayOf(timer)
 
     fun load(session: GameSession) = session.let {
         mCompleted.value = it.completed

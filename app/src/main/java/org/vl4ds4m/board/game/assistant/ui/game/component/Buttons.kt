@@ -23,7 +23,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ScoreField(score: MutableIntState) {
+fun ScoreField(
+    score: MutableIntState,
+    modifier: Modifier = Modifier,
+    label: String = "score(s)"
+) {
     TextField(
         value = score.intValue
             .takeIf { it != 0 }
@@ -32,9 +36,9 @@ fun ScoreField(score: MutableIntState) {
         onValueChange = {
             score.intValue = it.toIntOrNull() ?: 0
         },
-        modifier = Modifier.widthIn(min = 120.dp),
+        modifier = modifier.widthIn(min = 120.dp),
         singleLine = true,
-        label = { Text("score(s)") },
+        label = { Text(label) },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number
         )
@@ -85,10 +89,13 @@ fun PointsAppender(
 }
 
 @Composable
-fun NextPlayerButton(onClick: () -> Unit) {
+fun NextPlayerButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     OutlinedButton(
         onClick = onClick,
-        modifier = Modifier.width(180.dp)
+        modifier = modifier.width(180.dp)
     ) {
         Text("Next player")
     }

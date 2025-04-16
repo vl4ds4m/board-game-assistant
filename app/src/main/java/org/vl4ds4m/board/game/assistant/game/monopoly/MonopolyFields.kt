@@ -22,9 +22,7 @@ data object Prison : MonopolyField {
     const val FINE = 500_000
 }
 
-data object GoToPrison : MonopolyField {
-    const val POSITION = 31
-}
+data object GoToPrison : MonopolyField
 
 val monopolyFields: Map<Int, MonopolyField> = mapOf(
     1  to Ahead,

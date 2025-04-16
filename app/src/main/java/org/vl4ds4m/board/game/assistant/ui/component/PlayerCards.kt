@@ -217,26 +217,26 @@ fun PlayerInGameCard(
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "$rating. ",
                 style = MaterialTheme.typography.titleLarge
             )
-            Spacer(Modifier.width(16.dp))
+            Spacer(Modifier.width(8.dp))
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "Player image",
                 modifier = Modifier.size(40.dp)
             )
-            Spacer(Modifier.width(24.dp))
+            Spacer(Modifier.width(12.dp))
             Text(
                 text = name,
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.titleMedium,
             )
-            Spacer(Modifier.width(24.dp))
+            Spacer(Modifier.width(8.dp))
             Text(
                 text = "$score point(s)",
                 style = MaterialTheme.typography.bodyLarge

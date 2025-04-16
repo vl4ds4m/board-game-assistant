@@ -1,15 +1,9 @@
 package org.vl4ds4m.board.game.assistant.game.monopoly
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
 import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.MonopolyPlayerState
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
-import org.vl4ds4m.board.game.assistant.game.env.Initializable
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 
 class MonopolyGame : OrderedGameEnv(Monopoly) {
@@ -17,19 +11,6 @@ class MonopolyGame : OrderedGameEnv(Monopoly) {
         get() = currentPlayer?.let { (id, p) ->
             p.monopolyState?.let { state -> id to state }
         }
-
-    private val mCurrentField = MutableStateFlow<MonopolyField?>(null)
-    val currentField: StateFlow<MonopolyField?> = mCurrentField.asStateFlow()
-
-    val currentFieldObserver: Initializable = Initializable { scope ->
-        players.combine(currentPlayerId) { players, currentId ->
-            mCurrentField.value = currentId?.let { id ->
-                players[id]?.monopolyState?.position?.let {
-                    monopolyFields[it]
-                }
-            }
-        }.launchIn(scope)
-    }
 
     override fun addPlayer(netDevId: String?, name: String) {
         addPlayer(netDevId, name, MonopolyPlayerState())
@@ -100,7 +81,6 @@ class MonopolyGame : OrderedGameEnv(Monopoly) {
     }
 
     fun moveToPrison() {
-        if (currentField.value != GoToPrison) return
         val (id, state) = currentPlayerState ?: return
         if (state.inPrison) return
         val prisonPosState = state.copy(position = Prison.POSITION)

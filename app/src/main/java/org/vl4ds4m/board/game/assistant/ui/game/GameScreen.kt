@@ -193,7 +193,7 @@ fun GameScreenContent(
         HorizontalDivider()
         Box(
             modifier = Modifier
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 8.dp)
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {

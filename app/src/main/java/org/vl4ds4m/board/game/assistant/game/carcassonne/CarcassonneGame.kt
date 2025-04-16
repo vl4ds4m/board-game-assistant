@@ -22,13 +22,13 @@ class CarcassonneGame : OrderedGameEnv(Carcassonne) {
     override val additionalState
         get() = CarcassonneGameState(super.additionalState, finalStage.value)
 
-    fun addPoints(property: CarcassonneProperty, count: Int) {
+    fun addPoints(property: CarcassonneProperty, count: Int, final: Boolean) {
         if (count <= 0) return
         var points = 0
         when (property) {
             CarcassonneProperty.CLOISTER -> if (count <= 9) points = count
-            CarcassonneProperty.FIELD -> if (finalStage.value) points = 3 * count
-            CarcassonneProperty.CITY -> points = if (finalStage.value) count else 2 * count
+            CarcassonneProperty.FIELD -> if (final) points = 3 * count
+            CarcassonneProperty.CITY -> points = if (final) count else 2 * count
             CarcassonneProperty.ROAD -> points = count
         }
         if (points > 0) {

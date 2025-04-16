@@ -1,6 +1,5 @@
 package org.vl4ds4m.board.game.assistant.ui.game.carcassonne
 
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneGame
@@ -13,14 +12,8 @@ class CarcassonneGameViewModel(
     sessionId: String? = null,
     app: BoardGameAssistantApp
 ) : OrderedGameViewModel(gameEnv, sessionId, app) {
-    val onFinal: MutableStateFlow<Boolean> = gameEnv.finalStage
-
-    fun addPoints(property: CarcassonneProperty, count: Int) {
-        gameEnv.addPoints(property, count)
-    }
-
-    fun skip() {
-        gameEnv.changeCurrentPlayerId()
+    fun addPoints(property: CarcassonneProperty, count: Int, final: Boolean) {
+        gameEnv.addPoints(property, count, final)
     }
 
     companion object : GameViewModelProducer<CarcassonneGameViewModel> {

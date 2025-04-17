@@ -4,6 +4,7 @@ import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.vl4ds4m.board.game.assistant.States
 import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.GameType
@@ -15,8 +16,6 @@ import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.updateAndGetStates
 import org.vl4ds4m.board.game.assistant.updateMap
 import java.util.concurrent.atomic.AtomicLong
-
-typealias States<T> = Pair<T, T>
 
 abstract class GameEnv(override val type: GameType) : Game {
     final override val name: MutableStateFlow<String> = MutableStateFlow("")
@@ -147,8 +146,10 @@ abstract class GameEnv(override val type: GameType) : Game {
         }
         history += createPlayerStateChangedAction(
             id = id,
-            states = oldPlayers[id]!!.state
-                to newPlayers[id]!!.state
+            states = States(
+                old = oldPlayers[id]!!.state,
+                new = newPlayers[id]!!.state
+            )
         )
     }
 
@@ -162,8 +163,8 @@ abstract class GameEnv(override val type: GameType) : Game {
         type = Actions.CHANGE_PLAYER_SCORE,
         data = mapOf(
             Actions.PLAYER_ID_KEY to id.toString(),
-            Actions.OLD_SCORE_KEY to states.first.score.toString(),
-            Actions.NEW_SCORE_KEY to states.second.score.toString()
+            Actions.OLD_SCORE_KEY to states.old.score.toString(),
+            Actions.NEW_SCORE_KEY to states.new.score.toString()
         )
     )
 

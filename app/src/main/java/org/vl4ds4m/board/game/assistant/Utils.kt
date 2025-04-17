@@ -15,24 +15,26 @@ val String.short: String get() =
     if (length <= 20) this
     else substring(0, 20) + "..."
 
+data class States<T>(val old: T, val new: T)
+
 inline fun <K, V> MutableStateFlow<Map<K, V>>.updateMap(
     action: MutableMap<K, V>.() -> Unit
-): Pair<Map<K, V>, Map<K, V>> {
+): States<Map<K, V>> {
     return updateAndGetStates { it.toMutableMap().apply(action) }
 }
 
 inline fun <E> MutableStateFlow<List<E>>.updateList(
     action: MutableList<E>.() -> Unit
-): Pair<List<E>, List<E>> {
+): States<List<E>> {
     return updateAndGetStates { it.toMutableList().apply(action) }
 }
 
-inline fun <T> MutableStateFlow<T>.updateAndGetStates(function: (T) -> T): Pair<T, T> {
+inline fun <T> MutableStateFlow<T>.updateAndGetStates(function: (T) -> T): States<T> {
     while (true) {
         val prevValue = value
         val nextValue = function(prevValue)
         if (compareAndSet(prevValue, nextValue)) {
-            return prevValue to nextValue
+            return States(old = prevValue, new = nextValue)
         }
     }
 }

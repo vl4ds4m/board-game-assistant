@@ -136,12 +136,12 @@ open class GameEnv(override val type: GameType) : Game {
     }
 
     final override fun changePlayerState(id: Long, state: PlayerState) {
-        /*val (oldPlayers, newPlayers) = mPlayers.updateMap {
+        val (oldPlayers, newPlayers) = mPlayers.updateMap {
             val player = get(id) ?: return
             if (player.state == state) return
             put(id, player.copy(state = state))
         }
-        history += PlayerStateChangeAction( // TODO Implement
+        /*history += PlayerStateChangeAction( // TODO Implement
             playerId = id,
             oldState = oldPlayers[id]!!.state,
             newState = newPlayers[id]!!.state,

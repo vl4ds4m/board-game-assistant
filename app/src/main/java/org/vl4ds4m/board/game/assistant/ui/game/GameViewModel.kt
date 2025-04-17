@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.ui.game.vm
+package org.vl4ds4m.board.game.assistant.ui.game
 
 import android.net.nsd.NsdManager
 import android.util.Log

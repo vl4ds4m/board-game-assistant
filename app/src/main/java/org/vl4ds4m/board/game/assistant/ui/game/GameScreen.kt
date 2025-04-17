@@ -54,7 +54,6 @@ import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.SimpleOrderedGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable

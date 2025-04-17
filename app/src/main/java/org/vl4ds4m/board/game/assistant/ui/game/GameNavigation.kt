@@ -22,7 +22,6 @@ import org.vl4ds4m.board.game.assistant.ui.game.setting.PlayerSettingScreen
 import org.vl4ds4m.board.game.assistant.ui.game.setup.GameSetupViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.setup.NewGamePlayersScreen
 import org.vl4ds4m.board.game.assistant.ui.game.setup.NewGameStartScreen
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.rememberTopmost
 
 sealed interface GameRoute

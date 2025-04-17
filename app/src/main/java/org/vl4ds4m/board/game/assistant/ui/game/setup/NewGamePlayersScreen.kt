@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.map
 import org.vl4ds4m.board.game.assistant.ui.component.NewPlayerCard
 import org.vl4ds4m.board.game.assistant.ui.component.NewRemotePlayerCard
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable

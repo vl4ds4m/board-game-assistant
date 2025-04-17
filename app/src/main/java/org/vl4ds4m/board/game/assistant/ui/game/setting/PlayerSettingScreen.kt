@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.map
 import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.Score
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable

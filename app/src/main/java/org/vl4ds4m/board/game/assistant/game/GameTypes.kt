@@ -11,8 +11,8 @@ import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.ordered.SimpleOrderedGameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
+import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.GameViewModelProducer
 
 @Serializable
 sealed interface GameType {

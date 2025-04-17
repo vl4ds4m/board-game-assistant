@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.component.StandardCounter
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 
 @Composable
 fun FreeGameScreen(modifier: Modifier = Modifier) {

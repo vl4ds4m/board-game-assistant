@@ -4,8 +4,8 @@ import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.game.simple.FreeGame
 import org.vl4ds4m.board.game.assistant.game.simple.FreeGameEnv
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
+import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.GameViewModelProducer
 
 class FreeGameViewModel private constructor(
     override val gameEnv: FreeGameEnv = FreeGameEnv(),

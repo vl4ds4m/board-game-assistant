@@ -4,8 +4,8 @@ import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.game.DiceGame
 import org.vl4ds4m.board.game.assistant.game.DiceGameEnv
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
+import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.GameViewModelProducer
 
 class DiceGameViewModel private constructor(
     override val gameEnv: DiceGameEnv = DiceGameEnv(),

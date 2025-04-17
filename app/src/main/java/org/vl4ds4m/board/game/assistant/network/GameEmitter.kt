@@ -174,7 +174,7 @@ class GameEmitter(
         output: ObjectOutputStream,
         input: ObjectInputStream
     ) {
-        val bound = session.players.isBound(networkPlayer)
+        val bound = session.players.toMap().isBound(networkPlayer)
         emitState(NetworkGameState.IN_GAME, output, input, bound)
         if (bound) {
             Json.encodeToString(session)

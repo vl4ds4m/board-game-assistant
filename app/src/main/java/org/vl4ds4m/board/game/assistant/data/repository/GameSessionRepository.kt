@@ -56,18 +56,18 @@ private val GameSessionData.gameSession
         completed = entity.completed,
         type = GameType.valueOf(entity.type),
         name = entity.name,
-        players = players.fromEntities,
+        players = players.gamePlayers,
         currentPlayerId = entity.currentPlayerId,
         nextNewPlayerId = entity.nextNewPlayerId,
         startTime = entity.startTime,
         stopTime = entity.stopTime,
         timeout = entity.timeout,
         secondsUntilEnd = entity.secondsUntilEnd,
-        actions = actions.fromEntities,
+        actions = actions.gameActions,
         currentActionPosition = entity.currentActionPosition
     )
 
-private val List<PlayerEntity>.fromEntities: OrderedPlayers
+private val List<PlayerEntity>.gamePlayers: OrderedPlayers
     get() = map {
         it.id to Player(
             netDevId = it.netDevId,
@@ -77,7 +77,7 @@ private val List<PlayerEntity>.fromEntities: OrderedPlayers
         )
     }
 
-private val List<GameActionEntity>.fromEntities: List<GameAction>
+private val List<GameActionEntity>.gameActions: List<GameAction>
     get() = sortedBy { it.position }
         .map { GameAction.fromJson(it.action) }
 

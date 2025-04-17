@@ -38,7 +38,7 @@ fun NavGraphBuilder.observerNavigation(
             NetworkGameState.REGISTRATION -> ObserverStartupScreen()
             NetworkGameState.IN_GAME -> {
                 val players = remember {
-                    derivedStateOf { session.value?.players ?: mapOf() }
+                    derivedStateOf { session.value?.players?.toMap() ?: mapOf() }
                 }
                 val currentPlayerId = remember {
                     derivedStateOf { session.value?.currentPlayerId }

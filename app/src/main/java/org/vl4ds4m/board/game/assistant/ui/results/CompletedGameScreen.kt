@@ -60,7 +60,7 @@ fun CompletedGameScreen(
     }.value?.also {
         CompletedGameScreenContent(
             type = it.type,
-            players = it.players,
+            players = it.players.toMap(),
             startTime = it.startTime,
             stopTime = it.stopTime,
             modifier = modifier

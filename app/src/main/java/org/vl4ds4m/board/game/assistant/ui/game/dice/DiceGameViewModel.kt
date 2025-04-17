@@ -1,27 +1,21 @@
 package org.vl4ds4m.board.game.assistant.ui.game.dice
 
-import kotlinx.coroutines.flow.StateFlow
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.game.DiceGame
-import org.vl4ds4m.board.game.assistant.game.Game
-import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
+import org.vl4ds4m.board.game.assistant.game.DiceGameEnv
+import org.vl4ds4m.board.game.assistant.game.env.GameEnv
+import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 
 class DiceGameViewModel private constructor(
-    private val gameEnv: DiceGame = DiceGame(),
+    override val gameEnv: DiceGameEnv = DiceGameEnv(),
     sessionId: String? = null,
     app: BoardGameAssistantApp
-) : OrderedGameViewModel(gameEnv, sessionId, app) {
-    val addEnabled: StateFlow<Boolean> = gameEnv.addEnabled
-
-    fun addPoints(points: Int) {
-        gameEnv.addPoints(points)
-    }
-
+) : GameViewModel(gameEnv, sessionId, app), DiceGame by gameEnv {
     companion object : GameViewModelProducer<DiceGameViewModel> {
-        override fun createViewModel(game: Game, app: BoardGameAssistantApp) =
+        override fun createViewModel(gameEnv: GameEnv, app: BoardGameAssistantApp) =
             DiceGameViewModel(
-                gameEnv = game as DiceGame,
+                gameEnv = gameEnv as DiceGameEnv,
                 app = app
             )
 

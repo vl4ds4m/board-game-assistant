@@ -1,25 +1,21 @@
 package org.vl4ds4m.board.game.assistant.ui.game.carcassonne
 
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
-import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneGame
-import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneProperty
-import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
+import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneGameEnv
+import org.vl4ds4m.board.game.assistant.game.env.GameEnv
+import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 
 class CarcassonneGameViewModel(
-    private val gameEnv: CarcassonneGame = CarcassonneGame(),
+    override val gameEnv: CarcassonneGameEnv = CarcassonneGameEnv(),
     sessionId: String? = null,
     app: BoardGameAssistantApp
-) : OrderedGameViewModel(gameEnv, sessionId, app) {
-    fun addPoints(property: CarcassonneProperty, count: Int, final: Boolean) {
-        gameEnv.addPoints(property, count, final)
-    }
-
+) : GameViewModel(gameEnv, sessionId, app), CarcassonneGame by gameEnv {
     companion object : GameViewModelProducer<CarcassonneGameViewModel> {
-        override fun createViewModel(game: Game, app: BoardGameAssistantApp) =
+        override fun createViewModel(gameEnv: GameEnv, app: BoardGameAssistantApp) =
             CarcassonneGameViewModel(
-                gameEnv = game as CarcassonneGame,
+                gameEnv = gameEnv as CarcassonneGameEnv,
                 app = app
             )
 

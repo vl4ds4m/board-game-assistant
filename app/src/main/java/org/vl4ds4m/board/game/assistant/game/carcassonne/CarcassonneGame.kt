@@ -1,11 +1,16 @@
 package org.vl4ds4m.board.game.assistant.game.carcassonne
 
 import org.vl4ds4m.board.game.assistant.game.Carcassonne
+import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 
-class CarcassonneGame : OrderedGameEnv(Carcassonne) {
-    fun addPoints(property: CarcassonneProperty, count: Int, final: Boolean) {
+interface CarcassonneGame : OrderedGame {
+    fun addPoints(property: CarcassonneProperty, count: Int, final: Boolean)
+}
+
+class CarcassonneGameEnv : OrderedGameEnv(Carcassonne), CarcassonneGame {
+    override fun addPoints(property: CarcassonneProperty, count: Int, final: Boolean) {
         if (count <= 0) return
         var points = 0
         when (property) {

@@ -25,9 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.Score
-import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
@@ -36,7 +36,7 @@ fun PlayerSettingScreen(modifier: Modifier = Modifier) {
     val viewModel = viewModel<GameViewModel>()
     val onPlayerOrderChange: ((Long, Int) -> Unit)?
     val players = viewModel.players.let { flow ->
-        if (viewModel is OrderedGameViewModel) {
+        if (viewModel is OrderedGame) {
             onPlayerOrderChange = viewModel::changePlayerOrder
             viewModel.orderedPlayerIds.combine(flow) { ids, players ->
                 buildList {

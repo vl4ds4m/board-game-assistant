@@ -1,11 +1,11 @@
 package org.vl4ds4m.board.game.assistant.game
 
 import kotlinx.serialization.Serializable
-import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneGame
+import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneGameEnv
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
-import org.vl4ds4m.board.game.assistant.game.monopoly.MonopolyGame
-import org.vl4ds4m.board.game.assistant.game.simple.FreeGame
-import org.vl4ds4m.board.game.assistant.game.simple.SimpleOrderedGame
+import org.vl4ds4m.board.game.assistant.game.monopoly.MonopolyGameEnv
+import org.vl4ds4m.board.game.assistant.game.simple.FreeGameEnv
+import org.vl4ds4m.board.game.assistant.game.simple.SimpleOrderedGameEnv
 import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameViewModel
@@ -18,7 +18,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 sealed interface GameType {
     val title: String
 
-    fun createGame(): GameEnv
+    fun createGameEnv(): GameEnv
 
     val viewModelProducer: GameViewModelProducer<GameViewModel>
 
@@ -48,7 +48,7 @@ sealed interface GameType {
 data object Free : GameType {
     override val title: String = "Free"
 
-    override fun createGame() = FreeGame()
+    override fun createGameEnv() = FreeGameEnv()
 
     override val viewModelProducer = FreeGameViewModel
 }
@@ -60,7 +60,7 @@ sealed interface OrderedGameType : GameType
 data object SimpleOrdered : OrderedGameType {
     override val title: String = "Ordered"
 
-    override fun createGame() = SimpleOrderedGame()
+    override fun createGameEnv() = SimpleOrderedGameEnv()
 
     override val viewModelProducer = SimpleOrderedGameViewModel
 }
@@ -69,7 +69,7 @@ data object SimpleOrdered : OrderedGameType {
 data object Dice : OrderedGameType {
     override val title: String = "Dice"
 
-    override fun createGame() = DiceGame()
+    override fun createGameEnv() = DiceGameEnv()
 
     override val viewModelProducer = DiceGameViewModel
 }
@@ -78,7 +78,7 @@ data object Dice : OrderedGameType {
 data object Carcassonne : OrderedGameType {
     override val title: String = "Carcassonne"
 
-    override fun createGame() = CarcassonneGame()
+    override fun createGameEnv() = CarcassonneGameEnv()
 
     override val viewModelProducer = CarcassonneGameViewModel
 }
@@ -87,7 +87,7 @@ data object Carcassonne : OrderedGameType {
 data object Monopoly : OrderedGameType {
     override val title: String = "Monopoly"
 
-    override fun createGame() = MonopolyGame()
+    override fun createGameEnv() = MonopolyGameEnv()
 
     override val viewModelProducer = MonopolyGameViewModel
 }

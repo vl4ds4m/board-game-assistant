@@ -9,9 +9,15 @@ import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.game.env.Initializable
 
-class DiceGame : OrderedGameEnv(Dice) {
+interface DiceGame : OrderedGame {
+    val addEnabled: StateFlow<Boolean>
+
+    fun addPoints(points: Int)
+}
+
+class DiceGameEnv : OrderedGameEnv(Dice), DiceGame {
     private val mAddEnabled = MutableStateFlow(true)
-    val addEnabled: StateFlow<Boolean> = mAddEnabled.asStateFlow()
+    override val addEnabled: StateFlow<Boolean> = mAddEnabled.asStateFlow()
 
     private val addEnabledObserver = Initializable { scope ->
         currentPlayerId.combine(actions) { id, actions ->
@@ -25,7 +31,7 @@ class DiceGame : OrderedGameEnv(Dice) {
 
     override val initializables = super.initializables + addEnabledObserver
 
-    fun addPoints(points: Int) {
+    override fun addPoints(points: Int) {
         if (points <= 0 || points % 5 != 0) return
         val (_, player) = currentPlayer ?: return
         val oldScore = player.state.score

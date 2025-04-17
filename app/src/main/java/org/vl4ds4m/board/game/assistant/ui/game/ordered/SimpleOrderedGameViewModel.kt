@@ -1,23 +1,21 @@
 package org.vl4ds4m.board.game.assistant.ui.game.ordered
 
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
-import org.vl4ds4m.board.game.assistant.game.Game
+import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.game.simple.SimpleOrderedGame
+import org.vl4ds4m.board.game.assistant.game.simple.SimpleOrderedGameEnv
+import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.vm.GameViewModelProducer
 
 class SimpleOrderedGameViewModel private constructor(
-    private val gameEnv: SimpleOrderedGame = SimpleOrderedGame(),
+    override val gameEnv: SimpleOrderedGameEnv = SimpleOrderedGameEnv(),
     sessionId: String? = null,
     app: BoardGameAssistantApp
-) : OrderedGameViewModel(gameEnv, sessionId, app) {
-    fun addPoints(points: Int) {
-        gameEnv.addPoints(points)
-    }
-
+) : GameViewModel(gameEnv, sessionId, app), SimpleOrderedGame by gameEnv {
     companion object : GameViewModelProducer<SimpleOrderedGameViewModel> {
-        override fun createViewModel(game: Game, app: BoardGameAssistantApp) =
+        override fun createViewModel(gameEnv: GameEnv, app: BoardGameAssistantApp) =
             SimpleOrderedGameViewModel(
-                gameEnv = game as SimpleOrderedGame,
+                gameEnv = gameEnv as SimpleOrderedGameEnv,
                 app = app
             )
 

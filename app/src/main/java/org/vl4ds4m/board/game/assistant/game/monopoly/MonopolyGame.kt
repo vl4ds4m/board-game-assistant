@@ -1,12 +1,38 @@
 package org.vl4ds4m.board.game.assistant.game.monopoly
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import org.vl4ds4m.board.game.assistant.game.Monopoly
+import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.MonopolyPlayerState
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
+import org.vl4ds4m.board.game.assistant.game.env.Initializable
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 
-class MonopolyGame : OrderedGameEnv(Monopoly) {
+interface MonopolyGame : OrderedGame {
+    val inPrison: StateFlow<Boolean>
+
+    fun addMoney(money: Int)
+
+    fun spendMoney(money: Int)
+
+    fun movePlayer(steps: Int)
+
+    fun moveToPrison()
+
+    fun leavePrison(rescued: Boolean)
+
+    fun transferMoney(senderId: Long, receiverId: Long, money: Int)
+}
+
+class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
     private val currentPlayerState: Pair<Long, MonopolyPlayerState>?
         get() = currentPlayer?.let { (id, p) ->
             p.monopolyState?.let { state -> id to state }
@@ -28,7 +54,21 @@ class MonopolyGame : OrderedGameEnv(Monopoly) {
         }
     }
 
-    fun addMoney(money: Int) {
+    private val mInPrison = MutableStateFlow(false)
+    override val inPrison: StateFlow<Boolean> = mInPrison.asStateFlow()
+
+    private val inPrisonObserver = Initializable { scope ->
+        currentPlayerId.combine(players) { id, p -> p[id] }
+            .filterNotNull()
+            .map { it.state as MonopolyPlayerState }
+            .onEach { mInPrison.value = it.inPrison }
+            .launchIn(scope)
+    }
+
+    override val initializables: Array<Initializable> =
+        super.initializables + inPrisonObserver
+
+    override fun addMoney(money: Int) {
         currentPlayerId.value?.let {
             addMoney(it, money)
         }
@@ -44,7 +84,7 @@ class MonopolyGame : OrderedGameEnv(Monopoly) {
         }
     }
 
-    fun spendMoney(money: Int) {
+    override fun spendMoney(money: Int) {
         currentPlayerId.value?.let {
             spendMoney(it, money)
         }
@@ -61,7 +101,7 @@ class MonopolyGame : OrderedGameEnv(Monopoly) {
         }
     }
 
-    fun movePlayer(steps: Int) {
+    override fun movePlayer(steps: Int) {
         if (steps !in 2..12) return
         val (id, state) = currentPlayerState ?: return
         if (state.inPrison) return
@@ -80,7 +120,7 @@ class MonopolyGame : OrderedGameEnv(Monopoly) {
         if (newCycle) addMoney(id, Ahead.MONEY)
     }
 
-    fun moveToPrison() {
+    override fun moveToPrison() {
         val (id, state) = currentPlayerState ?: return
         if (state.inPrison) return
         val prisonPosState = state.copy(position = Prison.POSITION)
@@ -88,7 +128,7 @@ class MonopolyGame : OrderedGameEnv(Monopoly) {
         changePlayerState(id, prisonPosState.copy(inPrison = true))
     }
 
-    fun leavePrison(rescued: Boolean) {
+    override fun leavePrison(rescued: Boolean) {
         val (id, state) = currentPlayerState ?: return
         if (!state.inPrison) return
         val beforeFreeState =
@@ -97,7 +137,7 @@ class MonopolyGame : OrderedGameEnv(Monopoly) {
         changePlayerState(id, beforeFreeState.copy(inPrison = false))
     }
 
-    fun transferMoney(senderId: Long, receiverId: Long, money: Int) {
+    override fun transferMoney(senderId: Long, receiverId: Long, money: Int) {
         if (money <= 0) return
         val senderState = players.value[senderId]?.monopolyState ?: return
         if (senderState.score < money) return

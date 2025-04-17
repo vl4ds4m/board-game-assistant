@@ -7,19 +7,19 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
-import org.vl4ds4m.board.game.assistant.data.repository.GameRepository
+import org.vl4ds4m.board.game.assistant.data.repository.GameEnvRepository
 import org.vl4ds4m.board.game.assistant.game.GameType
 
 class GameSetupViewModel private constructor(
-    private val gameRepository: GameRepository
+    private val gameEnvRepository: GameEnvRepository
 ) : ViewModel() {
     val type = mutableStateOf<GameType?>(null)
     val name = mutableStateOf("")
 
     fun createGame(type: GameType) {
-        type.createGame()
+        type.createGameEnv()
             .also { it.name.value = name.value }
-            .let { gameRepository.put(it) }
+            .let { gameEnvRepository.put(it) }
     }
 
     private val mPlayers = mutableStateListOf<NewPlayer>()
@@ -55,7 +55,7 @@ class GameSetupViewModel private constructor(
     }
 
     fun startGame() {
-        val game = gameRepository.extract()
+        val game = gameEnvRepository.extract()
         players.forEach {
             game.addPlayer(it.netDevId, it.name)
         }
@@ -66,7 +66,7 @@ class GameSetupViewModel private constructor(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer<GameSetupViewModel> {
                 val app = BoardGameAssistantApp.from(this)
-                GameSetupViewModel(app.gameRepository)
+                GameSetupViewModel(app.gameEnvRepository)
             }
         }
     }

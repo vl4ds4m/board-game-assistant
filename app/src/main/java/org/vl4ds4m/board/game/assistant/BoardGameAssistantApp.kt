@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.vl4ds4m.board.game.assistant.data.AppDatabase
-import org.vl4ds4m.board.game.assistant.data.repository.GameRepository
+import org.vl4ds4m.board.game.assistant.data.repository.GameEnvRepository
 import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
 import org.vl4ds4m.board.game.assistant.data.repository.UserDataRepository
 import org.vl4ds4m.board.game.assistant.data.userDataStore
@@ -43,7 +43,7 @@ class BoardGameAssistantApp : Application() {
         }
     }
 
-    val gameRepository = GameRepository()
+    val gameEnvRepository = GameEnvRepository()
 
     val userDataRepository: UserDataRepository by lazy {
         UserDataRepository(userDataStore, coroutineScope)

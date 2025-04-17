@@ -2,7 +2,6 @@ package org.vl4ds4m.board.game.assistant.game.carcassonne
 
 import org.vl4ds4m.board.game.assistant.game.Carcassonne
 import org.vl4ds4m.board.game.assistant.game.OrderedGame
-import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 
 interface CarcassonneGame : OrderedGame {
@@ -21,7 +20,9 @@ class CarcassonneGameEnv : OrderedGameEnv(Carcassonne), CarcassonneGame {
         }
         if (points > 0) {
             val (_, player) = currentPlayer ?: return
-            val score = Score(player.state.score + points)
+            val score = player.state.run {
+                copy(score = score + points)
+            }
             val id = currentPlayerId.value ?: return
             changePlayerState(id, score)
         }

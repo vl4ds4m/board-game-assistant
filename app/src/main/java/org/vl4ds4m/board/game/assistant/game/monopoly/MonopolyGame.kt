@@ -1,19 +1,8 @@
 package org.vl4ds4m.board.game.assistant.game.monopoly
 
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.OrderedGame
-import org.vl4ds4m.board.game.assistant.game.Player
-import org.vl4ds4m.board.game.assistant.game.data.MonopolyPlayerState
-import org.vl4ds4m.board.game.assistant.game.data.PlayerState
-import org.vl4ds4m.board.game.assistant.game.env.Initializable
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 
 interface MonopolyGame : OrderedGame {
@@ -33,7 +22,7 @@ interface MonopolyGame : OrderedGame {
 }
 
 class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
-    private val currentPlayerState: Pair<Long, MonopolyPlayerState>?
+    /*private val currentPlayerState: Pair<Long, MonopolyPlayerState>? // TODO REFACTOR
         get() = currentPlayer?.let { (id, p) ->
             p.monopolyState?.let { state -> id to state }
         }
@@ -144,8 +133,34 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
         if (receiverId !in players.value) return
         spendMoney(senderId, money) ?: return
         addMoney(receiverId, money) ?: return
+    }*/
+    override val inPrison: StateFlow<Boolean>
+        get() = TODO("Not yet implemented")
+
+    override fun addMoney(money: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun spendMoney(money: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun movePlayer(steps: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun moveToPrison() {
+        TODO("Not yet implemented")
+    }
+
+    override fun leavePrison(rescued: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override fun transferMoney(senderId: Long, receiverId: Long, money: Int) {
+        TODO("Not yet implemented")
     }
 }
 
-private val Player.monopolyState: MonopolyPlayerState?
-    get() = state as? MonopolyPlayerState
+/*private val Player.monopolyState: MonopolyPlayerState?
+    get() = state as? MonopolyPlayerState*/

@@ -39,7 +39,7 @@ import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
-import org.vl4ds4m.board.game.assistant.game.data.Score
+import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.prettyTime
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
 import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameScreen
@@ -233,7 +233,7 @@ val fakePlayers = sequence {
         netDevId = null,
         name = name,
         active = true,
-        state = Score(score)
+        state = PlayerState(score, mapOf())
     )
 }.toMap()
 

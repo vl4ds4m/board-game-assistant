@@ -12,7 +12,7 @@ import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.updateAndGetStates
 import org.vl4ds4m.board.game.assistant.updateList
 
-open class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
+abstract class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
     private val mNextPlayerId: MutableStateFlow<Long?> = MutableStateFlow(null)
     final override val nextPlayerId = mCurrentPlayerId.asStateFlow()
 
@@ -29,7 +29,7 @@ open class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
                 if (it == currentId) return
             }
         }.let {
-            addActionForCurrentIdUpdate(it)
+            addCurrentPlayerChangedAction(it)
         }
     }
 
@@ -57,7 +57,7 @@ open class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
         }
         val (players, _) = remove(id) ?: return
         val states = updateCurrentIdOnEqual(id, players, ids) ?: return
-        addActionForCurrentIdUpdate(states)
+        addCurrentPlayerChangedAction(states)
     }
 
     private fun updateCurrentIdOnEqual(
@@ -73,7 +73,7 @@ open class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
     final override fun freezePlayer(id: Long) {
         val (players, _) = freeze(id) ?: return
         val ids = updateCurrentIdOnEqual(id, players, orderedPlayerIds.value) ?: return
-        addActionForCurrentIdUpdate(ids)
+        addCurrentPlayerChangedAction(ids)
     }
 
     private val nextPlayerIdObserver = Initializable { scope ->

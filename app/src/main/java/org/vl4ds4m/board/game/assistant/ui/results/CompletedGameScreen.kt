@@ -24,7 +24,7 @@ import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
-import org.vl4ds4m.board.game.assistant.game.data.Score
+import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.localTime
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
@@ -153,19 +153,19 @@ private fun CompletedGameScreenPreview() {
                     netDevId = null,
                     name = "Abv",
                     active = true,
-                    state = Score(45)
+                    state = PlayerState(45, mapOf())
                 ),
                 2L to Player(
                     netDevId = null,
                     name = "Efo",
                     active = false,
-                    state = Score(123)
+                    state = PlayerState(123, mapOf())
                 ),
                 3L to Player(
                     netDevId = null,
                     name = "Urt",
                     active = true,
-                    state = Score(59)
+                    state = PlayerState(59, mapOf())
                 )
             ),
             startTime = System.currentTimeMillis() - 11_000,

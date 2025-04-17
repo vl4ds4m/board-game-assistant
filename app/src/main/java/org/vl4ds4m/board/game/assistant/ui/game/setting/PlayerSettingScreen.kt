@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.Player
-import org.vl4ds4m.board.game.assistant.game.data.Score
+import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
@@ -121,8 +121,8 @@ private fun PlayerSettingScreenPreview() {
             players = remember {
                 mutableStateOf(
                     listOf(
-                        1L to Player(null, "Abc", true, Score()),
-                        2L to Player(null, "Def", true, Score()),
+                        1L to Player(null, "Abc", true, PlayerState(0, mapOf())),
+                        2L to Player(null, "Def", true, PlayerState(0, mapOf())),
                     )
                 )
             },

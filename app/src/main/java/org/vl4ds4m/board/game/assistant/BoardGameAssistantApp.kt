@@ -19,7 +19,7 @@ import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
-import org.vl4ds4m.board.game.assistant.game.data.Score
+import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 
 class BoardGameAssistantApp : Application() {
@@ -80,19 +80,19 @@ val defaultGames: List<GameSession> = listOf(
                 netDevId = null,
                 name = "Abc",
                 active = true,
-                state = Score(120)
+                state = PlayerState(120, mapOf())
             ),
             2L to Player(
                 netDevId = null,
                 name = "Def",
                 active = false,
-                state = Score(36)
+                state = PlayerState(36, mapOf())
             ),
             3L to Player(
                 netDevId = null,
                 name = "Foo",
                 active = true,
-                state = Score(154)
+                state = PlayerState(154, mapOf())
             )
         ),
         orderedPlayerIds = listOf(1, 2, 3),
@@ -114,19 +114,19 @@ val defaultGames: List<GameSession> = listOf(
                 netDevId = null,
                 name = "Bar",
                 active = true,
-                state = Score(1220)
+                state = PlayerState(1220, mapOf())
             ),
             2L to Player(
                 netDevId = null,
                 name = "Conf",
                 active = true,
-                state = Score(376)
+                state = PlayerState(376, mapOf())
             ),
             3L to Player(
                 netDevId = null,
                 name = "Leak",
                 active = true,
-                state = Score(532)
+                state = PlayerState(532, mapOf())
             )
         ),
         orderedPlayerIds = listOf(3, 1, 2),
@@ -148,25 +148,25 @@ val defaultGames: List<GameSession> = listOf(
                 netDevId = null,
                 name = "Bar",
                 active = true,
-                state = Score(12)
+                state = PlayerState(12, mapOf())
             ),
             2L to Player(
                 netDevId = null,
                 name = "Conf",
                 active = true,
-                state = Score(37)
+                state = PlayerState(37, mapOf())
             ),
             3L to Player(
                 netDevId = null,
                 name = "Leak",
                 active = true,
-                state = Score(53)
+                state = PlayerState(53, mapOf())
             ),
             4L to Player(
                 netDevId = null,
                 name = "Flick",
                 active = true,
-                state = Score(32)
+                state = PlayerState(32, mapOf())
             )
         ),
         orderedPlayerIds = listOf(1, 2, 3, 4),

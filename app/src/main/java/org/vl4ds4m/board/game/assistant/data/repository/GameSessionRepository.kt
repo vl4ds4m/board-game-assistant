@@ -10,12 +10,10 @@ import org.vl4ds4m.board.game.assistant.data.entity.GameSessionData
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionEntity
 import org.vl4ds4m.board.game.assistant.data.entity.PlayerEntity
 import org.vl4ds4m.board.game.assistant.game.GameType
-import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
-import org.vl4ds4m.board.game.assistant.game.data.MonopolyPlayerState
-import org.vl4ds4m.board.game.assistant.game.data.Score
+import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
 
 class GameSessionRepository(
@@ -77,14 +75,14 @@ private fun List<PlayerEntity>.fromEntities(type: GameType): Map<Long, Player> =
             netDevId = it.netDevId,
             name = it.name,
             active = it.active,
-            state = when (type) {
+            state = PlayerState(0, mapOf()) /*when (type) { // TODO Implement
                 is Monopoly -> MonopolyPlayerState(
                     score = it.score,
                     position = it.position!!,
                     inPrison = it.inPrison!!
                 )
                 else -> Score(it.score)
-            }
+            }*/
         )
         put(it.id, player)
     }
@@ -146,7 +144,8 @@ private fun GameSession.asEntity(id: String) = GameSessionEntity(
 private fun GameSession.getPlayers(sessionId: String): List<PlayerEntity> =
     orderedPlayerIds.mapIndexed { index, id ->
         val player = players[id]!!
-        when (type) {
+        createPlayerEntity(sessionId, id, player, index)
+        /*when (type) { // TODO Implement
             is Monopoly -> {
                 val state = player.state as MonopolyPlayerState
                 createPlayerEntity(
@@ -155,7 +154,7 @@ private fun GameSession.getPlayers(sessionId: String): List<PlayerEntity> =
                 )
             }
             else -> createPlayerEntity(sessionId, id, player, index)
-        }
+        }*/
     }
 
 private fun createPlayerEntity(

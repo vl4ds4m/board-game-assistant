@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
-import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.game.env.Initializable
 
 interface DiceGame : OrderedGame {
@@ -42,7 +41,7 @@ class DiceGameEnv : OrderedGameEnv(Dice), DiceGame {
             if (it > 1000) oldScore - 100
             else it
         }.let {
-            Score(it)
+            player.state.copy(score = it)
         }
         val id = currentPlayerId.value ?: return
         changePlayerState(id, newScore)

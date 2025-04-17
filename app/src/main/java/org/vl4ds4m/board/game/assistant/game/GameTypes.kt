@@ -8,9 +8,9 @@ import org.vl4ds4m.board.game.assistant.game.simple.FreeGameEnv
 import org.vl4ds4m.board.game.assistant.game.simple.SimpleOrderedGameEnv
 import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.simple.FreeGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.ordered.SimpleOrderedGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.simple.SimpleOrderedGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModelProducer
 

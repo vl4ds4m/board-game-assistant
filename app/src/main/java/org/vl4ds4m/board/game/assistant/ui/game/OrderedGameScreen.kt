@@ -1,8 +1,7 @@
-package org.vl4ds4m.board.game.assistant.ui.game.ordered
+package org.vl4ds4m.board.game.assistant.ui.game
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import org.vl4ds4m.board.game.assistant.ui.game.GameScreen
 
 @Composable
 fun OrderedGameScreen(

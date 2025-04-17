@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.ui.game.ordered
+package org.vl4ds4m.board.game.assistant.ui.game.simple
 
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv

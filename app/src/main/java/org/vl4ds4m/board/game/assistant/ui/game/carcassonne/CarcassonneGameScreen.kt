@@ -3,7 +3,7 @@ package org.vl4ds4m.board.game.assistant.ui.game.carcassonne
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import org.vl4ds4m.board.game.assistant.ui.game.ordered.OrderedGameScreen
+import org.vl4ds4m.board.game.assistant.ui.game.OrderedGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 
 @Composable

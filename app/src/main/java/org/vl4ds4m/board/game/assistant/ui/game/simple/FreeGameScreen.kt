@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.ui.game.free
+package org.vl4ds4m.board.game.assistant.ui.game.simple
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

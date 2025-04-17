@@ -51,9 +51,9 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.game.component.StandardCounter
 import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.free.FreeGameScreen
+import org.vl4ds4m.board.game.assistant.ui.game.simple.FreeGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.ordered.SimpleOrderedGameScreen
+import org.vl4ds4m.board.game.assistant.ui.game.simple.SimpleOrderedGameScreen
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable

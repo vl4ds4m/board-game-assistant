@@ -16,6 +16,7 @@ import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
+import org.vl4ds4m.board.game.assistant.ui.game.component.ShowGameAction
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -23,6 +24,7 @@ fun ObserverGameScreen(
     players: State<Players>,
     currentPlayerId: State<Long?>,
     actions: State<Actions>,
+    showAction: ShowGameAction,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -43,6 +45,7 @@ fun ObserverGameScreen(
         GameHistory(
             players = players,
             actions = actions,
+            showAction = showAction,
             modifier = Modifier
                 .weight(0.5f)
                 .fillMaxWidth()
@@ -57,7 +60,8 @@ private fun ObserverGameScreenPreview() {
         ObserverGameScreen(
             players = remember { mutableStateOf(mapOf()) },
             currentPlayerId = remember { mutableStateOf(null) },
-            actions = remember { mutableStateOf(listOf()) }
+            actions = remember { mutableStateOf(listOf()) },
+            showAction = { _, _ -> "Some action" }
         )
     }
 }

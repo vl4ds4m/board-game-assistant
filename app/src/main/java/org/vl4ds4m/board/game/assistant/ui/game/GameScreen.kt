@@ -50,7 +50,9 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistoryState
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenu
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
+import org.vl4ds4m.board.game.assistant.ui.game.component.ShowGameAction
 import org.vl4ds4m.board.game.assistant.ui.game.component.StandardCounter
+import org.vl4ds4m.board.game.assistant.ui.game.component.gameActionPresenter
 import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.simple.FreeGameScreen
 import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameScreen
@@ -125,6 +127,7 @@ fun GameScreen(
         players = viewModel.players.collectAsState(),
         currentPlayerId = viewModel.currentPlayerId.collectAsState(),
         actions = viewModel.actions.collectAsState(),
+        showAction = viewModel.type.gameActionPresenter::showAction,
         selectPlayer = selectPlayer,
         timer = timer,
         masterActions = masterActions,
@@ -137,6 +140,7 @@ fun GameScreenContent(
     players: State<Players>,
     currentPlayerId: State<Long?>,
     actions: State<Actions>,
+    showAction: ShowGameAction,
     selectPlayer: ((Long) -> Unit)?,
     timer: State<Int?>,
     masterActions: @Composable () -> Unit,
@@ -183,6 +187,7 @@ fun GameScreenContent(
         GameHistory(
             players = players,
             actions = actions,
+            showAction = showAction,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp)
@@ -209,6 +214,7 @@ private fun GameScreenPreview() {
             players = remember { mutableStateOf(fakePlayers) },
             currentPlayerId = remember { mutableStateOf(1) },
             actions = remember { mutableStateOf(fakeActions) },
+            showAction = { _, _ -> "Example action" },
             selectPlayer = null,
             timer = remember { mutableIntStateOf(157) },
             masterActions = {

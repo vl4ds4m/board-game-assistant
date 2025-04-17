@@ -11,6 +11,7 @@ import androidx.navigation.toRoute
 import org.vl4ds4m.board.game.assistant.network.NetworkGameState
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
+import org.vl4ds4m.board.game.assistant.ui.game.component.gameActionPresenter
 
 fun NavGraphBuilder.observerNavigation(
     navController: NavController,
@@ -50,10 +51,18 @@ fun NavGraphBuilder.observerNavigation(
                         } ?: listOf()
                     }
                 }
+                val showAction = remember {
+                    derivedStateOf {
+                        session.value?.type?.gameActionPresenter
+                            ?.let { it::showAction }
+                            ?: { _, _ -> "" }
+                    }
+                }
                 ObserverGameScreen(
                     players = players,
                     currentPlayerId = currentPlayerId,
-                    actions = actions
+                    actions = actions,
+                    showAction = showAction.value
                 )
             }
             NetworkGameState.END_GAME -> ObserverEndScreen()

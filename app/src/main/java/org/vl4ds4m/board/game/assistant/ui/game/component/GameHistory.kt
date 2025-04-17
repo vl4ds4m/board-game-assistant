@@ -17,6 +17,7 @@ import org.vl4ds4m.board.game.assistant.game.Players
 fun GameHistory(
     players: State<Players>,
     actions: State<Actions>,
+    showAction: ShowGameAction,
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
@@ -32,32 +33,9 @@ fun GameHistory(
     ) {
         items(actions.value) { action ->
             Text(
-                text = action.toJson(),
+                text = showAction(action, players.value),
                 maxLines = 1
             )
-            /*when (action) { // TODO Implement Game specific log
-                is CurrentPlayerChangeAction -> {
-                    val old = getPlayerName(players.value, action.oldPlayerId)
-                    val new = getPlayerName(players.value, action.newPlayerId)
-                    Text("$old -> $new")
-                }
-                is PlayerStateChangeAction -> {
-                    val name = getPlayerName(players.value, action.playerId)
-                    val scoreChange = action.newState.score.let {
-                        it - action.oldState.score
-                    }.let {
-                        if (it == 0) "no score change"
-                        else if (it > 0) "+$it point(s)"
-                        else "-$it point(s)"
-                    }
-                    Text("$name: $scoreChange")
-                }
-            }*/
         }
     }
-}
-
-private fun getPlayerName(players: Players, id: Long?): String {
-    id ?: return "[nobody]"
-    return players[id]?.name ?: "[removed]"
 }

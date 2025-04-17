@@ -17,7 +17,7 @@ import org.vl4ds4m.board.game.assistant.updateAndGetStates
 import org.vl4ds4m.board.game.assistant.updateMap
 import java.util.concurrent.atomic.AtomicLong
 
-abstract class GameEnv(override val type: GameType) : Game {
+abstract class GameEnv(final override val type: GameType) : Game {
     final override val name: MutableStateFlow<String> = MutableStateFlow("")
 
     private val mPlayers: MutableStateFlow<Players> = MutableStateFlow(mapOf())

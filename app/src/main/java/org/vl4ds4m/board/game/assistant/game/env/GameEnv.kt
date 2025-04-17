@@ -286,10 +286,6 @@ abstract class GameEnv(final override val type: GameType) : Game {
         get() = players.value.keys.toList()
         set(_) {}
 
-    companion object {
-        const val TAG = "GameEnvironment"
-    }
-
     protected object Actions {
         const val CHANGE_CURRENT_PLAYER  = "change_current_player"
         const val OLD_PLAYER_ID_KEY = "old_player_id"
@@ -301,3 +297,5 @@ abstract class GameEnv(final override val type: GameType) : Game {
         const val NEW_STATE_KEY = "new_state"
     }
 }
+
+private const val TAG = "GameEnvironment"

@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.vl4ds4m.board.game.assistant.game.Actions
-import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 
 class GameActionsHistory {
     private var mActionsContainer = mutableListOf<GameAction>()
@@ -31,7 +30,7 @@ class GameActionsHistory {
             in 0 .. actions.size -> nextActionIndex
             else -> {
                 Log.w(
-                    GameEnv.TAG,
+                    TAG,
                     "Invalid current position of GameActionsHistory" +
                         " during initialization. The position is set on the end"
                 )
@@ -63,7 +62,7 @@ class GameActionsHistory {
     fun revert(): GameAction? {
         if (!history.hasPrevious()) {
             Log.w(
-                GameEnv.TAG,
+                TAG,
                 "Can't revert action. There is no previous one"
             )
             return null
@@ -76,7 +75,7 @@ class GameActionsHistory {
     fun repeat(): GameAction? {
         if (!history.hasNext()) {
             Log.w(
-                GameEnv.TAG,
+                TAG,
                 "Can't repeat action. There is no next one"
             )
             return null
@@ -86,3 +85,5 @@ class GameActionsHistory {
         return action
     }
 }
+
+private const val TAG = "GameActionsHistory"

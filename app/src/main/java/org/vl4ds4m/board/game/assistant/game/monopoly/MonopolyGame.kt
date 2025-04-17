@@ -1,8 +1,17 @@
 package org.vl4ds4m.board.game.assistant.game.monopoly
 
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.OrderedGame
+import org.vl4ds4m.board.game.assistant.game.data.PlayerState
+import org.vl4ds4m.board.game.assistant.game.env.Initializable
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 
 interface MonopolyGame : OrderedGame {
@@ -22,25 +31,16 @@ interface MonopolyGame : OrderedGame {
 }
 
 class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
-    /*private val currentPlayerState: Pair<Long, MonopolyPlayerState>? // TODO REFACTOR
-        get() = currentPlayer?.let { (id, p) ->
-            p.monopolyState?.let { state -> id to state }
-        }
+    private val currentPlayerState: Pair<Long, PlayerState>?
+        get() = currentPlayer?.let { (id, player) -> id to player.state }
 
     override fun addPlayer(netDevId: String?, name: String) {
-        addPlayer(netDevId, name, MonopolyPlayerState())
-    }
-
-    override fun producePlayerState(
-        source: PlayerState, provider: PlayerState
-    ): MonopolyPlayerState {
-        val init = source as MonopolyPlayerState
-        val prov = provider as MonopolyPlayerState
-        return when {
-            init.position != prov.position -> init.copy(position = prov.position)
-            init.inPrison != prov.inPrison -> init.copy(inPrison = prov.inPrison)
-            else -> init.copy(score = prov.score)
-        }
+        val state = monopolyPlayerState(
+            score = 0,
+            position = 1,
+            inPrison = false
+        )
+        addPlayer(netDevId, name, state)
     }
 
     private val mInPrison = MutableStateFlow(false)
@@ -48,9 +48,9 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
 
     private val inPrisonObserver = Initializable { scope ->
         currentPlayerId.combine(players) { id, p -> p[id] }
+            .map { it?.state?.inPrison }
             .filterNotNull()
-            .map { it.state as MonopolyPlayerState }
-            .onEach { mInPrison.value = it.inPrison }
+            .onEach { mInPrison.value = it }
             .launchIn(scope)
     }
 
@@ -63,9 +63,9 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
         }
     }
 
-    private fun addMoney(playerId: Long, money: Int): MonopolyPlayerState? {
+    private fun addMoney(playerId: Long, money: Int): PlayerState? {
         if (money <= 0) return null
-        val state = players.value[playerId]?.monopolyState ?: return null
+        val state = players.value[playerId]?.state ?: return null
         return state.run {
             copy(score = score + money)
         }.also {
@@ -79,9 +79,9 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
         }
     }
 
-    private fun spendMoney(playerId: Long, money: Int): MonopolyPlayerState? {
+    private fun spendMoney(playerId: Long, money: Int): PlayerState? {
         if (money <= 0) return null
-        val state = players.value[playerId]?.monopolyState ?: return null
+        val state = players.value[playerId]?.state ?: return null
         if (state.score < money) return null
         return state.run {
             copy(score = score - money)
@@ -93,9 +93,10 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
     override fun movePlayer(steps: Int) {
         if (steps !in 2..12) return
         val (id, state) = currentPlayerState ?: return
-        if (state.inPrison) return
+        state.inPrison?.takeUnless { it } ?: return
+        val position = state.position ?: return
         var newCycle = false
-        val newPosState = (state.position + steps).let {
+        val newPosState = (position + steps).let {
             if (it > MonopolyField.COUNT) {
                 newCycle = true
                 it % MonopolyField.COUNT
@@ -103,7 +104,7 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
                 it
             }
         }.let {
-            state.copy(position = it)
+            state.updatePosition(it)
         }
         changePlayerState(id, newPosState)
         if (newCycle) addMoney(id, Ahead.MONEY)
@@ -111,56 +112,28 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
 
     override fun moveToPrison() {
         val (id, state) = currentPlayerState ?: return
-        if (state.inPrison) return
-        val prisonPosState = state.copy(position = Prison.POSITION)
+        state.inPrison?.takeUnless { it } ?: return
+        val prisonPosState = state.updatePosition(Prison.POSITION)
         changePlayerState(id, prisonPosState)
-        changePlayerState(id, prisonPosState.copy(inPrison = true))
+        val inPrisonState = prisonPosState.updateInPrison(true)
+        changePlayerState(id, inPrisonState)
     }
 
     override fun leavePrison(rescued: Boolean) {
         val (id, state) = currentPlayerState ?: return
-        if (!state.inPrison) return
+        state.inPrison?.takeIf { it } ?: return
         val beforeFreeState =
             if (!rescued) spendMoney(id, Prison.FINE) ?: return
             else state
-        changePlayerState(id, beforeFreeState.copy(inPrison = false))
+        changePlayerState(id, beforeFreeState.updateInPrison(false))
     }
 
     override fun transferMoney(senderId: Long, receiverId: Long, money: Int) {
         if (money <= 0) return
-        val senderState = players.value[senderId]?.monopolyState ?: return
+        val senderState = players.value[senderId]?.state ?: return
         if (senderState.score < money) return
         if (receiverId !in players.value) return
         spendMoney(senderId, money) ?: return
         addMoney(receiverId, money) ?: return
-    }*/
-    override val inPrison: StateFlow<Boolean>
-        get() = TODO("Not yet implemented")
-
-    override fun addMoney(money: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun spendMoney(money: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun movePlayer(steps: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun moveToPrison() {
-        TODO("Not yet implemented")
-    }
-
-    override fun leavePrison(rescued: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    override fun transferMoney(senderId: Long, receiverId: Long, money: Int) {
-        TODO("Not yet implemented")
     }
 }
-
-/*private val Player.monopolyState: MonopolyPlayerState?
-    get() = state as? MonopolyPlayerState*/

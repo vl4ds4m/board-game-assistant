@@ -22,13 +22,13 @@ class DiceGameEnv : OrderedGameEnv(Dice), DiceGame {
         currentPlayerId.combine(actions) { id, actions ->
             mAddEnabled.value = actions.takeIf { actions.isNotEmpty() }
                 ?.last()
-                ?.takeIf { it.type == Actions.CHANGE_PLAYER_SCORE }
+                ?.takeIf { it.type == Actions.CHANGE_PLAYER_STATE }
                 ?.takeIf { action ->
                     val playerId = action.data[Actions.PLAYER_ID_KEY]?.toLongOrNull()
                     playerId == id
                 }
                 ?.takeIf { action ->
-                    val score = action.data[Actions.OLD_SCORE_KEY]?.toIntOrNull()
+                    val score = action.data[Actions.OLD_STATE_KEY]?.toIntOrNull()
                     score?.let { isPlayerInHole(it) } ?: false
                 }
                 ?.let { false } ?: true

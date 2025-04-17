@@ -1,6 +1,8 @@
 package org.vl4ds4m.board.game.assistant.game.data
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 typealias PlayerStateData = Map<String, String>
 
@@ -8,14 +10,14 @@ typealias PlayerStateData = Map<String, String>
 data class PlayerState(
     val score: Int,
     val data: PlayerStateData
-)
-/*
-@Serializable
-data class Score(override val score: Int = 0) : PlayerState
+) {
+    fun toJson(): String = Json.encodeToString(this)
 
-@Serializable
-data class MonopolyPlayerState(
-    override val score: Int = 0,
-    val position: Int = 1,
-    val inPrison: Boolean = false,
-) : PlayerState*/
+    companion object {
+        fun fromJson(value: String): PlayerState = Json.decodeFromString(value)
+    }
+}
+
+fun PlayerStateData.copy(
+    vararg updates: Pair<String, String>
+): PlayerStateData = toMutableMap().apply { putAll(updates) }

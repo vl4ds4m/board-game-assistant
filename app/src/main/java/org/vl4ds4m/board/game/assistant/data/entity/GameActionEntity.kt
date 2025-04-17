@@ -24,7 +24,10 @@ data class GameActionEntity(
     @ColumnInfo(name = POSITION)
     val position: Int,
 
-    @ColumnInfo(name = TYPE)
+    @ColumnInfo(name = CONTENT)
+    val content: String
+
+    /*@ColumnInfo(name = TYPE) TODO Resolve
     val type: String,
 
     @ColumnInfo(name = PLAYER_ID)
@@ -49,13 +52,14 @@ data class GameActionEntity(
     val newPos: Int?,
 
     @ColumnInfo(name = IN_PRISON)
-    val inPrison: Boolean?
+    val inPrison: Boolean?*/
 ) {
     companion object {
         const val TABLE_NAME = "actions"
         const val SESSION_ID = "session_id"
         const val POSITION = "position"
-        const val TYPE = "action_type"
+        const val CONTENT = "action_content"
+        /*const val TYPE = "action_type" TODO Resolve
         const val PLAYER_ID = "player_id"
         const val OLD_SCORE = "old_score"
         const val NEW_SCORE = "new_score"
@@ -63,6 +67,6 @@ data class GameActionEntity(
         const val NEW_PLAYER_ID = "new_player_id"
         const val OLD_POS = "old_position"
         const val NEW_POS = "new_position"
-        const val IN_PRISON = "in_prison"
+        const val IN_PRISON = "in_prison"*/
     }
 }

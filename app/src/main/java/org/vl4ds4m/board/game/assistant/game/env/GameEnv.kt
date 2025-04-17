@@ -9,9 +9,7 @@ import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.Players
-import org.vl4ds4m.board.game.assistant.game.log.CurrentPlayerChangeAction
 import org.vl4ds4m.board.game.assistant.game.log.GameActionsHistory
-import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.updateAndGetStates
@@ -40,13 +38,13 @@ open class GameEnv(override val type: GameType) : Game {
     }
 
     protected fun addActionForCurrentIdUpdate(ids: States<Long?>) {
-        val (old, new) = ids
+        /*val (old, new) = ids // TODO Implement
         if (old != new) {
             history += CurrentPlayerChangeAction(
                 oldPlayerId = old,
                 newPlayerId = new
             )
-        }
+        }*/
     }
 
     override fun addPlayer(netDevId: String?, name: String) {
@@ -138,16 +136,16 @@ open class GameEnv(override val type: GameType) : Game {
     }
 
     final override fun changePlayerState(id: Long, state: PlayerState) {
-        val (oldPlayers, newPlayers) = mPlayers.updateMap {
+        /*val (oldPlayers, newPlayers) = mPlayers.updateMap {
             val player = get(id) ?: return
             if (player.state == state) return
             put(id, player.copy(state = state))
         }
-        history += PlayerStateChangeAction(
+        history += PlayerStateChangeAction( // TODO Implement
             playerId = id,
             oldState = oldPlayers[id]!!.state,
             newState = newPlayers[id]!!.state,
-        )
+        )*/
     }
 
     private var startTime: Long? = null
@@ -208,8 +206,8 @@ open class GameEnv(override val type: GameType) : Game {
 
     final override val actions = history.actions
 
-    final override fun revert() {
-        val action = history.revert() ?: return
+    final override fun revert() { // TODO Implement
+        /*val action = history.revert() ?: return
         when (action) {
             is CurrentPlayerChangeAction -> {
                 mCurrentPlayerId.value = action.oldPlayerId
@@ -223,15 +221,15 @@ open class GameEnv(override val type: GameType) : Game {
                     }
                 }
             }
-        }
+        }*/
     }
 
     protected open fun producePlayerState(
         source: PlayerState, provider: PlayerState
     ): PlayerState = provider
 
-    final override fun repeat() {
-        val action = history.repeat() ?: return
+    final override fun repeat() { // TODO Implement
+        /*val action = history.repeat() ?: return
         when (action) {
             is CurrentPlayerChangeAction -> {
                 mCurrentPlayerId.value = action.newPlayerId
@@ -245,7 +243,7 @@ open class GameEnv(override val type: GameType) : Game {
                     }
                 }
             }
-        }
+        }*/
     }
 
     open val initializables: Array<Initializable> = arrayOf(timer)

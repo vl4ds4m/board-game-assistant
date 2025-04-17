@@ -16,9 +16,7 @@ import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 import org.vl4ds4m.board.game.assistant.game.data.MonopolyPlayerState
 import org.vl4ds4m.board.game.assistant.game.data.Score
-import org.vl4ds4m.board.game.assistant.game.log.CurrentPlayerChangeAction
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
-import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
 
 class GameSessionRepository(
     private val sessionDao: GameSessionDao,
@@ -46,9 +44,7 @@ class GameSessionRepository(
             GameSessionData(
                 entity = session.asEntity(id),
                 players = session.getPlayers(id),
-                actions = session.actions.mapIndexed { index, action ->
-                    action.asEntity(session.type, id, index)
-                }
+                actions = session.getActions(id)
             ).let {
                 sessionDao.insertSession(it)
             }
@@ -70,7 +66,7 @@ private fun GameSessionData.gameSession(): GameSession {
         stopTime = entity.stopTime,
         timeout = entity.timeout,
         secondsUntilEnd = entity.secondsUntilEnd,
-        actions = actions.fromEntities(gameType),
+        actions = actions.fromEntities,
         currentActionPosition = entity.currentActionPosition
     )
 }
@@ -97,14 +93,19 @@ private fun List<PlayerEntity>.fromEntities(type: GameType): Map<Long, Player> =
 private val GameSessionData.orderedPlayerIds
     get() = players.sortedBy { it.order }.map { it.id }
 
-private fun List<GameActionEntity>.fromEntities(gameType: GameType): List<GameAction> = sortedBy { it.position }
+private val List<GameActionEntity>.fromEntities: List<GameAction>
+    get() = sortedBy { it.position }
+        .map { GameAction.fromJson(it.content) }
+
+// TODO Resolve
+/*private fun List<GameActionEntity>.fromEntities2(gameType: GameType): List<GameAction> = sortedBy { it.position }
     .map {
         when (it.type) {
             GameAction.CHANGE_CURRENT_PLAYER -> CurrentPlayerChangeAction(
                 oldPlayerId = it.oldPlayerId,
                 newPlayerId = it.newPlayerId
             )
-            GameAction.CHANGE_PLAYER_STATE -> {
+            GameAction.CHANGE_PLAYER_SCORE -> {
                 val (oldState, newState) = when (gameType) {
                     is Monopoly -> {
                         when {
@@ -126,7 +127,7 @@ private fun List<GameActionEntity>.fromEntities(gameType: GameType): List<GameAc
             }
             else -> throw IllegalStateException("Unknown GameAction type: ${it.type}")
         }
-    }
+    }*/
 
 private fun GameSession.asEntity(id: String) = GameSessionEntity(
     id = id,
@@ -173,7 +174,18 @@ private fun createPlayerEntity(
     inPrison = inPrison
 )
 
-private fun GameAction.asEntity(gameType: GameType, sessionId: String, position: Int): GameActionEntity =
+
+private fun GameSession.getActions(id: String): List<GameActionEntity> =
+    actions.mapIndexed { index, action ->
+        GameActionEntity(
+            sessionId = id,
+            position = index,
+            content = action.toJson()
+        )
+    }
+
+// TODO Resolve
+/*private fun GameAction.asEntity(gameType: GameType, sessionId: String, position: Int): GameActionEntity =
     when (this) {
         is CurrentPlayerChangeAction -> GameActionEntity(
             sessionId = sessionId,
@@ -196,7 +208,7 @@ private fun GameAction.asEntity(gameType: GameType, sessionId: String, position:
                     oldState.position != newState.position -> GameActionEntity(
                         sessionId = sessionId,
                         position = position,
-                        type = GameAction.CHANGE_PLAYER_STATE,
+                        type = GameAction.CHANGE_PLAYER_SCORE,
                         playerId = playerId,
                         oldScore = null,
                         newScore = null,
@@ -209,7 +221,7 @@ private fun GameAction.asEntity(gameType: GameType, sessionId: String, position:
                     else -> GameActionEntity(
                         sessionId = sessionId,
                         position = position,
-                        type = GameAction.CHANGE_PLAYER_STATE,
+                        type = GameAction.CHANGE_PLAYER_SCORE,
                         playerId = playerId,
                         oldScore = null,
                         newScore = null,
@@ -224,7 +236,7 @@ private fun GameAction.asEntity(gameType: GameType, sessionId: String, position:
             else -> GameActionEntity(
                 sessionId = sessionId,
                 position = position,
-                type = GameAction.CHANGE_PLAYER_STATE,
+                type = GameAction.CHANGE_PLAYER_SCORE,
                 playerId = playerId,
                 oldScore = oldState.score,
                 newScore = newState.score,
@@ -235,4 +247,4 @@ private fun GameAction.asEntity(gameType: GameType, sessionId: String, position:
                 inPrison = null
             )
         }
-    }
+    }*/

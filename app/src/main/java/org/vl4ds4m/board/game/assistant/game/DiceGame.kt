@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.launchIn
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 import org.vl4ds4m.board.game.assistant.game.data.Score
 import org.vl4ds4m.board.game.assistant.game.env.Initializable
-import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
 
 class DiceGame : OrderedGameEnv(Dice) {
     private val mAddEnabled = MutableStateFlow(true)
@@ -16,11 +15,11 @@ class DiceGame : OrderedGameEnv(Dice) {
 
     private val addEnabledObserver = Initializable { scope ->
         currentPlayerId.combine(actions) { id, actions ->
-            mAddEnabled.value = actions.takeIf { actions.isNotEmpty() }
+            mAddEnabled.value = /*actions.takeIf { actions.isNotEmpty() } // TODO Implement
                 ?.let { actions.last() as? PlayerStateChangeAction }
                 ?.takeIf { it.playerId == id }
                 ?.takeIf { isPlayerInHole(it.oldState.score) }
-                ?.let { false } ?: true
+                ?.let { false } ?:*/ true
             }.launchIn(scope)
     }
 

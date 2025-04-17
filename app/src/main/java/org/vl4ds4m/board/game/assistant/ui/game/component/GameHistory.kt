@@ -12,8 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.Players
-import org.vl4ds4m.board.game.assistant.game.log.CurrentPlayerChangeAction
-import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
 
 @Composable
 fun GameHistory(
@@ -33,7 +31,11 @@ fun GameHistory(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         items(actions.value) { action ->
-            when (action) { // TODO Implement Game specific log
+            Text(
+                text = action.toJson(),
+                maxLines = 1
+            )
+            /*when (action) { // TODO Implement Game specific log
                 is CurrentPlayerChangeAction -> {
                     val old = getPlayerName(players.value, action.oldPlayerId)
                     val new = getPlayerName(players.value, action.newPlayerId)
@@ -50,7 +52,7 @@ fun GameHistory(
                     }
                     Text("$name: $scoreChange")
                 }
-            }
+            }*/
         }
     }
 }

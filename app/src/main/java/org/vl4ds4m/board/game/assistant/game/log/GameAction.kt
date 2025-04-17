@@ -1,17 +1,24 @@
 package org.vl4ds4m.board.game.assistant.game.log
 
 import kotlinx.serialization.Serializable
-import org.vl4ds4m.board.game.assistant.game.data.PlayerState
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
+typealias GameActionData = Map<String, String>
 
 @Serializable
-sealed interface GameAction {
+data class GameAction(val type: String, val data: GameActionData) {
+    fun toJson(): String = Json.encodeToString(this)
+
     companion object {
         const val CHANGE_CURRENT_PLAYER  = "change_current_player"
-        const val CHANGE_PLAYER_STATE  = "change_player_state"
+        const val CHANGE_PLAYER_SCORE  = "change_player_score"
+
+        fun fromJson(value: String): GameAction = Json.decodeFromString(value)
     }
 }
 
-@Serializable
+/*@Serializable
 data class CurrentPlayerChangeAction(
     val oldPlayerId: Long?,
     val newPlayerId: Long?
@@ -22,4 +29,4 @@ data class PlayerStateChangeAction(
     val playerId: Long,
     val oldState: PlayerState,
     val newState: PlayerState
-) : GameAction
+) : GameAction*/

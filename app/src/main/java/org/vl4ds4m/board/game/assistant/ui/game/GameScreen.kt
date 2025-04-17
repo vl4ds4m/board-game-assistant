@@ -40,8 +40,6 @@ import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.game.data.Score
-import org.vl4ds4m.board.game.assistant.game.log.CurrentPlayerChangeAction
-import org.vl4ds4m.board.game.assistant.game.log.PlayerStateChangeAction
 import org.vl4ds4m.board.game.assistant.prettyTime
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
 import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameScreen
@@ -210,7 +208,7 @@ private fun GameScreenPreview() {
         GameScreenContent(
             players = remember { mutableStateOf(fakePlayers) },
             currentPlayerId = remember { mutableStateOf(1) },
-            actions = remember { mutableStateOf(fakeActions) },
+            actions = remember { mutableStateOf(listOf()/* TODO fakeActions*/) },
             selectPlayer = null,
             timer = remember { mutableIntStateOf(157) },
             masterActions = {
@@ -240,7 +238,7 @@ val fakePlayers = sequence {
     )
 }.toMap()
 
-val fakeActions = listOf(
+/*private val fakeActions = listOf(
     CurrentPlayerChangeAction(3, 4),
     PlayerStateChangeAction(4, Score(2), Score(7))
-)
+)*/

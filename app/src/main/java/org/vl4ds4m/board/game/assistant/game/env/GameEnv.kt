@@ -307,15 +307,15 @@ abstract class GameEnv(override val type: GameType) : Game {
     companion object {
         const val TAG = "GameEnvironment"
     }
-}
 
-private object Actions {
-    const val CHANGE_CURRENT_PLAYER  = "change_current_player"
-    const val OLD_PLAYER_ID_KEY = "old_player_id"
-    const val NEW_PLAYER_ID_KEY = "new_player_id"
+    protected object Actions {
+        const val CHANGE_CURRENT_PLAYER  = "change_current_player"
+        const val OLD_PLAYER_ID_KEY = "old_player_id"
+        const val NEW_PLAYER_ID_KEY = "new_player_id"
 
-    const val CHANGE_PLAYER_SCORE  = "change_player_score"
-    const val PLAYER_ID_KEY = "player_id"
-    const val OLD_SCORE_KEY = "old_score"
-    const val NEW_SCORE_KEY = "new_score"
+        const val CHANGE_PLAYER_SCORE  = "change_player_score"
+        const val PLAYER_ID_KEY = "player_id"
+        const val OLD_SCORE_KEY = "old_score"
+        const val NEW_SCORE_KEY = "new_score"
+    }
 }

@@ -20,11 +20,18 @@ class DiceGameEnv : OrderedGameEnv(Dice), DiceGame {
 
     private val addEnabledObserver = Initializable { scope ->
         currentPlayerId.combine(actions) { id, actions ->
-            mAddEnabled.value = /*actions.takeIf { actions.isNotEmpty() } // TODO Implement
-                ?.let { actions.last() as? PlayerStateChangeAction }
-                ?.takeIf { it.playerId == id }
-                ?.takeIf { isPlayerInHole(it.oldState.score) }
-                ?.let { false } ?:*/ true
+            mAddEnabled.value = actions.takeIf { actions.isNotEmpty() }
+                ?.last()
+                ?.takeIf { it.type == Actions.CHANGE_PLAYER_SCORE }
+                ?.takeIf { action ->
+                    val playerId = action.data[Actions.PLAYER_ID_KEY]?.toLongOrNull()
+                    playerId == id
+                }
+                ?.takeIf { action ->
+                    val score = action.data[Actions.OLD_SCORE_KEY]?.toIntOrNull()
+                    score?.let { isPlayerInHole(it) } ?: false
+                }
+                ?.let { false } ?: true
             }.launchIn(scope)
     }
 

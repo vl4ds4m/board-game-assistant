@@ -252,8 +252,10 @@ abstract class GameEnv(final override val type: GameType) : Game {
     fun load(session: GameSession): Unit = session.let {
         mCompleted.value = it.completed
         name.value = it.name
-        mPlayers.value = it.players
-        playersIds = it.orderedPlayerIds
+        it.players.let { ps ->
+            mPlayers.value = ps.toMap()
+            playersIds = ps.map { p -> p.first }
+        }
         mCurrentPlayerId.value = it.currentPlayerId
         nextNewPlayerId.set(it.nextNewPlayerId)
         startTime = it.startTime
@@ -267,8 +269,9 @@ abstract class GameEnv(final override val type: GameType) : Game {
         completed = completed.value,
         type = type,
         name = name.value,
-        players = players.value,
-        orderedPlayerIds = playersIds,
+        players = players.value.let { ps ->
+            playersIds.map { it to ps[it]!! }
+        },
         currentPlayerId = currentPlayerId.value,
         nextNewPlayerId = nextNewPlayerId.get(),
         startTime = startTime,

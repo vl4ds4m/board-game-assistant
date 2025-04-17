@@ -33,17 +33,11 @@ data class PlayerEntity(
     @ColumnInfo(name = ACTIVE)
     val active: Boolean,
 
-    @ColumnInfo(name = SCORE)
-    val score: Int,
+    @ColumnInfo(name = STATE)
+    val state: String,
 
     @ColumnInfo(name = ORDER)
-    val order: Int,
-
-    @ColumnInfo(name = POSITION)
-    val position: Int?, // Monopoly property
-
-    @ColumnInfo(name = IN_PRISON)
-    val inPrison: Boolean? // Monopoly property
+    val order: Int
 ) {
     companion object {
         const val TABLE_NAME = "players"
@@ -52,9 +46,7 @@ data class PlayerEntity(
         const val NET_DEV_ID = "net_dev_id"
         const val NAME = "nickname"
         const val ACTIVE = "active"
-        const val SCORE = "score"
+        const val STATE = "player_state"
         const val ORDER = "move_order"
-        const val POSITION = "position"
-        const val IN_PRISON = "in_prison"
     }
 }

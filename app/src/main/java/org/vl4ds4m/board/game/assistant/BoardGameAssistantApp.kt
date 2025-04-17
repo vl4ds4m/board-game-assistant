@@ -75,7 +75,7 @@ val defaultGames: List<GameSession> = listOf(
         completed = false,
         type = SimpleOrdered,
         name = "Uno 93",
-        players = mapOf(
+        players = listOf(
             1L to Player(
                 netDevId = null,
                 name = "Abc",
@@ -95,7 +95,6 @@ val defaultGames: List<GameSession> = listOf(
                 state = PlayerState(154, mapOf())
             )
         ),
-        orderedPlayerIds = listOf(1, 2, 3),
         currentPlayerId = 1L,
         nextNewPlayerId = 10L,
         startTime = initialTime + 40_000,
@@ -109,7 +108,7 @@ val defaultGames: List<GameSession> = listOf(
         completed = false,
         type = Free,
         name = "Poker Counts 28",
-        players = mapOf(
+        players = listOf(
             1L to Player(
                 netDevId = null,
                 name = "Bar",
@@ -129,7 +128,6 @@ val defaultGames: List<GameSession> = listOf(
                 state = PlayerState(532, mapOf())
             )
         ),
-        orderedPlayerIds = listOf(3, 1, 2),
         currentPlayerId = 2L,
         nextNewPlayerId = 10L,
         startTime = initialTime + 20_000,
@@ -143,7 +141,7 @@ val defaultGames: List<GameSession> = listOf(
         type = SimpleOrdered,
         completed = true,
         name = "Imaginarium 74",
-        players = mapOf(
+        players = listOf(
             1L to Player(
                 netDevId = null,
                 name = "Bar",
@@ -169,7 +167,6 @@ val defaultGames: List<GameSession> = listOf(
                 state = PlayerState(32, mapOf())
             )
         ),
-        orderedPlayerIds = listOf(1, 2, 3, 4),
         currentPlayerId = 3L,
         nextNewPlayerId = 10L,
         startTime = initialTime + 30_000,

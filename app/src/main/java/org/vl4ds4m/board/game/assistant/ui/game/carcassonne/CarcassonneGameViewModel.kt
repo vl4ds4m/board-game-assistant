@@ -8,7 +8,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModelProducer
 
 class CarcassonneGameViewModel(
-    override val gameEnv: CarcassonneGameEnv = CarcassonneGameEnv(),
+    gameEnv: CarcassonneGameEnv = CarcassonneGameEnv(),
     sessionId: String? = null,
     app: BoardGameAssistantApp
 ) : GameViewModel(gameEnv, sessionId, app), CarcassonneGame by gameEnv {

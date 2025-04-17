@@ -8,7 +8,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModelProducer
 
 class DiceGameViewModel private constructor(
-    override val gameEnv: DiceGameEnv = DiceGameEnv(),
+    gameEnv: DiceGameEnv = DiceGameEnv(),
     sessionId: String? = null,
     app: BoardGameAssistantApp
 ) : GameViewModel(gameEnv, sessionId, app), DiceGame by gameEnv {

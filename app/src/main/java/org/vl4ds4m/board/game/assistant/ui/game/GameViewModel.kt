@@ -19,12 +19,10 @@ import org.vl4ds4m.board.game.assistant.network.SessionEmitter
 import java.util.UUID
 
 abstract class GameViewModel(
-    gameEnv: GameEnv,
+    private val gameEnv: GameEnv,
     sessionId: String?,
     app: BoardGameAssistantApp
 ) : ViewModel(), Game {
-    protected open val gameEnv: GameEnv = gameEnv
-
     private val sessionRepository: GameSessionRepository = app.sessionRepository
 
     private val gameEmitter: GameEmitter = SessionEmitter(

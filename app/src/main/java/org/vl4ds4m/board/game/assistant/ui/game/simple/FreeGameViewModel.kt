@@ -8,7 +8,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModelProducer
 
 class FreeGameViewModel private constructor(
-    override val gameEnv: FreeGameEnv = FreeGameEnv(),
+    gameEnv: FreeGameEnv = FreeGameEnv(),
     sessionId: String? = null,
     app: BoardGameAssistantApp
 ) : GameViewModel(gameEnv, sessionId, app), FreeGame by gameEnv {

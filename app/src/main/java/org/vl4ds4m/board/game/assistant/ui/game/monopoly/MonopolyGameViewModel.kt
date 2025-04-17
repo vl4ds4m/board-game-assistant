@@ -8,7 +8,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModelProducer
 
 class MonopolyGameViewModel(
-    override val gameEnv: MonopolyGameEnv = MonopolyGameEnv(),
+    gameEnv: MonopolyGameEnv = MonopolyGameEnv(),
     sessionId: String? = null,
     app: BoardGameAssistantApp
 ) : GameViewModel(gameEnv, sessionId, app), MonopolyGame by gameEnv {

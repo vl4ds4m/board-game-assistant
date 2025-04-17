@@ -15,7 +15,7 @@ val String.short: String get() =
     if (length <= 20) this
     else substring(0, 20) + "..."
 
-data class States<T>(val old: T, val new: T)
+data class States<T>(val prev: T, val next: T)
 
 inline fun <K, V> MutableStateFlow<Map<K, V>>.updateMap(
     action: MutableMap<K, V>.() -> Unit
@@ -34,7 +34,7 @@ inline fun <T> MutableStateFlow<T>.updateAndGetStates(function: (T) -> T): State
         val prevValue = value
         val nextValue = function(prevValue)
         if (compareAndSet(prevValue, nextValue)) {
-            return States(old = prevValue, new = nextValue)
+            return States(prev = prevValue, next = nextValue)
         }
     }
 }

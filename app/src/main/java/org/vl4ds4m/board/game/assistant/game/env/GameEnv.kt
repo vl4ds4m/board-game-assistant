@@ -10,9 +10,16 @@ import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.Players
-import org.vl4ds4m.board.game.assistant.game.log.GameAction
+import org.vl4ds4m.board.game.assistant.game.changesCurrentPlayer
+import org.vl4ds4m.board.game.assistant.game.changesPlayerState
+import org.vl4ds4m.board.game.assistant.game.currentPlayerChangedAction
+import org.vl4ds4m.board.game.assistant.game.currentPlayerIds
 import org.vl4ds4m.board.game.assistant.game.log.GameActionsHistory
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
+import org.vl4ds4m.board.game.assistant.game.log.GameAction
+import org.vl4ds4m.board.game.assistant.game.playerId
+import org.vl4ds4m.board.game.assistant.game.playerStateChangedAction
+import org.vl4ds4m.board.game.assistant.game.playerStates
 import org.vl4ds4m.board.game.assistant.updateAndGetStates
 import org.vl4ds4m.board.game.assistant.updateMap
 import java.util.concurrent.atomic.AtomicLong
@@ -37,17 +44,8 @@ abstract class GameEnv(final override val type: GameType) : Game {
     }
 
     protected fun addCurrentPlayerChangedAction(ids: States<Long?>) {
-        val (old, new) = ids
-        if (old == new) return
-        history += GameAction(
-            type = Actions.CHANGE_CURRENT_PLAYER,
-            data = mapOf(
-                Actions.OLD_PLAYER_ID_KEY to
-                    old.let { it ?: -1L }.toString(),
-                Actions.NEW_PLAYER_ID_KEY to
-                    new.let { it ?: -1L }.toString()
-            )
-        )
+        if (ids.prev == ids.next) return
+        history += currentPlayerChangedAction(ids)
     }
 
     override fun addPlayer(netDevId: String?, name: String) {
@@ -144,14 +142,11 @@ abstract class GameEnv(final override val type: GameType) : Game {
             if (player.state == state) return
             put(id, player.copy(state = state))
         }
-        history += GameAction(
-            type = Actions.CHANGE_PLAYER_STATE,
-            data = mapOf(
-                Actions.PLAYER_ID_KEY to id.toString(),
-                Actions.OLD_STATE_KEY to oldPlayers[id]!!.state.toJson(),
-                Actions.NEW_STATE_KEY to newPlayers[id]!!.state.toJson()
-            )
+        val states = States(
+            prev = oldPlayers[id]!!.state,
+            next = newPlayers[id]!!.state
         )
+        history += playerStateChangedAction(id, states)
     }
 
     private var startTime: Long? = null
@@ -214,32 +209,34 @@ abstract class GameEnv(final override val type: GameType) : Game {
 
     final override fun revert() {
         val action = history.revert() ?: return
-        when (action.type) {
-            Actions.CHANGE_CURRENT_PLAYER ->
-                action.updatePlayerId(Actions.OLD_PLAYER_ID_KEY)
-            Actions.CHANGE_PLAYER_STATE ->
-                action.updatePlayerState(Actions.OLD_STATE_KEY)
+        when {
+            action.changesCurrentPlayer -> {
+                val ids = action.currentPlayerIds ?: return
+                mCurrentPlayerId.value = ids.prev
+            }
+            action.changesPlayerState -> {
+                val states = action.playerStates ?: return
+                updatePlayerState(action, states.prev)
+            }
         }
     }
 
     final override fun repeat() {
         val action = history.repeat() ?: return
-        when (action.type) {
-            Actions.CHANGE_CURRENT_PLAYER ->
-                action.updatePlayerId(Actions.NEW_PLAYER_ID_KEY)
-            Actions.CHANGE_PLAYER_STATE ->
-                action.updatePlayerState(Actions.NEW_STATE_KEY)
+        when {
+            action.changesCurrentPlayer -> {
+                val ids = action.currentPlayerIds ?: return
+                mCurrentPlayerId.value = ids.next
+            }
+            action.changesPlayerState -> {
+                val states = action.playerStates ?: return
+                updatePlayerState(action, states.next)
+            }
         }
     }
 
-    private fun GameAction.updatePlayerId(key: String) {
-        val playerId = data[key]?.toLongOrNull() ?: return
-        mCurrentPlayerId.value = playerId.takeIf { it != -1L }
-    }
-
-    private fun GameAction.updatePlayerState(stateKey: String) {
-        val id = data[Actions.PLAYER_ID_KEY]?.toLongOrNull() ?: return
-        val state = data[stateKey]?.let { PlayerState.fromJson(it) } ?: return
+    private fun updatePlayerState(action: GameAction, state: PlayerState) {
+        val id = action.playerId ?: return
         mPlayers.updateMap {
             val player = get(id) ?: return
             val updPlayer = player.copy(state = state)
@@ -285,17 +282,6 @@ abstract class GameEnv(final override val type: GameType) : Game {
     protected open var playersIds: List<Long>
         get() = players.value.keys.toList()
         set(_) {}
-
-    protected object Actions {
-        const val CHANGE_CURRENT_PLAYER  = "change_current_player"
-        const val OLD_PLAYER_ID_KEY = "old_player_id"
-        const val NEW_PLAYER_ID_KEY = "new_player_id"
-
-        const val CHANGE_PLAYER_STATE  = "change_player_state"
-        const val PLAYER_ID_KEY = "player_id"
-        const val OLD_STATE_KEY = "old_state"
-        const val NEW_STATE_KEY = "new_state"
-    }
 }
 
 private const val TAG = "GameEnvironment"

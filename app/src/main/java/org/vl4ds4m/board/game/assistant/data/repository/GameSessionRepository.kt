@@ -79,7 +79,7 @@ private val List<PlayerEntity>.fromEntities: OrderedPlayers
 
 private val List<GameActionEntity>.fromEntities: List<GameAction>
     get() = sortedBy { it.position }
-        .map { GameAction.fromJson(it.content) }
+        .map { GameAction.fromJson(it.action) }
 
 private fun GameSession.asEntity(id: String) = GameSessionEntity(
     id = id,
@@ -114,6 +114,6 @@ private fun GameSession.getActions(id: String): List<GameActionEntity> =
         GameActionEntity(
             sessionId = id,
             position = index,
-            content = action.toJson()
+            action = action.toJson()
         )
     }

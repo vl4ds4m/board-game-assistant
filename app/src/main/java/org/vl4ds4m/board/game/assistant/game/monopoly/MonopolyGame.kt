@@ -34,13 +34,13 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
     private val currentPlayerState: Pair<Long, PlayerState>?
         get() = currentPlayer?.let { (id, player) -> id to player.state }
 
-    override fun addPlayer(netDevId: String?, name: String) {
+    override fun addPlayer(netDevId: String?, name: String): Long {
         val state = monopolyPlayerState(
             score = 0,
             position = 1,
             inPrison = false
         )
-        addPlayer(netDevId, name, state)
+        return addPlayer(netDevId, name, state)
     }
 
     private val mInPrison = MutableStateFlow(false)

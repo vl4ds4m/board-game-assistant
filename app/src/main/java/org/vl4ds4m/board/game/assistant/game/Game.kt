@@ -24,7 +24,7 @@ interface Game {
             players.value[id]?.let { player -> id to player }
         }
 
-    fun addPlayer(netDevId: String?, name: String)
+    fun addPlayer(netDevId: String?, name: String): Long
 
     fun removePlayer(id: Long)
 

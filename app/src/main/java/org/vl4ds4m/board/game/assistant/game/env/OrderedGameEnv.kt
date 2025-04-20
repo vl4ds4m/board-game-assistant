@@ -13,7 +13,7 @@ import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.updateAndGetStates
 import org.vl4ds4m.board.game.assistant.updateList
 
-abstract class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
+open class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
     private val mNextPlayerId: MutableStateFlow<Long?> = MutableStateFlow(null)
     final override val nextPlayerId = mCurrentPlayerId.asStateFlow()
 

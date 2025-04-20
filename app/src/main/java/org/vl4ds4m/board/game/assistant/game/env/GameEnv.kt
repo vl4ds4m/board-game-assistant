@@ -24,7 +24,7 @@ import org.vl4ds4m.board.game.assistant.updateAndGetStates
 import org.vl4ds4m.board.game.assistant.updateMap
 import java.util.concurrent.atomic.AtomicLong
 
-abstract class GameEnv(final override val type: GameType) : Game {
+open class GameEnv(final override val type: GameType) : Game {
     final override val name: MutableStateFlow<String> = MutableStateFlow("")
 
     private val mPlayers: MutableStateFlow<Players> = MutableStateFlow(mapOf())
@@ -48,9 +48,8 @@ abstract class GameEnv(final override val type: GameType) : Game {
         history += currentPlayerChangedAction(ids)
     }
 
-    override fun addPlayer(netDevId: String?, name: String) {
+    override fun addPlayer(netDevId: String?, name: String): Long =
         addPlayer(netDevId, name, PlayerState(0, mapOf()))
-    }
 
     private val nextNewPlayerId: AtomicLong = AtomicLong(0)
 

@@ -16,7 +16,7 @@ class UserDataRepository(
     private val coroutineScope: CoroutineScope
 ) {
     val userName: Flow<String> = userDataStore.data.map { preferences ->
-        preferences[USER_NAME] ?: ""
+        preferences[USER_NAME] ?: "Player"
     }
 
     fun editUserName(name: String) {

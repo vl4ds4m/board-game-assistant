@@ -75,4 +75,5 @@
     <string name="game_monopoly_from_player">From</string>
     <string name="game_monopoly_to_player">To</string>
     <string name="game_monopoly_transfer">Transfer</string>
+    <string name="profile_save_changes">Save</string>
 </resources>

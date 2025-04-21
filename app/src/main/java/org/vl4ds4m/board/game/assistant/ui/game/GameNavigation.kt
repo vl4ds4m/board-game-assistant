@@ -3,6 +3,7 @@ package org.vl4ds4m.board.game.assistant.ui.game
 import androidx.activity.addCallback
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -10,6 +11,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.ui.Play
 import org.vl4ds4m.board.game.assistant.ui.MainActivity
@@ -60,7 +62,7 @@ fun NavGraphBuilder.gameNavigation(
     }
     composable<NewGameStart> {
         topBarUiState.update(
-            title = "New game: creation",
+            title = stringResource(R.string.new_game_title),
             navigateBack = navigateUp
         )
         NewGameStartScreen(
@@ -91,7 +93,7 @@ fun NavGraphBuilder.gameNavigation(
             }
         }
         topBarUiState.update(
-            title = "New game: players",
+            title = stringResource(R.string.new_game_title),
             navigateBack = onBackClick
         )
         LocalActivity.current.let {
@@ -132,7 +134,7 @@ fun NavGraphBuilder.gameNavigation(
     }
     composable<GameSetting> { entry ->
         topBarUiState.update(
-            title = "Game settings",
+            title = stringResource(R.string.game_settings_title),
             navigateBack = navigateUp
         )
         val gameEntry = navController.rememberTopmost<Game>(entry)
@@ -142,7 +144,7 @@ fun NavGraphBuilder.gameNavigation(
     }
     composable<PlayerSetting> { entry ->
         topBarUiState.update(
-            title = "Player Settings",
+            title = stringResource(R.string.game_players_settings_title),
             navigateBack = navigateUp
         )
         val gameEntry = navController.rememberTopmost<Game>(entry)
@@ -152,7 +154,7 @@ fun NavGraphBuilder.gameNavigation(
     }
     composable<DiceImitation> {
         topBarUiState.update(
-            title = "Dice Imitation",
+            title = stringResource(R.string.game_dice_imitation_title),
             navigateBack = navigateUp
         )
         DiceImitationScreen()
@@ -161,7 +163,7 @@ fun NavGraphBuilder.gameNavigation(
         val gameEntry = navController.rememberTopmost<Game>(entry)
         val viewModel = viewModel<GameViewModel>(gameEntry)
         topBarUiState.update(
-            title = "Game end",
+            title = stringResource(R.string.game_end_title),
             navigateBack = {
                 viewModel.returnGame()
                 navigateUp()

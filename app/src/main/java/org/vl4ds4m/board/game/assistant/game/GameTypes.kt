@@ -1,6 +1,8 @@
 package org.vl4ds4m.board.game.assistant.game
 
+import androidx.annotation.StringRes
 import kotlinx.serialization.Serializable
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneGameEnv
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.game.monopoly.MonopolyGameEnv
@@ -17,6 +19,9 @@ import org.vl4ds4m.board.game.assistant.ui.game.GameViewModelProducer
 @Serializable
 sealed interface GameType {
     val title: String
+
+    @get:StringRes
+    val localizedStringId: Int
 
     fun createGameEnv(): GameEnv
 
@@ -48,6 +53,8 @@ sealed interface GameType {
 data object Free : GameType {
     override val title: String = "Free"
 
+    override val localizedStringId = R.string.game_type_free
+
     override fun createGameEnv() = FreeGameEnv()
 
     override val viewModelProducer = FreeGameViewModel
@@ -60,6 +67,8 @@ sealed interface OrderedGameType : GameType
 data object SimpleOrdered : OrderedGameType {
     override val title: String = "Ordered"
 
+    override val localizedStringId = R.string.game_type_simple
+
     override fun createGameEnv() = SimpleOrderedGameEnv()
 
     override val viewModelProducer = SimpleOrderedGameViewModel
@@ -68,6 +77,8 @@ data object SimpleOrdered : OrderedGameType {
 @Serializable
 data object Dice : OrderedGameType {
     override val title: String = "Dice"
+
+    override val localizedStringId = R.string.game_type_dice
 
     override fun createGameEnv() = DiceGameEnv()
 
@@ -78,6 +89,8 @@ data object Dice : OrderedGameType {
 data object Carcassonne : OrderedGameType {
     override val title: String = "Carcassonne"
 
+    override val localizedStringId = R.string.game_type_carcassonne
+
     override fun createGameEnv() = CarcassonneGameEnv()
 
     override val viewModelProducer = CarcassonneGameViewModel
@@ -86,6 +99,8 @@ data object Carcassonne : OrderedGameType {
 @Serializable
 data object Monopoly : OrderedGameType {
     override val title: String = "Monopoly"
+
+    override val localizedStringId = R.string.game_type_monopoly
 
     override fun createGameEnv() = MonopolyGameEnv()
 

@@ -16,9 +16,11 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.Player
@@ -42,22 +44,19 @@ fun CompletedGameScreen(
     modifier: Modifier = Modifier
 ) {
     produceState<GameSession?>(null) {
-        topBarUiState.update(
-            title = "Game results",
-            navigateBack = navigateBack
-        )
+        topBarUiState.update(navigateBack = navigateBack)
         value = viewModel.getSession(sessionId).also {
-            it?.also {
-                topBarUiState.update(
-                    title = "'${it.name}' results",
-                    navigateBack = navigateBack
-                )
-            } ?: Log.e(
+            it ?: Log.e(
                 "GameResults",
                 "Can't load completed session[id = $sessionId]"
             )
         }
     }.value?.also {
+        topBarUiState.update(
+            title = stringResource(R.string.results_title_prefix)
+                + ": " + it.name,
+            navigateBack = navigateBack
+        )
         CompletedGameScreenContent(
             type = it.type,
             players = it.players.toMap(),

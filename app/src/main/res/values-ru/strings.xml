@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_bar_play">Играть</string>
+    <string name="nav_bar_results">Итоги</string>
+    <string name="nav_bar_profile">Профиль</string>
+    <string name="profile_title">Ваш профиль</string>
+    <string name="profile_name_label">Имя</string>
+    <string name="results_title">Результаты игр</string>
+    <string name="results_empty_list">Нет завершенных игр</string>
+    <string name="results_title_prefix">Результаты</string>
+    <string name="play_title">Игровые сессии</string>
+    <string name="play_start_new_game">Начать новую игру</string>
+    <string name="play_continue_game_title">Продолжить игру</string>
+    <string name="play_local_empty_list">Нет начатых игр</string>
+    <string name="play_join_game_title">Присоединиться к игре</string>
+    <string name="play_remote_empty_list">Нет доступных игр</string>
+    <string name="observe_registr_msg">Ожидайте начала подключения к игре</string>
+    <string name="observe_end_msg">Игра окончена, ждем решения ведущего</string>
+    <string name="new_game_title">Новая игра</string>
+    <string name="game_settings_title">Настройки игр</string>
+    <string name="game_players_settings_title">Настройки игроков</string>
+    <string name="game_dice_imitation_title">Бросок костей</string>
+    <string name="game_end_title">Завершение игр</string>
+    <string name="new_game_name">Название игровой сессии</string>
+    <string name="new_game_next_step">Продолжить</string>
+    <string name="new_game_players_list">Список игроков</string>
+    <string name="new_game_player_prefix">Игрок</string>
+    <string name="new_game_players_empty_list">Нет игроков</string>
+    <string name="new_game_start">Начать игру</string>
+    <string name="new_game_online_players">Добавить подключившихся игроков</string>
+    <string name="new_game_online_players_empty">Нет подключившихся игроков</string>
+    <string name="game_timer_prefix">Окончание через</string>
+    <string name="game_timer_enabled">Включить тайиер</string>
+    <string name="game_timer_seconds_label">Секунд до окончания</string>
+    <string name="dice_imitation_roll_dice">Бросить кости</string>
+    <string name="dice_imitation_dice_prefix">Кубик</string>
+    <string name="dice_imitation_copy_sum">Скопировать сумму очков</string>
+    <string name="game_end_msg">Игра окончена</string>
+    <string name="game_end_to_play">Завершить</string>
+    <string name="game_type_free">Свободная игра</string>
+    <string name="game_type_simple">Обычная игра</string>
+    <string name="game_type_dice">Кости</string>
+    <string name="game_type_carcassonne">Каркассон</string>
+    <string name="game_type_monopoly">Монополия</string>
+</resources>

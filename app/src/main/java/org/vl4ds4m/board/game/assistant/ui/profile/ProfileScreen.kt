@@ -17,8 +17,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -46,7 +48,7 @@ fun ProfileScreenContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Your profile",
+            text = stringResource(R.string.profile_title),
             style = MaterialTheme.typography.headlineMedium
         )
         Icon(
@@ -57,7 +59,7 @@ fun ProfileScreenContent(
         TextField(
             value = userName.value ?: "",
             onValueChange = { userName.value = it },
-            label = { Text("Name") },
+            label = { Text(stringResource(R.string.profile_name_label)) },
             singleLine = true
         )
     }

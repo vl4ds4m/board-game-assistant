@@ -9,8 +9,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -27,14 +29,14 @@ fun EndGameScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "End of Game",
+            text = stringResource(R.string.game_end_msg),
             style = MaterialTheme.typography.headlineLarge
         )
         Button(
             onClick = onHomeNavigate
         ) {
             Text(
-                text = "Navigate Home"
+                text = stringResource(R.string.game_end_to_play)
             )
         }
     }

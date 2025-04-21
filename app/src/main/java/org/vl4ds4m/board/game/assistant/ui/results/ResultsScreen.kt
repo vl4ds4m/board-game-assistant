@@ -19,8 +19,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.defaultGames
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.component.GameSessionCard
@@ -50,14 +52,14 @@ fun ResultsScreenContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "Game results",
+            text = stringResource(R.string.results_title),
             modifier = Modifier.align(Alignment.CenterHorizontally),
             style = MaterialTheme.typography.headlineMedium
         )
         HorizontalDivider()
         if (sessions.value.isEmpty()) {
             Text(
-                text = "No completed games",
+                text = stringResource(R.string.results_empty_list),
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()

@@ -17,11 +17,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.map
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
@@ -59,17 +61,17 @@ fun GameSettingScreenContent(
         verticalArrangement = Arrangement.spacedBy(24.dp),
         modifier = modifier.padding(16.dp)
     ) {
-        Text("Game Settings")
+        Text(stringResource(R.string.game_settings_title))
         HorizontalDivider()
         TextField(
             value = name.value,
             onValueChange = onNameChange,
-            label = { Text("Name") }
+            label = { Text(stringResource(R.string.new_game_name)) }
         )
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Enable timeout")
+            Text(stringResource(R.string.game_timer_enabled))
             Checkbox(
                 checked = timeout.value,
                 onCheckedChange = onTimeoutChange
@@ -78,7 +80,7 @@ fun GameSettingScreenContent(
         TextField(
             value = secondsToEnd.value,
             onValueChange = onSecondsToEndChange,
-            label = { Text("Seconds to end") },
+            label = { Text(stringResource(R.string.game_timer_seconds_label)) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number
             )

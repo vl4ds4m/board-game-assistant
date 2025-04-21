@@ -24,12 +24,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.Carcassonne
 import org.vl4ds4m.board.game.assistant.game.Dice
@@ -155,7 +157,8 @@ fun GameScreenContent(
                 modifier = Modifier.padding(start = 32.dp)
             ) {
                 Text(
-                    text = "Time until end: " + prettyTime(it),
+                    text = stringResource(R.string.game_timer_prefix)
+                        + ": " + prettyTime(it),
                     color = if (it <= 5) {
                         MaterialTheme.colorScheme.error
                     } else {

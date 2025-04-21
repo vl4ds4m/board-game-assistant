@@ -21,8 +21,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.Dice
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
@@ -61,7 +63,7 @@ fun NewGameStartScreenContent(
         TextField(
             value = name,
             onValueChange = onNameChanged,
-            label = { Text("Name") },
+            label = { Text(stringResource(R.string.new_game_name)) },
             singleLine = true
         )
         Column(
@@ -84,7 +86,7 @@ fun NewGameStartScreenContent(
                     }
                 ) {
                     Text(
-                        text = it.title,
+                        text = stringResource(it.localizedStringId),
                         modifier = Modifier
                             .padding(start = 20.dp)
                             .fillMaxHeight()
@@ -99,7 +101,7 @@ fun NewGameStartScreenContent(
             },
             enabled = name.isNotBlank() && type != null
         ) {
-            Text("Continue")
+            Text(stringResource(R.string.new_game_next_step))
         }
     }
 }

@@ -25,9 +25,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.map
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.ui.component.NewPlayerCard
 import org.vl4ds4m.board.game.assistant.ui.component.NewRemotePlayerCard
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
@@ -81,15 +83,16 @@ fun NewGamePlayersScreenContent(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "List of players",
+            text = stringResource(R.string.new_game_players_list),
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 16.dp),
             style = MaterialTheme.typography.titleLarge
         )
+        val playerPrefix = stringResource(R.string.new_game_player_prefix)
         FloatingActionButton(
             onClick = {
-                addPlayer("Player ${players.size + 1}", null)
+                addPlayer("$playerPrefix ${players.size + 1}", null)
             }
         ) {
             Icon(
@@ -100,7 +103,7 @@ fun NewGamePlayersScreenContent(
     }
     if (players.isEmpty()) {
         Text(
-            text = "No players",
+            text = stringResource(R.string.new_game_players_empty_list),
             modifier = Modifier
                 .weight(2f)
                 .fillMaxWidth()
@@ -132,14 +135,14 @@ fun NewGamePlayersScreenContent(
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text(
-                text = "Start the game",
+                text = stringResource(R.string.new_game_start),
                 style = MaterialTheme.typography.titleLarge
             )
         }
     }
     HorizontalDivider()
     Text(
-        text = "Add online players",
+        text = stringResource(R.string.new_game_online_players),
         modifier = Modifier.padding(start = 16.dp),
         style = MaterialTheme.typography.titleMedium
     )
@@ -152,7 +155,7 @@ fun NewGamePlayersScreenContent(
     }
     if (newRemotePlayers.value.isEmpty()) {
         Text(
-            text = "No online players",
+            text = stringResource(R.string.new_game_online_players_empty),
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()

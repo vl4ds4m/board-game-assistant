@@ -31,8 +31,10 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 import kotlin.random.Random
 import kotlin.random.nextInt
@@ -72,7 +74,7 @@ fun DiceImitationScreen(modifier: Modifier = Modifier) {
                 },
                 colors = ButtonDefaults.buttonColors()
             ) {
-                Text("Roll the dice")
+                Text(stringResource(R.string.dice_imitation_roll_dice))
             }
             Spacer(Modifier.weight(1f))
             IconButton(
@@ -100,7 +102,7 @@ fun DiceImitationScreen(modifier: Modifier = Modifier) {
         ) {
             itemsIndexed(dice) { index, value ->
                 Text(
-                    text = "Dice ${index + 1}:     $value",
+                    text = stringResource(R.string.dice_imitation_dice_prefix) + " ${index + 1}:     $value",
                     style = MaterialTheme.typography.headlineSmall
                 )
             }
@@ -117,7 +119,7 @@ fun DiceImitationScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.align(Alignment.CenterHorizontally),
             colors = ButtonDefaults.buttonColors()
         ) {
-            Text("Copy sum of values")
+            Text(stringResource(R.string.dice_imitation_copy_sum))
         }
         Spacer(Modifier.weight(0.3f))
     }

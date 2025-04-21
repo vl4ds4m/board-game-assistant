@@ -20,8 +20,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.defaultGames
 import org.vl4ds4m.board.game.assistant.fakeRemoteSession
 import org.vl4ds4m.board.game.assistant.game.GameType
@@ -62,7 +64,7 @@ fun PlayScreenContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "Game sessions",
+            text = stringResource(R.string.play_title),
             modifier = Modifier.align(Alignment.CenterHorizontally),
             style = MaterialTheme.typography.headlineMedium
         )
@@ -72,19 +74,19 @@ fun PlayScreenContent(
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text(
-                text = "Start a new game",
+                text = stringResource(R.string.play_start_new_game),
                 style = MaterialTheme.typography.bodyLarge
             )
         }
         HorizontalDivider()
         Text(
-            text = "Continue the game",
+            text = stringResource(R.string.play_continue_game_title),
             modifier = Modifier.padding(start = 16.dp),
             style = MaterialTheme.typography.titleMedium
         )
         if (sessions.value.isEmpty()) {
             Text(
-                text = "No games to continue",
+                text = stringResource(R.string.play_local_empty_list),
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
@@ -117,13 +119,13 @@ fun PlayScreenContent(
         }
         HorizontalDivider()
         Text(
-            text = "Join to the game",
+            text = stringResource(R.string.play_join_game_title),
             modifier = Modifier.padding(start = 16.dp),
             style = MaterialTheme.typography.titleMedium
         )
         if (remoteSessions.value.isEmpty()) {
             Text(
-                text = "No games to join",
+                text = stringResource(R.string.play_remote_empty_list),
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()

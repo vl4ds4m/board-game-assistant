@@ -28,8 +28,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -88,12 +90,21 @@ fun NewPlayerCard(
                 ActionMenu(
                     expanded = expanded,
                     actions = buildList {
-                        add(PlayerAction("Remove", remove))
+                        add(PlayerAction(
+                            name = stringResource(R.string.player_action_remove),
+                            action = remove
+                        ))
                         moveUp?.let {
-                            add(PlayerAction("Move up", it))
+                            add(PlayerAction(
+                                name = stringResource(R.string.player_action_move_up),
+                                action = it
+                            ))
                         }
                         moveDown?.let {
-                            add(PlayerAction("Move down", it))
+                            add(PlayerAction(
+                                name = stringResource(R.string.player_action_move_down),
+                                action = it
+                            ))
                         }
                     }
                 )

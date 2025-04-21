@@ -13,6 +13,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import org.vl4ds4m.board.game.assistant.R
 
 @Composable
@@ -52,10 +53,10 @@ fun GameMenu(actions: GameNavActions) {
             onDismissRequest = { expanded.value = false }
         ) {
             listOf(
-                "Open game settings"   to actions.openGameSetting,
-                "Open player settings" to actions.openPlayerSetting,
-                "Open Dice imitation"  to actions.openDiceImitation,
-                "Complete game"        to actions.completeGame,
+                stringResource(R.string.game_menu_game_settings)   to actions.openGameSetting,
+                stringResource(R.string.game_menu_player_settings) to actions.openPlayerSetting,
+                stringResource(R.string.game_menu_dice_imitation)  to actions.openDiceImitation,
+                stringResource(R.string.game_menu_complete)        to actions.completeGame,
             ).forEach { (text, action) ->
                 DropdownMenuItem(
                     text = { Text(text) },

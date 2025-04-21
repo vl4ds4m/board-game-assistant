@@ -30,8 +30,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -160,16 +162,16 @@ fun PlayerSettingMenu(
         buildList {
             if (active) {
                 if (!selected) {
-                    add("Make current" to actions.onSelect)
+                    add(R.string.player_action_select to actions.onSelect)
                 }
-                add("Freeze player" to actions.onFreeze)
+                add(R.string.player_action_freeze to actions.onFreeze)
             } else {
-                add("Unfreeze player" to actions.onUnfreeze)
+                add(R.string.player_action_unfreeze to actions.onUnfreeze)
             }
-            add("Remove player" to actions.onRemove)
-        }.forEach { (text, action) ->
+            add(R.string.player_action_remove to actions.onRemove)
+        }.forEach { (resId, action) ->
             DropdownMenuItem(
-                text = { Text(text) },
+                text = { Text(stringResource(resId)) },
                 onClick = {
                     expanded.value = false
                     action(id)

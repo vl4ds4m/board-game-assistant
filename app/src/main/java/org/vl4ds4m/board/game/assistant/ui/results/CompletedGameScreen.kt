@@ -53,7 +53,7 @@ fun CompletedGameScreen(
         }
     }.value?.also {
         topBarUiState.update(
-            title = stringResource(R.string.results_title_prefix)
+            title = stringResource(R.string.game_results_title_prefix)
                 + ": " + it.name,
             navigateBack = navigateBack
         )
@@ -87,24 +87,24 @@ fun CompletedGameScreenContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Param(
-            name  = "Type",
+            name  = stringResource(R.string.game_results_type),
             value = type.title
         )
         Param(
-            name = "Player count",
+            name = stringResource(R.string.game_results_player_count),
             value = players.size.toString()
         )
         Param(
-            name = "Start time",
+            name = stringResource(R.string.game_results_start_time),
             value = startTime?.localTime?.formatted ?: "no data"
         )
         Param(
-            name = "Stop time",
+            name = stringResource(R.string.game_results_stop_time),
             value = stopTime?.localTime?.formatted ?: "no data"
         )
         HorizontalDivider()
         Text(
-            text = "Players rating",
+            text = stringResource(R.string.game_results_rating),
             modifier = Modifier.padding(start = 16.dp),
             style = MaterialTheme.typography.titleMedium
         )

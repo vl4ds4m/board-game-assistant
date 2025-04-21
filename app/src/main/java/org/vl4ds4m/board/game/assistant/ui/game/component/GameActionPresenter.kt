@@ -1,27 +1,12 @@
 package org.vl4ds4m.board.game.assistant.ui.game.component
 
-import org.vl4ds4m.board.game.assistant.game.Carcassonne
-import org.vl4ds4m.board.game.assistant.game.Dice
-import org.vl4ds4m.board.game.assistant.game.Free
-import org.vl4ds4m.board.game.assistant.game.GameType
-import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.Players
-import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.game.changesCurrentPlayer
 import org.vl4ds4m.board.game.assistant.game.changesPlayerState
 import org.vl4ds4m.board.game.assistant.game.currentPlayerIds
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
 import org.vl4ds4m.board.game.assistant.game.playerId
 import org.vl4ds4m.board.game.assistant.game.playerStates
-import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameActionPresenter
-
-typealias ShowGameAction = (GameAction, Players) -> String
-
-val GameType.gameActionPresenter: GameActionPresenter
-    get() = when (this) {
-        Free, SimpleOrdered, Dice, Carcassonne -> BaseGameActionPresenter()
-        Monopoly -> MonopolyGameActionPresenter()
-    }
 
 interface GameActionPresenter {
     fun showAction(action: GameAction, players: Players): String
@@ -33,9 +18,13 @@ interface GameActionPresenter {
 
     val fallback: String
         get() = "Unknown event"
+
+    companion object {
+        val Default: GameActionPresenter = BaseGameActionPresenter()
+    }
 }
 
-open class BaseGameActionPresenter : GameActionPresenter {
+private class BaseGameActionPresenter : GameActionPresenter {
     override fun showAction(action: GameAction, players: Players): String {
         when {
             action.changesCurrentPlayer -> {

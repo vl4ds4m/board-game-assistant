@@ -15,6 +15,8 @@ import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.simple.SimpleOrderedGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModelProducer
+import org.vl4ds4m.board.game.assistant.ui.game.component.GameActionPresenter
+import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameActionPresenter
 
 @Serializable
 sealed interface GameType {
@@ -106,3 +108,9 @@ data object Monopoly : OrderedGameType {
 
     override val viewModelProducer = MonopolyGameViewModel
 }
+
+val GameType.gameActionPresenter: GameActionPresenter
+    get() = when (this) {
+        Free, SimpleOrdered, Dice, Carcassonne -> GameActionPresenter.Default
+        Monopoly -> MonopolyGameActionPresenter
+    }

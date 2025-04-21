@@ -2,6 +2,7 @@ package org.vl4ds4m.board.game.assistant.ui.game.observer
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -9,10 +10,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
+import org.vl4ds4m.board.game.assistant.game.data.GameSession
+import org.vl4ds4m.board.game.assistant.game.gameActionPresenter
 import org.vl4ds4m.board.game.assistant.network.NetworkGameState
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
-import org.vl4ds4m.board.game.assistant.ui.game.component.gameActionPresenter
 
 fun NavGraphBuilder.observerNavigation(
     navController: NavController,
@@ -24,14 +27,16 @@ fun NavGraphBuilder.observerNavigation(
             factory = GameObserverViewModel.createFactory(route)
         )
         val observer = viewModel.observerState.collectAsState()
-        val session = viewModel.sessionState.collectAsState()
+        val session = produceState(emptySession) {
+            viewModel.sessionState.collect {
+                value = it ?: emptySession
+            }
+        }
         val onBackClick: () -> Unit = { navController.navigateUp() }
-        val typeName = session.value?.type?.localizedStringId
-            ?.let { stringResource(it) }
+        val typeName = stringResource(session.value.type.localizedStringId)
         val title = remember {
             derivedStateOf {
-                session.value?.let { "${it.name} ($typeName)" }
-                    ?: route.name
+                session.value.let { "${it.name} ($typeName)" }
             }
         }
         topBarUiState.update(
@@ -42,30 +47,29 @@ fun NavGraphBuilder.observerNavigation(
             NetworkGameState.REGISTRATION -> ObserverStartupScreen()
             NetworkGameState.IN_GAME -> {
                 val players = remember {
-                    derivedStateOf { session.value?.players?.toMap() ?: mapOf() }
+                    derivedStateOf { session.value.players.toMap() }
                 }
                 val currentPlayerId = remember {
-                    derivedStateOf { session.value?.currentPlayerId }
+                    derivedStateOf { session.value.currentPlayerId }
                 }
                 val actions = remember {
                     derivedStateOf {
-                        session.value?.let {
-                            it.actions.take(it.currentActionPosition)
-                        } ?: listOf()
+                        val presenter = session.value.type.gameActionPresenter
+                        session.value.actions.map {
+                            presenter.showAction(it, players.value)
+                        }
                     }
                 }
-                val showAction = remember {
+                val timer = remember {
                     derivedStateOf {
-                        session.value?.type?.gameActionPresenter
-                            ?.let { it::showAction }
-                            ?: { _, _ -> "" }
+                        session.value.secondsUntilEnd.takeIf { session.value.timeout }
                     }
                 }
                 ObserverGameScreen(
                     players = players,
                     currentPlayerId = currentPlayerId,
                     actions = actions,
-                    showAction = showAction.value
+                    timer = timer
                 )
             }
             NetworkGameState.END_GAME -> ObserverEndScreen()
@@ -73,3 +77,18 @@ fun NavGraphBuilder.observerNavigation(
         }
     }
 }
+
+private val emptySession = GameSession(
+    completed = false,
+    type = SimpleOrdered,
+    name = "Default",
+    players = listOf(),
+    currentPlayerId = null,
+    nextNewPlayerId = 1L,
+    startTime = null,
+    stopTime = null,
+    timeout = false,
+    secondsUntilEnd = 0,
+    actions = listOf(),
+    currentActionPosition = 0
+)

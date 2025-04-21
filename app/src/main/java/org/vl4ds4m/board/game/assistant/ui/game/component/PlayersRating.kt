@@ -3,7 +3,9 @@ package org.vl4ds4m.board.game.assistant.ui.game.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
@@ -27,7 +29,20 @@ fun PlayersRating(
                 }
         }
     }
+    val listState = rememberLazyListState()
+    val currentIndex = remember {
+        derivedStateOf {
+            currentPlayerId.value?.let { current ->
+                rating.value.indexOfFirst { (id, _) -> id == current }
+                    .takeUnless { it == -1 }
+            }
+        }
+    }
+    LaunchedEffect(currentIndex.value) {
+        currentIndex.value?.let { listState.scrollToItem(it) }
+    }
     LazyColumn(
+        state = listState,
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {

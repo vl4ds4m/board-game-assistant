@@ -63,6 +63,7 @@ fun PlayerSettingScreen(modifier: Modifier = Modifier) {
     PlayerSettingScreenContent(
         players = players,
         remotePlayers = viewModel.remotePlayers.collectAsState(),
+        userPlayer = viewModel.userPlayer.collectAsState(),
         currentPlayerId = viewModel.currentPlayerId.collectAsState(),
         addPlayer = viewModel::addPlayer,
         bindPlayer = viewModel::bindPlayer,
@@ -84,6 +85,7 @@ fun PlayerSettingScreen(modifier: Modifier = Modifier) {
 fun PlayerSettingScreenContent(
     players: State<List<Pair<Long, Player>>>,
     remotePlayers: State<List<NetworkPlayer>>,
+    userPlayer: State<NetworkPlayer?>,
     currentPlayerId: State<Long?>,
     addPlayer: (String?, String) -> Unit,
     bindPlayer: (Long, String) -> Unit,
@@ -156,7 +158,14 @@ fun PlayerSettingScreenContent(
                 }
             }
         }
-        if (newRemotePlayers.value.isEmpty()) {
+        val newUserPlayer = remember {
+            derivedStateOf {
+                userPlayer.value?.takeUnless { user ->
+                    players.value.any { (_, p) -> p.netDevId == user.netDevId }
+                }
+            }
+        }
+        if (newRemotePlayers.value.isEmpty() && newUserPlayer.value == null) {
             Text(
                 text = stringResource(R.string.game_online_players_empty),
                 modifier = Modifier
@@ -181,6 +190,18 @@ fun PlayerSettingScreenContent(
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                newUserPlayer.value?.let { user ->
+                    item {
+                        NewRemotePlayerCard(
+                            name = "${user.name} (${stringResource(R.string.game_player_self_label)})",
+                            add = {
+                                user.run { addPlayer(name, netDevId) }
+                            },
+                            bind = { bindPlayer(it, user.netDevId) },
+                            bindList = unboundPlayers
+                        )
+                    }
+                }
                 items(newRemotePlayers.value) { player ->
                     NewRemotePlayerCard(
                         name = player.name,
@@ -210,9 +231,12 @@ private fun PlayerSettingScreenPreview() {
             ),
             remotePlayers = rememberUpdatedState(
                 listOf(
-                    NetworkPlayer("Tre", "fgdfg"),
-                    NetworkPlayer("Pdf", "65hgf"),
+                    NetworkPlayer(name = "Tre", netDevId = "fgdfg"),
+                    NetworkPlayer(name = "Pdf", netDevId = "65hgf"),
                 )
+            ),
+            userPlayer = rememberUpdatedState(
+                NetworkPlayer(name = "Oreo", netDevId = "oi32j")
             ),
             currentPlayerId = rememberUpdatedState(null),
             addPlayer = { _, _ -> },

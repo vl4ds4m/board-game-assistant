@@ -80,4 +80,5 @@
     <string name="game_player_remove_confirm">Подтвердить</string>
     <string name="player_action_unbind">Отвязать</string>
     <string name="player_action_bind">Привязать к</string>
+    <string name="game_player_self_label">Это Вы</string>
 </resources>

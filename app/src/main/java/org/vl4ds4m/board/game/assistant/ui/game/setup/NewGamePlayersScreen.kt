@@ -21,8 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -50,9 +50,15 @@ fun NewGamePlayersScreen(
             )
         }
     }.collectAsState(listOf())
+    val userPlayer = gameViewModel.userPlayer.map {
+        it?.let {
+            NewPlayer(name = it.name, netDevId = it.netDevId)
+        }
+    }.collectAsState(null)
     NewGamePlayersScreenContent(
         players = viewModel.players,
         remotePlayers = remotePlayers,
+        userPlayer = userPlayer,
         addPlayer = viewModel::addPlayer,
         renamePlayer = viewModel::renamePlayer,
         removePlayer = viewModel::removePlayerAt,
@@ -67,6 +73,7 @@ fun NewGamePlayersScreen(
 fun NewGamePlayersScreenContent(
     players: List<NewPlayer>,
     remotePlayers: State<List<NewPlayer>>,
+    userPlayer: State<NewPlayer?>,
     addPlayer: (String, String?) -> Unit,
     renamePlayer: (Int, String) -> Unit,
     removePlayer: (Int) -> Unit,
@@ -153,7 +160,14 @@ fun NewGamePlayersScreenContent(
             }
         }
     }
-    if (newRemotePlayers.value.isEmpty()) {
+    val newUserPlayer = remember {
+        derivedStateOf {
+            userPlayer.value?.takeUnless { user ->
+                players.any { it.netDevId == user.netDevId }
+            }
+        }
+    }
+    if (newRemotePlayers.value.isEmpty() && newUserPlayer.value == null) {
         Text(
             text = stringResource(R.string.game_online_players_empty),
             modifier = Modifier
@@ -169,6 +183,18 @@ fun NewGamePlayersScreenContent(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            newUserPlayer.value?.let {
+                item {
+                    NewRemotePlayerCard(
+                        name = "${it.name} (${stringResource(R.string.game_player_self_label)})",
+                        add = {
+                            it.run { addPlayer(name, netDevId) }
+                        },
+                        bind = null,
+                        bindList = null
+                    )
+                }
+            }
             items(newRemotePlayers.value) { player ->
                 NewRemotePlayerCard(
                     name = player.name,
@@ -215,7 +241,8 @@ private fun NewGamePlayersScreenPreview(
     BoardGameAssistantTheme {
         NewGamePlayersScreenContent(
             players = players,
-            remotePlayers = remember { mutableStateOf(remotePlayers) },
+            remotePlayers = rememberUpdatedState(remotePlayers),
+            userPlayer = rememberUpdatedState(NewPlayer("Oreo", "oi32j")),
             addPlayer = { _, _ -> },
             renamePlayer = { _, _ -> },
             removePlayer = {},

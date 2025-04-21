@@ -23,12 +23,12 @@
     <string name="game_end_title">Завершение игр</string>
     <string name="new_game_name">Название игровой сессии</string>
     <string name="new_game_next_step">Продолжить</string>
-    <string name="new_game_players_list">Список игроков</string>
-    <string name="new_game_player_prefix">Игрок</string>
+    <string name="game_players_list">Список игроков</string>
+    <string name="game_player_prefix">Игрок</string>
     <string name="new_game_players_empty_list">Нет игроков</string>
     <string name="new_game_start">Начать игру</string>
-    <string name="new_game_online_players">Добавить подключившихся игроков</string>
-    <string name="new_game_online_players_empty">Нет подключившихся игроков</string>
+    <string name="game_online_players">Добавить подключившихся игроков</string>
+    <string name="game_online_players_empty">Нет подключившихся игроков</string>
     <string name="game_timer_prefix">Окончание через</string>
     <string name="game_timer_enabled">Включить таймер</string>
     <string name="game_timer_seconds_label">Секунд до окончания</string>
@@ -76,4 +76,8 @@
     <string name="game_monopoly_to_player">Кому</string>
     <string name="game_monopoly_transfer">Перевести</string>
     <string name="profile_save_changes">Сохранить</string>
+    <string name="game_player_remove_msg">Вы хотите удалить игрока</string>
+    <string name="game_player_remove_confirm">Подтвердить</string>
+    <string name="player_action_unbind">Отвязать</string>
+    <string name="player_action_bind">Привязать к</string>
 </resources>

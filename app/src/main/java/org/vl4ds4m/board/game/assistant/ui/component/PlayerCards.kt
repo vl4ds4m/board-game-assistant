@@ -24,8 +24,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -65,7 +67,6 @@ fun NewPlayerCard(
                 value = name,
                 onValueChange = editName,
                 modifier = Modifier.weight(1f),
-                readOnly = remote,
                 textStyle = MaterialTheme.typography.titleMedium,
                 singleLine = true,
             )
@@ -117,6 +118,8 @@ fun NewPlayerCard(
 fun NewRemotePlayerCard(
     name: String,
     add: () -> Unit,
+    bind: ((Long) -> Unit)?,
+    bindList: State<List<Pair<Long, String>>>?,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -143,6 +146,30 @@ fun NewRemotePlayerCard(
                 maxLines = 1,
                 style = MaterialTheme.typography.titleMedium,
             )
+            Spacer(Modifier.width(40.dp))
+            val expanded = remember { mutableStateOf(false) }
+            if (bind != null && bindList != null) {
+                IconButton(
+                    onClick = { expanded.value = true },
+                    modifier = Modifier.size(28.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "Actions",
+                    )
+                    ActionMenu(
+                        expanded = expanded,
+                        actions = buildList {
+                            bindList.value.forEach { (id, name) ->
+                                add(PlayerAction(
+                                    name = stringResource(R.string.player_action_bind) + " $name",
+                                    action = { bind(id) }
+                                ))
+                            }
+                        }
+                    )
+                }
+            }
         }
     }
 }
@@ -196,6 +223,8 @@ private fun NewRemotePlayerCardPreview() {
         NewRemotePlayerCard(
             name = "Player",
             add = {},
+            bind = {},
+            bindList = rememberUpdatedState(listOf(1L to "Oret")),
             modifier = Modifier.width(300.dp)
         )
     }

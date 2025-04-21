@@ -83,13 +83,13 @@ fun NewGamePlayersScreenContent(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = stringResource(R.string.new_game_players_list),
+            text = stringResource(R.string.game_players_list),
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 16.dp),
             style = MaterialTheme.typography.titleLarge
         )
-        val playerPrefix = stringResource(R.string.new_game_player_prefix)
+        val playerPrefix = stringResource(R.string.game_player_prefix)
         FloatingActionButton(
             onClick = {
                 addPlayer("$playerPrefix ${players.size + 1}", null)
@@ -142,7 +142,7 @@ fun NewGamePlayersScreenContent(
     }
     HorizontalDivider()
     Text(
-        text = stringResource(R.string.new_game_online_players),
+        text = stringResource(R.string.game_online_players),
         modifier = Modifier.padding(start = 16.dp),
         style = MaterialTheme.typography.titleMedium
     )
@@ -155,7 +155,7 @@ fun NewGamePlayersScreenContent(
     }
     if (newRemotePlayers.value.isEmpty()) {
         Text(
-            text = stringResource(R.string.new_game_online_players_empty),
+            text = stringResource(R.string.game_online_players_empty),
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
@@ -174,7 +174,9 @@ fun NewGamePlayersScreenContent(
                     name = player.name,
                     add = {
                         player.run { addPlayer(name, netDevId) }
-                    }
+                    },
+                    bind = null,
+                    bindList = null
                 )
             }
         }

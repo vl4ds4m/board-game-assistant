@@ -11,7 +11,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -40,6 +43,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 fun PlayerSettingCard(
     id: Long,
     name: String,
+    remote: Boolean,
     active: Boolean,
     selected: Boolean,
     menuActions: PlayerSettingActions,
@@ -50,7 +54,7 @@ fun PlayerSettingCard(
 ) {
     Card(
         modifier = modifier
-            .height(80.dp)
+            .height(60.dp)
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = with(MaterialTheme.colorScheme) {
@@ -63,7 +67,7 @@ fun PlayerSettingCard(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (onOrderChange != null) {
@@ -93,6 +97,13 @@ fun PlayerSettingCard(
                 textStyle = MaterialTheme.typography.titleMedium,
                 singleLine = true
             )
+            if (remote) {
+                Icon(
+                    imageVector = Icons.Filled.Place,
+                    contentDescription = "Remote",
+                    modifier = Modifier.size(16.dp)
+                )
+            }
             if (!active) {
                 Icon(
                     imageVector = Icons.Default.Lock,
@@ -101,6 +112,7 @@ fun PlayerSettingCard(
                 )
             }
             val expanded = remember { mutableStateOf(false) }
+            val removeDialogOpened = remember { mutableStateOf(false) }
             IconButton(
                 onClick = { expanded.value = true }
             ) {
@@ -111,12 +123,20 @@ fun PlayerSettingCard(
                 )
                 PlayerSettingMenu(
                     id = id,
+                    remote = remote,
                     active = active,
                     selected = selected,
                     expanded = expanded,
-                    actions = menuActions
+                    actions = menuActions.copy(
+                        onRemove = { removeDialogOpened.value = true }
+                    )
                 )
             }
+            RemoveAlertDialog(
+                opened = removeDialogOpened,
+                playerName = name,
+                remove = { menuActions.onRemove(id) }
+            )
         }
     }
 }
@@ -148,6 +168,7 @@ fun PlayerSettingSelectOrderMenu(
 @Composable
 fun PlayerSettingMenu(
     id: Long,
+    remote: Boolean,
     active: Boolean,
     selected: Boolean,
     expanded: MutableState<Boolean>,
@@ -168,6 +189,9 @@ fun PlayerSettingMenu(
             } else {
                 add(R.string.player_action_unfreeze to actions.onUnfreeze)
             }
+            if (remote) {
+                add(R.string.player_action_unbind to actions.onUnbind)
+            }
             add(R.string.player_action_remove to actions.onRemove)
         }.forEach { (resId, action) ->
             DropdownMenuItem(
@@ -181,9 +205,41 @@ fun PlayerSettingMenu(
     }
 }
 
+@Composable
+private fun RemoveAlertDialog(
+    opened: MutableState<Boolean>,
+    playerName: String,
+    remove: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    if (opened.value) {
+        AlertDialog(
+            onDismissRequest = { opened.value = false },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        remove()
+                        opened.value = false
+                    }
+                ) {
+                    Text(stringResource(R.string.game_player_remove_confirm))
+                }
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.game_player_remove_msg) + " $playerName ?"
+                )
+            },
+            modifier = modifier
+        )
+    }
+}
+
 @Immutable
-class PlayerSettingActions(
+data class PlayerSettingActions(
     val onSelect: (Long) -> Unit,
+    val onBind: (Long, String) -> Unit,
+    val onUnbind: (Long) -> Unit,
     val onRename: (Long, String) -> Unit,
     val onRemove: (Long) -> Unit,
     val onFreeze: (Long) -> Unit,
@@ -191,7 +247,7 @@ class PlayerSettingActions(
 ) {
     companion object {
         val Empty = PlayerSettingActions(
-            {}, { _, _ -> }, {}, {}, {}
+            {}, { _, _ -> }, {}, { _, _ -> }, {}, {}, {}
         )
     }
 }
@@ -205,6 +261,7 @@ private fun PlayerSettingCardPreview(
         PlayerSettingCard(
             id = 1,
             name = "Hello",
+            remote = true,
             active = active,
             selected = selected,
             menuActions = PlayerSettingActions.Empty,

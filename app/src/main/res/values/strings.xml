@@ -23,12 +23,12 @@
     <string name="game_end_title">Game end</string>
     <string name="new_game_name">Game session name</string>
     <string name="new_game_next_step">Continue</string>
-    <string name="new_game_players_list">List of players</string>
-    <string name="new_game_player_prefix">Player</string>
+    <string name="game_players_list">List of players</string>
+    <string name="game_player_prefix">Player</string>
     <string name="new_game_players_empty_list">No players</string>
     <string name="new_game_start">Start the game</string>
-    <string name="new_game_online_players">Add online players</string>
-    <string name="new_game_online_players_empty">No online players</string>
+    <string name="game_online_players">Add online players</string>
+    <string name="game_online_players_empty">No online players</string>
     <string name="game_timer_prefix">Time until end</string>
     <string name="game_timer_enabled">Enable timer</string>
     <string name="game_timer_seconds_label">Seconds until end</string>
@@ -76,4 +76,8 @@
     <string name="game_monopoly_to_player">To</string>
     <string name="game_monopoly_transfer">Transfer</string>
     <string name="profile_save_changes">Save</string>
+    <string name="game_player_remove_msg">Do you want to remove player</string>
+    <string name="game_player_remove_confirm">Confirm</string>
+    <string name="player_action_unbind">Unbind</string>
+    <string name="player_action_bind">Bind to</string>
 </resources>

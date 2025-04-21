@@ -3,6 +3,7 @@ package org.vl4ds4m.board.game.assistant.ui.game.observer
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -25,9 +26,11 @@ fun NavGraphBuilder.observerNavigation(
         val observer = viewModel.observerState.collectAsState()
         val session = viewModel.sessionState.collectAsState()
         val onBackClick: () -> Unit = { navController.navigateUp() }
+        val typeName = session.value?.type?.localizedStringId
+            ?.let { stringResource(it) }
         val title = remember {
             derivedStateOf {
-                session.value?.let { "${it.name} (${it.type.title})" }
+                session.value?.let { "${it.name} ($typeName)" }
                     ?: route.name
             }
         }

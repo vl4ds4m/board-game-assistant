@@ -57,4 +57,22 @@
     <string name="player_action_select">Сделать текущим</string>
     <string name="player_action_freeze">Заморозить</string>
     <string name="player_action_unfreeze">Разморозить</string>
+    <string name="game_master_apply">Применить</string>
+    <string name="game_master_next_player">След. игрок</string>
+    <string name="game_master_carcassonne_final">Завершение</string>
+    <string name="game_master_carcassonne_property">Владение</string>
+    <string name="game_carcassonne_property_city">Город</string>
+    <string name="game_carcassonne_property_field">Поле</string>
+    <string name="game_carcassonne_property_cloister">Монастырь</string>
+    <string name="game_carcassonne_property_road">Дорога</string>
+    <string name="game_monopoly_move_prefix">Ход</string>
+    <string name="game_monopoly_to_prison">В тюрьму</string>
+    <string name="game_monopoly_from_prison">Из тюрьмы</string>
+    <string name="game_monopoly_positioning">Перемещение</string>
+    <string name="game_monopoly_accounting">Подсчет</string>
+    <string name="game_monopoly_pay">Снять</string>
+    <string name="game_monopoly_gain">Получить</string>
+    <string name="game_monopoly_from_player">От кого</string>
+    <string name="game_monopoly_to_player">Кому</string>
+    <string name="game_monopoly_transfer">Перевести</string>
 </resources>

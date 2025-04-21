@@ -22,8 +22,10 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.ui.game.component.NextPlayerButton
 import org.vl4ds4m.board.game.assistant.ui.game.component.ResetButton
 import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreField
@@ -97,7 +99,8 @@ private fun Positioning(
                 modifier = Modifier.width(120.dp)
             ) {
                 Text(
-                    text = "Move ${steps.intValue}"
+                    text = stringResource(R.string.game_monopoly_move_prefix)
+                        + " ${steps.intValue}"
                 )
             }
         }
@@ -112,8 +115,11 @@ private fun Positioning(
                 }
             ) {
                 Text(
-                    text = if (inPrison.value) "Leave prison"
-                    else "To prison!"
+                    text = if (inPrison.value) {
+                        stringResource(R.string.game_monopoly_from_prison)
+                    } else {
+                        stringResource(R.string.game_monopoly_to_prison)
+                    }
                 )
             }
             NextPlayerButton(
@@ -125,7 +131,7 @@ private fun Positioning(
             onClick = toAccounting,
             modifier = Modifier.width(180.dp)
         ) {
-            Text("To accounting")
+            Text(stringResource(R.string.game_monopoly_accounting))
         }
     }
 }
@@ -162,33 +168,33 @@ private fun Accounting(
                 onClick = { spendMoney(money.intValue) },
                 enabled = moneyFilled.value
             ) {
-                Text("Pay")
+                Text(stringResource(R.string.game_monopoly_pay))
             }
             Button(
                 onClick = { addMoney(money.intValue) },
                 enabled = moneyFilled.value
             ) {
-                Text("Gain")
+                Text(stringResource(R.string.game_monopoly_gain))
             }
         }
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TransferParticipant("From")
-            TransferParticipant("To")
+            TransferParticipant(stringResource(R.string.game_monopoly_from_player))
+            TransferParticipant(stringResource(R.string.game_monopoly_to_player))
             Button(
                 onClick = { transferMoney(-1L, -1L, -1) }, // TODO Implement transferring
                 enabled = moneyFilled.value
             ) {
-                Text("Transfer")
+                Text(stringResource(R.string.game_monopoly_transfer))
             }
         }
         OutlinedButton(
             onClick = toPositioning,
             modifier = Modifier.width(180.dp)
         ) {
-            Text("To positioning")
+            Text(stringResource(R.string.game_monopoly_positioning))
         }
     }
 }

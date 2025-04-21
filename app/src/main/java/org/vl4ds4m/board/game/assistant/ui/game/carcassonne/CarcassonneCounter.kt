@@ -21,10 +21,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.carcassonne.CarcassonneProperty
-import org.vl4ds4m.board.game.assistant.title
 import org.vl4ds4m.board.game.assistant.ui.game.component.ApplyButton
 import org.vl4ds4m.board.game.assistant.ui.game.component.NextPlayerButton
 import org.vl4ds4m.board.game.assistant.ui.game.component.PointsAppender
@@ -93,7 +94,9 @@ private fun PropertyButton(property: MutableState<CarcassonneProperty?>) {
         onClick = { expanded = true }
     ) {
         Text(
-            text = property.value?.title ?: "Property"
+            text =  stringResource(
+                property.value?.localizedStringRes ?: R.string.game_master_carcassonne_property
+            )
         )
         DropdownMenu(
             expanded = expanded,
@@ -101,7 +104,7 @@ private fun PropertyButton(property: MutableState<CarcassonneProperty?>) {
         ) {
             for (entry in CarcassonneProperty.entries) {
                 DropdownMenuItem(
-                    text = { Text(entry.title) },
+                    text = { Text(stringResource(entry.localizedStringRes)) },
                     onClick = {
                         property.value = entry
                         expanded = false
@@ -121,7 +124,7 @@ private fun FinalStageButton(finalStage: MutableState<Boolean>) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Final"
+                text = stringResource(R.string.game_master_carcassonne_final)
             )
             Spacer(Modifier.size(8.dp))
             Checkbox(

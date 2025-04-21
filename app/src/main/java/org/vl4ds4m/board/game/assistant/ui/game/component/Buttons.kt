@@ -19,8 +19,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.R
 
 @Composable
 fun ScoreField(
@@ -55,7 +57,7 @@ fun ApplyButton(
         enabled = enabled?.value ?: true,
         modifier = Modifier.width(90.dp)
     ) {
-        Text("Apply")
+        Text(stringResource(R.string.game_master_apply))
     }
 }
 
@@ -97,6 +99,6 @@ fun NextPlayerButton(
         onClick = onClick,
         modifier = modifier.width(180.dp)
     ) {
-        Text("Next player")
+        Text(stringResource(R.string.game_master_next_player))
     }
 }

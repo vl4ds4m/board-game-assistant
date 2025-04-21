@@ -57,4 +57,22 @@
     <string name="player_action_select">Make current</string>
     <string name="player_action_freeze">Freeze</string>
     <string name="player_action_unfreeze">Unfreeze</string>
+    <string name="game_master_apply">Apply</string>
+    <string name="game_master_next_player">Next player</string>
+    <string name="game_master_carcassonne_final">Final</string>
+    <string name="game_master_carcassonne_property">Property</string>
+    <string name="game_carcassonne_property_city">City</string>
+    <string name="game_carcassonne_property_field">Field</string>
+    <string name="game_carcassonne_property_cloister">Cloister</string>
+    <string name="game_carcassonne_property_road">Road</string>
+    <string name="game_monopoly_move_prefix">Move</string>
+    <string name="game_monopoly_to_prison">To prison</string>
+    <string name="game_monopoly_from_prison">Leave prison</string>
+    <string name="game_monopoly_positioning">To positioning</string>
+    <string name="game_monopoly_accounting">To accounting</string>
+    <string name="game_monopoly_pay">Pay</string>
+    <string name="game_monopoly_gain">Gain</string>
+    <string name="game_monopoly_from_player">From</string>
+    <string name="game_monopoly_to_player">To</string>
+    <string name="game_monopoly_transfer">Transfer</string>
 </resources>

@@ -28,6 +28,7 @@ import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.localTime
+import org.vl4ds4m.board.game.assistant.prettyTime
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
@@ -62,6 +63,7 @@ fun CompletedGameScreen(
             players = it.players.toMap(),
             startTime = it.startTime,
             stopTime = it.stopTime,
+            duration = it.duration,
             modifier = modifier
         )
     } ?: run {
@@ -80,6 +82,7 @@ fun CompletedGameScreenContent(
     players: Players,
     startTime: Long?,
     stopTime: Long?,
+    duration: Long?,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -101,6 +104,12 @@ fun CompletedGameScreenContent(
         Param(
             name = stringResource(R.string.game_results_stop_time),
             value = stopTime?.localTime?.formatted ?: "no data"
+        )
+        Param(
+            name = stringResource(R.string.game_results_duration),
+            value = duration?.let {
+                prettyTime((it / 1000).toInt())
+            } ?: "no data"
         )
         HorizontalDivider()
         Text(
@@ -169,6 +178,7 @@ private fun CompletedGameScreenPreview() {
             ),
             startTime = System.currentTimeMillis() - 11_000,
             stopTime = System.currentTimeMillis(),
+            duration = 5_320,
             modifier = Modifier.fillMaxSize()
         )
     }

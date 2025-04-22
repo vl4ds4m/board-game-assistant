@@ -192,7 +192,7 @@ private fun PlayScreenPreview(
 }
 
 private val initialTime: Long = java.time.Instant
-    .parse("2025-01-24T10:15:34.00Z").epochSecond
+    .parse("2025-01-24T10:15:34.00Z").toEpochMilli()
 
 
 val gameSessionsPreview: List<GameSession> get() = listOf(
@@ -223,7 +223,8 @@ val gameSessionsPreview: List<GameSession> get() = listOf(
         currentPlayerId = 1L,
         nextNewPlayerId = 10L,
         startTime = initialTime + 40_000,
-        stopTime = initialTime + 40_005,
+        stopTime = initialTime + 45_000,
+        duration = 2_000,
         timeout = false,
         secondsUntilEnd = 0,
         actions = listOf(),
@@ -256,7 +257,8 @@ val gameSessionsPreview: List<GameSession> get() = listOf(
         currentPlayerId = 2L,
         nextNewPlayerId = 10L,
         startTime = initialTime + 20_000,
-        stopTime = initialTime + 20_015,
+        stopTime = initialTime + 35_000,
+        duration = 15_000,
         timeout = false,
         secondsUntilEnd = 0,
         actions = listOf(),
@@ -295,7 +297,8 @@ val gameSessionsPreview: List<GameSession> get() = listOf(
         currentPlayerId = 3L,
         nextNewPlayerId = 10L,
         startTime = initialTime + 30_000,
-        stopTime = initialTime + 30_010,
+        stopTime = initialTime + 40_000,
+        duration = 4_000,
         timeout = false,
         secondsUntilEnd = 0,
         actions = listOf(),

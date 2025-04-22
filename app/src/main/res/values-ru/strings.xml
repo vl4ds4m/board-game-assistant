@@ -44,8 +44,9 @@
     <string name="game_type_monopoly">Монополия</string>
     <string name="game_results_type">Вид игры</string>
     <string name="game_results_player_count">Кол-во игроков</string>
-    <string name="game_results_start_time">Время начала</string>
-    <string name="game_results_stop_time">Время окончания</string>
+    <string name="game_results_start_time">Начало</string>
+    <string name="game_results_stop_time">Окончание</string>
+    <string name="game_results_duration">Продолжительность</string>
     <string name="game_results_rating">Рейтинг</string>
     <string name="game_menu_game_settings">Открыть настройки игры</string>
     <string name="game_menu_player_settings">Открыть настройки игроков</string>

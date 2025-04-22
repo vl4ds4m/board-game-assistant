@@ -31,6 +31,9 @@ data class GameSessionEntity(
     @ColumnInfo(name = STOP_TIME)
     val stopTime: Long?,
 
+    @ColumnInfo(name = DURATION)
+    val duration: Long?,
+
     @ColumnInfo(name = TIMEOUT)
     val timeout: Boolean,
 
@@ -50,6 +53,7 @@ data class GameSessionEntity(
         const val NEXT_NEW_PLAYER_ID = "next_new_player_id"
         const val START_TIME = "start_time"
         const val STOP_TIME = "stop_time"
+        const val DURATION = "game_duration"
         const val TIMEOUT = "timeout"
         const val SECONDS_UNTIL_END = "seconds_until_end"
         const val CURRENT_ACTION_POSITION = "current_action_position"

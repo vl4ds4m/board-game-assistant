@@ -150,6 +150,8 @@ open class GameEnv(final override val type: GameType) : Game {
 
     private var startTime: Long? = null
     private var stopTime: Long? = null
+    private var lastStart: Long? = null
+    private var duration: Long? = null
 
     final override val timeout = MutableStateFlow(false)
 
@@ -175,9 +177,11 @@ open class GameEnv(final override val type: GameType) : Game {
 
     final override fun start() {
         Log.i(TAG, "Start game")
+        val millis = System.currentTimeMillis()
         if (startTime == null) {
-            startTime = System.currentTimeMillis()
+            startTime = millis
         }
+        lastStart = millis
         if (timeout.value) {
             timer.start(mSecondsToEnd, mCompleted)
         }
@@ -185,7 +189,11 @@ open class GameEnv(final override val type: GameType) : Game {
 
     final override fun stop() {
         Log.i(TAG, "Stop game")
-        stopTime = System.currentTimeMillis()
+        val millis = System.currentTimeMillis()
+        stopTime = millis
+        lastStart?.let {
+            duration = (millis - it) + (duration ?: 0)
+        }
         timer.stop()
     }
 
@@ -256,6 +264,7 @@ open class GameEnv(final override val type: GameType) : Game {
         nextNewPlayerId.set(it.nextNewPlayerId)
         startTime = it.startTime
         stopTime = it.stopTime
+        duration = it.duration
         timeout.value = it.timeout
         mSecondsToEnd.value = it.secondsUntilEnd
         history.setup(it.actions, it.currentActionPosition)
@@ -272,6 +281,7 @@ open class GameEnv(final override val type: GameType) : Game {
         nextNewPlayerId = nextNewPlayerId.get(),
         startTime = startTime,
         stopTime = stopTime,
+        duration = duration,
         timeout = timeout.value,
         secondsUntilEnd = secondsToEnd.value,
         actions = history.actionsContainer,

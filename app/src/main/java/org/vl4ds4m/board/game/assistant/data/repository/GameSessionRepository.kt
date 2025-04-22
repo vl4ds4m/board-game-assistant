@@ -61,6 +61,7 @@ private val GameSessionData.gameSession
         nextNewPlayerId = entity.nextNewPlayerId,
         startTime = entity.startTime,
         stopTime = entity.stopTime,
+        duration = entity.duration,
         timeout = entity.timeout,
         secondsUntilEnd = entity.secondsUntilEnd,
         actions = actions.gameActions,
@@ -90,6 +91,7 @@ private fun GameSession.asEntity(id: String) = GameSessionEntity(
     nextNewPlayerId = nextNewPlayerId,
     startTime = startTime,
     stopTime = stopTime,
+    duration = duration,
     timeout = timeout,
     secondsUntilEnd = secondsUntilEnd,
     currentActionPosition = currentActionPosition

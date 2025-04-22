@@ -87,6 +87,7 @@ private val emptySession = GameSession(
     nextNewPlayerId = 1L,
     startTime = null,
     stopTime = null,
+    duration = null,
     timeout = false,
     secondsUntilEnd = 0,
     actions = listOf(),

@@ -46,6 +46,7 @@
     <string name="game_results_player_count">Player count</string>
     <string name="game_results_start_time">Start time</string>
     <string name="game_results_stop_time">Stop time</string>
+    <string name="game_results_duration">Duration</string>
     <string name="game_results_rating">Players rating</string>
     <string name="game_menu_game_settings">Open game settings</string>
     <string name="game_menu_player_settings">Open player settings</string>

@@ -17,6 +17,7 @@ data class GameSession(
     val nextNewPlayerId: Long,
     val startTime: Long?,
     val stopTime: Long?,
+    val duration: Long?,
     val timeout: Boolean,
     val secondsUntilEnd: Int,
     val actions: Actions,

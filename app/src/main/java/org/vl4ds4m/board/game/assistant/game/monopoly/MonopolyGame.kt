@@ -129,6 +129,7 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
     }
 
     override fun transferMoney(senderId: Long, receiverId: Long, money: Int) {
+        if (senderId == receiverId) return
         if (money <= 0) return
         val senderState = players.value[senderId]?.state ?: return
         if (senderState.score < money) return

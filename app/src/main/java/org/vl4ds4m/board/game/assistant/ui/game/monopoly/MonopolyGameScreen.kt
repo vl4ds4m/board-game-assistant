@@ -12,6 +12,7 @@ fun MonopolyGameScreen(modifier: Modifier = Modifier) {
     val viewModel = viewModel<GameViewModel>() as MonopolyGameViewModel
     OrderedGameScreen(modifier) {
         MonopolyCounter(
+            players = viewModel.players.collectAsState(),
             movePlayer = viewModel::movePlayer,
             inPrison = viewModel.inPrison.collectAsState(),
             moveToPrison = viewModel::moveToPrison,

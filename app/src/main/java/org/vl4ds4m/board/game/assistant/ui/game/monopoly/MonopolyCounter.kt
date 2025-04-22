@@ -1,6 +1,7 @@
 package org.vl4ds4m.board.game.assistant.ui.game.monopoly
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,14 +9,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -26,14 +31,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
+import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.ui.game.component.NextPlayerButton
 import org.vl4ds4m.board.game.assistant.ui.game.component.ResetButton
 import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreField
+import org.vl4ds4m.board.game.assistant.ui.game.previewPlayers
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 import kotlin.math.roundToInt
 
 @Composable
 fun MonopolyCounter(
+    players: State<Players>,
     movePlayer: (Int) -> Unit,
     inPrison: State<Boolean>,
     moveToPrison: () -> Unit,
@@ -58,6 +66,7 @@ fun MonopolyCounter(
     } else {
         Accounting(
             toPositioning = { firstPanel.value = true },
+            players = players,
             addMoney = addMoney,
             spendMoney = spendMoney,
             transferMoney = transferMoney,
@@ -139,6 +148,7 @@ private fun Positioning(
 @Composable
 private fun Accounting(
     toPositioning: () -> Unit,
+    players: State<Players>,
     addMoney: (Int) -> Unit,
     spendMoney: (Int) -> Unit,
     transferMoney: (Long, Long, Int) -> Unit,
@@ -181,10 +191,37 @@ private fun Accounting(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TransferParticipant(stringResource(R.string.game_monopoly_from_player))
-            TransferParticipant(stringResource(R.string.game_monopoly_to_player))
+            val fromId = rememberSaveable { mutableLongStateOf(-1L) }
+            val fromName = rememberSaveable { mutableStateOf("") }
+            TransferParticipant(
+                player = fromName,
+                label = stringResource(R.string.game_monopoly_from_player),
+                players = players,
+                takePlayer = { id, name ->
+                    fromId.longValue = id
+                    fromName.value = name
+                }
+            )
+            val toId = rememberSaveable { mutableLongStateOf(-1L) }
+            val toName = rememberSaveable { mutableStateOf("") }
+            TransferParticipant(
+                player = toName,
+                label = stringResource(R.string.game_monopoly_to_player),
+                players = players,
+                takePlayer = { id, name ->
+                    toId.longValue = id
+                    toName.value = name
+                }
+            )
             Button(
-                onClick = { transferMoney(-1L, -1L, -1) }, // TODO Implement transferring
+                onClick = {
+                    val sender = fromId.longValue
+                    val receiver = toId.longValue
+                    val amount = money.intValue
+                    if (sender != -1L && receiver != -1L && amount > 0) {
+                        transferMoney(sender, receiver, amount)
+                    }
+                },
                 enabled = moneyFilled.value
             ) {
                 Text(stringResource(R.string.game_monopoly_transfer))
@@ -201,16 +238,56 @@ private fun Accounting(
 
 @Composable
 private fun TransferParticipant(
+    player: State<String>,
     label: String,
+    players: State<Players>,
+    takePlayer: (Long, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    TextField(
-        value = "",
-        onValueChange = {},
-        label = { Text(label) },
-        singleLine = true,
-        modifier = modifier.width(100.dp)
-    )
+    val expanded = remember { mutableStateOf(false) }
+    Box(modifier) {
+        FilledTonalButton(
+            onClick = { expanded.value = true },
+            modifier = Modifier.width(100.dp)
+        ) {
+            Text(
+                text = player.value.ifBlank { label },
+                maxLines = 1
+            )
+        }
+        PlayerSelector(
+            expanded = expanded,
+            players = players,
+            takePlayer = takePlayer
+        )
+    }
+}
+
+@Composable
+private fun PlayerSelector(
+    expanded: MutableState<Boolean>,
+    players: State<Players>,
+    takePlayer: (Long, String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    DropdownMenu(
+        expanded = expanded.value,
+        onDismissRequest = {
+            takePlayer(-1L, "")
+            expanded.value = false
+        },
+        modifier = modifier
+    ) {
+        for ((id, player) in players.value) {
+            DropdownMenuItem(
+                text = { Text(player.name) },
+                onClick = {
+                    takePlayer(id, player.name)
+                    expanded.value = false
+                }
+            )
+        }
+    }
 }
 
 @Preview
@@ -234,6 +311,7 @@ private fun MonopolyAccountingPreview() {
     BoardGameAssistantTheme {
         Accounting(
             toPositioning = {},
+            players = rememberUpdatedState(previewPlayers),
             addMoney = {},
             spendMoney = {},
             transferMoney = { _, _, _ -> },

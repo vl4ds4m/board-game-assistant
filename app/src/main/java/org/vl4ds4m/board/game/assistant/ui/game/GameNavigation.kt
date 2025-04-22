@@ -169,6 +169,8 @@ fun NavGraphBuilder.gameNavigation(
                 navigateUp()
             }
         )
-        EndGameScreen(navigateHome)
+        CompositionLocalProvider(LocalViewModelStoreOwner provides gameEntry) {
+            EndGameScreen(navigateHome)
+        }
     }
 }

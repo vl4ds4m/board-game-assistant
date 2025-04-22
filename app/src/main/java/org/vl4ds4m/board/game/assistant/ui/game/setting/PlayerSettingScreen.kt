@@ -195,7 +195,7 @@ fun PlayerSettingScreenContent(
                         NewRemotePlayerCard(
                             name = "${user.name} (${stringResource(R.string.game_player_self_label)})",
                             add = {
-                                user.run { addPlayer(name, netDevId) }
+                                user.run { addPlayer(netDevId, name) }
                             },
                             bind = { bindPlayer(it, user.netDevId) },
                             bindList = unboundPlayers

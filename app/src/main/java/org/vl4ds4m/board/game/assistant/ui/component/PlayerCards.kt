@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -234,6 +235,7 @@ private fun NewRemotePlayerCardPreview() {
 fun PlayerInGameCard(
     rating: Int,
     name: String,
+    active: Boolean,
     score: Int,
     selected: Boolean,
     onSelect: (() -> Unit)?,
@@ -277,6 +279,14 @@ fun PlayerInGameCard(
                 style = MaterialTheme.typography.titleMedium,
             )
             Spacer(Modifier.width(8.dp))
+            if (!active) {
+                Icon(
+                    painter = painterResource(R.drawable.frozen_24px),
+                    contentDescription = "Frozen",
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(Modifier.size(4.dp))
+            }
             Text(
                 text = "$score point(s)",
                 style = MaterialTheme.typography.bodyLarge
@@ -303,6 +313,7 @@ private fun PlayerInGameCardPreview(current: Boolean) {
         PlayerInGameCard(
             rating = 1,
             name = "Fedya",
+            active = false,
             score = 1234,
             selected = current,
             onSelect = null

@@ -9,4 +9,12 @@ data class Player(
     val name: String,
     val active: Boolean,
     val state: PlayerState
-)
+) : Comparable<Player> {
+    override fun compareTo(other: Player): Int = when {
+        this.active != other.active -> {
+            if (this.active) -1
+            else 1
+        }
+        else -> other.state.score.compareTo(this.state.score)
+    }
+}

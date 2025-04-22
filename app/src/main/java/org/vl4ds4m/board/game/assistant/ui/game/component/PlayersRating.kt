@@ -24,9 +24,7 @@ fun PlayersRating(
     val rating = remember {
         derivedStateOf {
             players.value.toList()
-                .sortedByDescending { (_, player) ->
-                    player.state.score
-                }
+                .sortedBy { (_, p) -> p }
         }
     }
     val listState = rememberLazyListState()
@@ -53,6 +51,7 @@ fun PlayersRating(
             PlayerInGameCard(
                 rating = i + 1,
                 name = player.name,
+                active = player.active,
                 score = player.state.score,
                 selected = id == currentPlayerId.value,
                 onSelect = onSelectPlayer?.let { f -> { f(id) } }

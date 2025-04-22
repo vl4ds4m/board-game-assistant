@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="monopoly_field_ahead">Ahead</string>
+    <string name="monopoly_field_prison">Prison</string>
+    <string name="monopoly_field_parking">Parking</string>
+    <string name="monopoly_field_goto_prison">To Prison</string>
+    <string name="monopoly_field_penalty">Penalty</string>
+    <string name="monopoly_field_community_chest">Community chest</string>
+    <string name="monopoly_field_chance">Chance</string>
+    <string name="monopoly_field_power_station">Power station</string>
+    <string name="monopoly_field_water_station">Water station</string>
+    <string name="monopoly_field_terminal_a">Terminal A</string>
+    <string name="monopoly_field_terminal_b">Terminal B</string>
+    <string name="monopoly_field_terminal_c">Terminal C</string>
+    <string name="monopoly_field_terminal_d">Terminal D</string>
+    <string name="monopoly_field_property_a_1">A1</string>
+    <string name="monopoly_field_property_a_2">A2</string>
+    <string name="monopoly_field_property_b_1">B1</string>
+    <string name="monopoly_field_property_b_2">B2</string>
+    <string name="monopoly_field_property_b_3">B3</string>
+    <string name="monopoly_field_property_c_1">C1</string>
+    <string name="monopoly_field_property_c_2">C2</string>
+    <string name="monopoly_field_property_c_3">C3</string>
+    <string name="monopoly_field_property_d_1">D1</string>
+    <string name="monopoly_field_property_d_2">D2</string>
+    <string name="monopoly_field_property_d_3">D3</string>
+    <string name="monopoly_field_property_e_1">E1</string>
+    <string name="monopoly_field_property_e_2">E2</string>
+    <string name="monopoly_field_property_e_3">E3</string>
+    <string name="monopoly_field_property_f_1">F1</string>
+    <string name="monopoly_field_property_f_2">F2</string>
+    <string name="monopoly_field_property_f_3">F3</string>
+    <string name="monopoly_field_property_g_1">G1</string>
+    <string name="monopoly_field_property_g_2">G2</string>
+    <string name="monopoly_field_property_g_3">G3</string>
+    <string name="monopoly_field_property_h_1">H1</string>
+    <string name="monopoly_field_property_h_2">H2</string>
+</resources>

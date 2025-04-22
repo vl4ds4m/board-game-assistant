@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="monopoly_field_ahead">Вперед</string>
+    <string name="monopoly_field_prison">Тюрьма</string>
+    <string name="monopoly_field_parking">Стоянка</string>
+    <string name="monopoly_field_goto_prison">В Тюрьму</string>
+    <string name="monopoly_field_penalty">Штраф</string>
+    <string name="monopoly_field_community_chest">Обществ. казна</string>
+    <string name="monopoly_field_chance">Шанс</string>
+    <string name="monopoly_field_power_station">Эл/станция</string>
+    <string name="monopoly_field_water_station">Водопровод</string>
+    <string name="monopoly_field_terminal_a">Рижский вокзал</string>
+    <string name="monopoly_field_terminal_b">Курский вокзал</string>
+    <string name="monopoly_field_terminal_c">Казанский вокзал</string>
+    <string name="monopoly_field_terminal_d">Ленинградский вокзал</string>
+    <string name="monopoly_field_property_a_1">ул. Житная</string>
+    <string name="monopoly_field_property_a_2">ул. Нагатинская</string>
+    <string name="monopoly_field_property_b_1">Варшавское ш.</string>
+    <string name="monopoly_field_property_b_2">ул. Огарева</string>
+    <string name="monopoly_field_property_b_3">ул. Первая парковая</string>
+    <string name="monopoly_field_property_c_1">ул. Полянка</string>
+    <string name="monopoly_field_property_c_2">ул. Сретенка</string>
+    <string name="monopoly_field_property_c_3">Ростовская наб.</string>
+    <string name="monopoly_field_property_d_1">Рязанский пр.</string>
+    <string name="monopoly_field_property_d_2">ул. Вавилова</string>
+    <string name="monopoly_field_property_d_3">Рублевское ш.</string>
+    <string name="monopoly_field_property_e_1">ул. Тверская</string>
+    <string name="monopoly_field_property_e_2">ул. Пушкинская</string>
+    <string name="monopoly_field_property_e_3">пл. Маяковского</string>
+    <string name="monopoly_field_property_f_1">ул. Грузинский вал</string>
+    <string name="monopoly_field_property_f_2">ул. Чайковского</string>
+    <string name="monopoly_field_property_f_3">Смоленская пл.</string>
+    <string name="monopoly_field_property_g_1">ул. Щусева</string>
+    <string name="monopoly_field_property_g_2">Гоголевский б.</string>
+    <string name="monopoly_field_property_g_3">Кутузовский пр.</string>
+    <string name="monopoly_field_property_h_1">ул. Малая Бронная</string>
+    <string name="monopoly_field_property_h_2">ул. Арбат</string>
+</resources>

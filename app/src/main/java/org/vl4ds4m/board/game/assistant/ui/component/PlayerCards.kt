@@ -1,6 +1,7 @@
 package org.vl4ds4m.board.game.assistant.ui.component
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
+import org.vl4ds4m.board.game.assistant.ui.game.component.MonopolyField
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -239,11 +241,12 @@ fun PlayerInGameCard(
     score: Int,
     selected: Boolean,
     onSelect: (() -> Unit)?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    position: Int? = null, // TODO Make different cards
 ) {
     Card(
         modifier = modifier
-            .height(50.dp)
+            .height(60.dp)
             .fillMaxWidth()
             .clickable(
                 enabled = onSelect != null,
@@ -259,7 +262,10 @@ fun PlayerInGameCard(
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 12.dp),
+                .padding(
+                    horizontal = 12.dp,
+                    vertical = 4.dp
+                ),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -287,10 +293,18 @@ fun PlayerInGameCard(
                 )
                 Spacer(Modifier.size(4.dp))
             }
-            Text(
-                text = "$score point(s)",
-                style = MaterialTheme.typography.bodyLarge
-            )
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = "$score point(s)",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                position?.let { pos ->
+                    Spacer(Modifier.size(8.dp))
+                    MonopolyField(pos)
+                }
+            }
         }
     }
 }
@@ -316,7 +330,8 @@ private fun PlayerInGameCardPreview(current: Boolean) {
             active = false,
             score = 1234,
             selected = current,
-            onSelect = null
+            onSelect = null,
+            position = 6
         )
     }
 }

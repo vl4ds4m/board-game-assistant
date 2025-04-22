@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.game.Player
+import org.vl4ds4m.board.game.assistant.game.monopoly.position
 import org.vl4ds4m.board.game.assistant.ui.component.PlayerInGameCard
 
 @Composable
@@ -53,6 +54,7 @@ fun PlayersRating(
                 name = player.name,
                 active = player.active,
                 score = player.state.score,
+                position = player.state.position,
                 selected = id == currentPlayerId.value,
                 onSelect = onSelectPlayer?.let { f -> { f(id) } }
             )

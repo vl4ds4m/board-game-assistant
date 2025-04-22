@@ -15,7 +15,7 @@
     <string name="play_join_game_title">Присоединиться к игре</string>
     <string name="play_remote_empty_list">Нет доступных игр</string>
     <string name="observe_registr_msg">Ожидайте начала подключения к игре</string>
-    <string name="observe_end_msg">Игра окончена, ждем решения ведущего</string>
+    <string name="observe_end_msg">Ждем решения ведущего</string>
     <string name="new_game_title">Новая игра</string>
     <string name="game_settings_title">Настройки игр</string>
     <string name="game_players_settings_title">Настройки игроков</string>

@@ -15,7 +15,7 @@
     <string name="play_join_game_title">Join to the game</string>
     <string name="play_remote_empty_list">No games to join</string>
     <string name="observe_registr_msg">Wait for the game master starts the game and add you</string>
-    <string name="observe_end_msg">End of the game, wait for the game master decision</string>
+    <string name="observe_end_msg">Wait for the game master decision</string>
     <string name="new_game_title">New game</string>
     <string name="game_settings_title">Game settings</string>
     <string name="game_players_settings_title">Players settings</string>

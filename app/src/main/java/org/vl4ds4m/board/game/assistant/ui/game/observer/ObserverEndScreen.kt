@@ -1,23 +1,62 @@
 package org.vl4ds4m.board.game.assistant.ui.game.observer
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
+import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
+import org.vl4ds4m.board.game.assistant.ui.game.previewPlayers
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
-fun ObserverEndScreen(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+fun ObserverEndScreen(
+    players: State<Players>,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(stringResource(R.string.observe_end_msg))
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(R.string.game_end_msg),
+                style = MaterialTheme.typography.headlineLarge
+            )
+            Spacer(Modifier.size(24.dp))
+            Text(
+                text = stringResource(R.string.observe_end_msg),
+                textAlign = TextAlign.Center
+            )
+        }
+        HorizontalDivider()
+        PlayersRating(
+            players = players,
+            currentPlayerId = rememberUpdatedState(null),
+            onSelectPlayer = null,
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp)
+        )
+        Spacer(Modifier.size(48.dp))
     }
 }
 
@@ -25,6 +64,8 @@ fun ObserverEndScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun ObserverEndScreenPreview() {
     BoardGameAssistantTheme {
-        ObserverEndScreen()
+        ObserverEndScreen(
+            players = rememberUpdatedState(previewPlayers)
+        )
     }
 }

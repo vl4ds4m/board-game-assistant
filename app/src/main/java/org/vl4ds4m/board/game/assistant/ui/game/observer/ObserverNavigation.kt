@@ -4,7 +4,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -33,22 +32,19 @@ fun NavGraphBuilder.observerNavigation(
             }
         }
         val onBackClick: () -> Unit = { navController.navigateUp() }
-        val typeName = stringResource(session.value.type.localizedStringId)
         val title = remember {
-            derivedStateOf {
-                session.value.let { "${it.name} ($typeName)" }
-            }
+            derivedStateOf { session.value.name }
         }
         topBarUiState.update(
             title = title.value,
             navigateBack = onBackClick
         )
+        val players = remember {
+            derivedStateOf { session.value.players.toMap() }
+        }
         when (observer.value) {
             NetworkGameState.REGISTRATION -> ObserverStartupScreen()
             NetworkGameState.IN_GAME -> {
-                val players = remember {
-                    derivedStateOf { session.value.players.toMap() }
-                }
                 val currentPlayerId = remember {
                     derivedStateOf { session.value.currentPlayerId }
                 }
@@ -72,7 +68,7 @@ fun NavGraphBuilder.observerNavigation(
                     timer = timer
                 )
             }
-            NetworkGameState.END_GAME -> ObserverEndScreen()
+            NetworkGameState.END_GAME -> ObserverEndScreen(players)
             NetworkGameState.EXIT -> onBackClick()
         }
     }

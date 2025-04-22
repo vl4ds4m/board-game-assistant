@@ -23,9 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
-import org.vl4ds4m.board.game.assistant.defaultGames
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.component.GameSessionCard
+import org.vl4ds4m.board.game.assistant.ui.play.gameSessionsPreview
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -112,7 +112,8 @@ private fun ResultsScreenPreview(sessionsInfo: List<GameSessionInfo>) {
     }
 }
 
-private val sessionsInfo: List<GameSessionInfo> get() = defaultGames.mapIndexed { i, s ->
+private val sessionsInfo: List<GameSessionInfo> get() =
+    gameSessionsPreview.mapIndexed { i, s ->
         GameSessionInfo(
             id = i.inc().toString(),
             completed = true,

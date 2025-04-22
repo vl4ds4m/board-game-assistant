@@ -1,17 +1,23 @@
 package org.vl4ds4m.board.game.assistant.ui.game.monopoly
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -27,6 +33,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -165,7 +173,7 @@ private fun Accounting(
         }
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             ResetButton { money.intValue = 0 }
             ScoreField(
@@ -174,17 +182,66 @@ private fun Accounting(
                 modifier = Modifier
                     .width(110.dp)
             )
-            Button(
+            IconButton(
                 onClick = { spendMoney(money.intValue) },
-                enabled = moneyFilled.value
+                enabled = moneyFilled.value,
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        shape = MaterialTheme.shapes.large
+                    )
+                    .height(44.dp)
             ) {
-                Text(stringResource(R.string.game_monopoly_pay))
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.keyboard_arrow_down_24px),
+                        contentDescription = "Arrow up",
+                        modifier = Modifier
+                            .size(24.dp)
+                            .rotate(180f)
+                            .align(Alignment.TopCenter)
+                    )
+                    Icon(
+                        painter = painterResource(R.drawable.credit_card_24px),
+                        contentDescription = "Credit card",
+                        modifier = Modifier
+                            .size(28.dp)
+                            .align(Alignment.BottomCenter)
+                    )
+                }
             }
-            Button(
+            IconButton(
                 onClick = { addMoney(money.intValue) },
-                enabled = moneyFilled.value
+                enabled = moneyFilled.value,
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        shape = MaterialTheme.shapes.large
+                    )
+                    .height(44.dp)
             ) {
-                Text(stringResource(R.string.game_monopoly_gain))
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.keyboard_arrow_down_24px),
+                        contentDescription = "Arrow down",
+                        modifier = Modifier
+                            .size(24.dp)
+                            .align(Alignment.TopCenter)
+                    )
+                    Icon(
+                        painter = painterResource(R.drawable.credit_card_24px),
+                        contentDescription = "Credit card",
+                        modifier = Modifier
+                            .size(28.dp)
+                            .align(Alignment.BottomCenter)
+                    )
+                }
             }
         }
         Row(
@@ -213,7 +270,7 @@ private fun Accounting(
                     toName.value = name
                 }
             )
-            Button(
+            IconButton(
                 onClick = {
                     val sender = fromId.longValue
                     val receiver = toId.longValue
@@ -222,9 +279,17 @@ private fun Accounting(
                         transferMoney(sender, receiver, amount)
                     }
                 },
-                enabled = moneyFilled.value
+                enabled = moneyFilled.value,
+                modifier = Modifier.background(
+                    color = MaterialTheme.colorScheme.surfaceContainer,
+                    shape = MaterialTheme.shapes.large
+                )
             ) {
-                Text(stringResource(R.string.game_monopoly_transfer))
+                Icon(
+                    painter = painterResource(R.drawable.double_arrow_24px),
+                    contentDescription = "Transfer",
+                    modifier = Modifier.size(32.dp)
+                )
             }
         }
         OutlinedButton(
@@ -300,7 +365,8 @@ private fun MonopolyPositioningPreview() {
             inPrison = rememberUpdatedState(false),
             moveToPrison = {},
             leavePrison = {},
-            selectNextPlayer = {}
+            selectNextPlayer = {},
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }

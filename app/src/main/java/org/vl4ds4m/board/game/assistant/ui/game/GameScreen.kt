@@ -146,7 +146,7 @@ fun GameScreenContent(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.padding(16.dp),
+        modifier = modifier.padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         val timerEnabled = remember {
@@ -189,7 +189,7 @@ fun GameScreenContent(
         ) {
             masterActions()
         }
-        Spacer(Modifier.size(24.dp))
+        Spacer(Modifier.size(4.dp))
     }
 }
 

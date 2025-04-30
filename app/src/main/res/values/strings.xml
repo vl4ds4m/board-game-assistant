@@ -56,6 +56,10 @@
     <string name="player_action_move_up">Move up</string>
     <string name="player_action_move_down">Move down</string>
     <string name="player_action_select">Make current</string>
+    <string name="player_action_change_order">Change order</string>
+    <string name="player_action_rename">Rename</string>
+    <string name="player_action_rename_confirm">Apply</string>
+    <string name="player_action_rename_dismiss">Cancel</string>
     <string name="player_action_freeze">Freeze</string>
     <string name="player_action_unfreeze">Unfreeze</string>
     <string name="game_master_apply">Apply</string>

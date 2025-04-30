@@ -1,42 +1,40 @@
 package org.vl4ds4m.board.game.assistant.ui.game.setting
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import org.vl4ds4m.board.game.assistant.R
+import org.vl4ds4m.board.game.assistant.ui.component.PlayerCard
+import org.vl4ds4m.board.game.assistant.ui.component.PlayerIcon
+import org.vl4ds4m.board.game.assistant.ui.component.PlayerIndicators
+import org.vl4ds4m.board.game.assistant.ui.component.PlayerName
+import org.vl4ds4m.board.game.assistant.ui.component.PlayerPosition
+import org.vl4ds4m.board.game.assistant.ui.component.PlayerState
+import org.vl4ds4m.board.game.assistant.ui.component.isValidPlayerName
+import org.vl4ds4m.board.game.assistant.ui.component.playerName
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -44,121 +42,212 @@ fun PlayerSettingCard(
     id: Long,
     name: String,
     remote: Boolean,
-    active: Boolean,
+    frozen: Boolean,
     selected: Boolean,
-    menuActions: PlayerSettingActions,
+    settingActions: PlayerSettingActions,
     index: Int,
-    count: State<Int>,
-    onOrderChange: ((Long, Int) -> Unit)?,
+    playersCount: State<Int>,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    PlayerCard(
+        selected = selected,
         modifier = modifier
-            .height(60.dp)
-            .fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = with(MaterialTheme.colorScheme) {
-                if (selected && active) surfaceContainerHigh
-                else surfaceContainerLow
-            }
-        )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (onOrderChange != null) {
-                val expanded = remember { mutableStateOf(false) }
-                Text(
-                    text = "${index + 1}.",
-                    modifier = Modifier.clickable { expanded.value = true },
-                    style = MaterialTheme.typography.titleLarge
+        PlayerPosition(index + 1)
+        PlayerIcon(name)
+        PlayerState(
+            topRow = {
+                PlayerName(
+                    name = name,
+                    modifier = Modifier.fillMaxWidth()
                 )
-                PlayerSettingSelectOrderMenu(
-                    expanded = expanded,
-                    itemCount = count,
-                    onItemClick = { onOrderChange(id, it) }
-                )
-            }
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Player image",
-                modifier = Modifier.size(40.dp)
-            )
-            TextField(
-                value = name,
-                onValueChange = { menuActions.onRename(id, it) },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(50.dp),
-                textStyle = MaterialTheme.typography.titleMedium,
-                singleLine = true
-            )
-            if (remote) {
-                Icon(
-                    imageVector = Icons.Filled.Place,
-                    contentDescription = "Remote",
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-            if (!active) {
-                Icon(
-                    painter = painterResource(R.drawable.frozen_24px),
-                    contentDescription = "Frozen",
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-            val expanded = remember { mutableStateOf(false) }
-            val removeDialogOpened = remember { mutableStateOf(false) }
-            IconButton(
-                onClick = { expanded.value = true }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Player setting",
-                    modifier = Modifier.size(32.dp)
-                )
-                PlayerSettingMenu(
-                    id = id,
-                    remote = remote,
-                    active = active,
-                    selected = selected,
-                    expanded = expanded,
-                    actions = menuActions.copy(
-                        onRemove = { removeDialogOpened.value = true }
+            },
+            bottomRow = {
+                if (remote || frozen) {
+                    PlayerIndicators(
+                        remote = remote,
+                        frozen = frozen
                     )
+                }
+            },
+            modifier = Modifier.weight(1f)
+        )
+        SettingButton(
+            playerId = id,
+            name = name,
+            remote = remote,
+            frozen = frozen,
+            selected = selected,
+            actions = settingActions,
+            playersCount = playersCount
+        )
+    }
+}
+
+@Composable
+private fun SettingButton(
+    playerId: Long,
+    name: String,
+    remote: Boolean,
+    frozen: Boolean,
+    selected: Boolean,
+    actions: PlayerSettingActions,
+    playersCount: State<Int>
+) {
+    val expanded = remember { mutableStateOf(false) }
+    IconButton(
+        onClick = { expanded.value = true }
+    ) {
+        Icon(
+            imageVector = Icons.Default.Settings,
+            contentDescription = "Player setting",
+            modifier = Modifier.size(24.dp)
+        )
+        val menu = actionsMenu(
+            playerId = playerId,
+            name = name,
+            remote = remote,
+            frozen = frozen,
+            selected = selected,
+            actions = actions,
+            playersCount = playersCount
+        )
+        DropdownMenu(
+            expanded = expanded.value,
+            onDismissRequest = { expanded.value = false }
+        ) {
+            menu.forEach { item ->
+                DropdownMenuItem(
+                    text = {
+                        Text(stringResource(item.resId))
+                    },
+                    onClick = {
+                        expanded.value = false
+                        item.action()
+                    }
                 )
             }
-            RemoveAlertDialog(
-                opened = removeDialogOpened,
-                playerName = name,
-                remove = { menuActions.onRemove(id) }
-            )
         }
     }
 }
 
 @Composable
-fun PlayerSettingSelectOrderMenu(
+private fun actionsMenu(
+    playerId: Long,
+    name: String,
+    remote: Boolean,
+    frozen: Boolean,
+    selected: Boolean,
+    actions: PlayerSettingActions,
+    playersCount: State<Int>
+): List<Action> {
+    val menu = mutableListOf<Action?>()
+    menu += onOrderChangeAction(
+        playersCount = playersCount,
+        onOrderChange = actions.onOrderChange?.let { change ->
+            { i: Int -> change(playerId, i) }
+        }
+    )
+    menu += onSelectAction(
+        frozen = frozen,
+        selected = selected,
+        onSelect = { actions.onSelect(playerId) }
+    )
+    menu += onRenameAction(name) { actions.onRename(playerId, it) }
+    menu += playerActivityAction(
+        frozen = frozen,
+        onFreeze = { actions.onFreeze(playerId) },
+        onUnfreeze = { actions.onUnfreeze(playerId) }
+    )
+    menu += onUnbindAction(remote) { actions.onUnbind(playerId) }
+    menu += onRemoveAction(name) { actions.onRemove(playerId) }
+    return menu.filterNotNull()
+}
+
+private data class Action(
+    @StringRes val resId: Int,
+    val action: () -> Unit
+)
+
+@Composable
+private fun onOrderChangeAction(
+    playersCount: State<Int>,
+    onOrderChange: ((Int) -> Unit)?
+): Action? {
+    onOrderChange ?: return null
+    val changeOrderExp = remember { mutableStateOf(false) }
+    ChangeOrderMenu(
+        expanded = changeOrderExp,
+        playersCount = playersCount,
+        onOrderChange = onOrderChange
+    )
+    return Action(R.string.player_action_change_order) {
+        changeOrderExp.value = true
+    }
+}
+
+private fun onSelectAction(
+    frozen: Boolean,
+    selected: Boolean,
+    onSelect: () -> Unit
+): Action? = Action(R.string.player_action_select, onSelect)
+    .takeIf { !frozen && !selected }
+
+@Composable
+private fun onRenameAction(name: String, onRename: (String) -> Unit): Action {
+    val renameExp = remember { mutableStateOf(false) }
+    RenameDialog(
+        opened = renameExp,
+        oldName = name,
+        rename = onRename
+    )
+    return Action(R.string.player_action_rename) {
+        renameExp.value = true
+    }
+}
+
+private fun playerActivityAction(
+    frozen: Boolean,
+    onFreeze: () -> Unit,
+    onUnfreeze: () -> Unit
+): Action = if (frozen) {
+    Action(R.string.player_action_unfreeze, onUnfreeze)
+} else {
+    Action(R.string.player_action_freeze, onFreeze)
+}
+
+private fun onUnbindAction(remote: Boolean, onUnbind: () -> Unit): Action? =
+    Action(R.string.player_action_unbind, onUnbind).takeIf { remote }
+
+@Composable
+private fun onRemoveAction(name: String, onRemove: () -> Unit): Action {
+    val removeDialogOpened = remember { mutableStateOf(false) }
+    RemoveDialog(
+        opened = removeDialogOpened,
+        name = name,
+        remove = onRemove
+    )
+    return Action(R.string.player_action_remove) {
+        removeDialogOpened.value = true
+    }
+}
+
+@Composable
+private fun ChangeOrderMenu(
     expanded: MutableState<Boolean>,
-    itemCount: State<Int>,
-    onItemClick: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    playersCount: State<Int>,
+    onOrderChange: (Int) -> Unit
 ) {
     DropdownMenu(
         expanded = expanded.value,
-        onDismissRequest = { expanded.value = false },
-        modifier = modifier
+        onDismissRequest = { expanded.value = false }
     ) {
-        repeat(itemCount.value) {
+        repeat(playersCount.value) {
             DropdownMenuItem(
                 text = { Text("${it + 1}") },
                 onClick = {
                     expanded.value = false
-                    onItemClick(it)
+                    onOrderChange(it)
                 }
             )
         }
@@ -166,51 +255,54 @@ fun PlayerSettingSelectOrderMenu(
 }
 
 @Composable
-fun PlayerSettingMenu(
-    id: Long,
-    remote: Boolean,
-    active: Boolean,
-    selected: Boolean,
-    expanded: MutableState<Boolean>,
-    actions: PlayerSettingActions,
-    modifier: Modifier = Modifier
-) {
-    DropdownMenu(
-        expanded = expanded.value,
-        onDismissRequest = { expanded.value = false },
-        modifier = modifier
-    ) {
-        buildList {
-            if (active) {
-                if (!selected) {
-                    add(R.string.player_action_select to actions.onSelect)
-                }
-                add(R.string.player_action_freeze to actions.onFreeze)
-            } else {
-                add(R.string.player_action_unfreeze to actions.onUnfreeze)
-            }
-            if (remote) {
-                add(R.string.player_action_unbind to actions.onUnbind)
-            }
-            add(R.string.player_action_remove to actions.onRemove)
-        }.forEach { (resId, action) ->
-            DropdownMenuItem(
-                text = { Text(stringResource(resId)) },
-                onClick = {
-                    expanded.value = false
-                    action(id)
-                }
-            )
-        }
-    }
-}
-
-@Composable
-private fun RemoveAlertDialog(
+private fun RenameDialog(
     opened: MutableState<Boolean>,
-    playerName: String,
-    remove: () -> Unit,
-    modifier: Modifier = Modifier
+    oldName: String,
+    rename: (String) -> Unit
+) {
+    if (opened.value) {
+        val dismiss = { opened.value = false }
+        val text = rememberSaveable { mutableStateOf(oldName) }
+        val newName = text.value.playerName
+        val confirmable = newName != oldName && newName.isValidPlayerName
+        AlertDialog(
+            onDismissRequest = dismiss,
+            properties = DialogProperties(
+                dismissOnClickOutside = false
+            ),
+            confirmButton = {
+                Button(
+                    enabled = confirmable,
+                    onClick = {
+                        rename(newName)
+                        opened.value = false
+                    }
+                ) {
+                    Text(stringResource(R.string.player_action_rename_confirm))
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = dismiss
+                ) {
+                    Text(stringResource(R.string.player_action_rename_dismiss))
+                }
+            },
+            text = {
+                TextField(
+                    value = text.value,
+                    onValueChange = { text.value = it }
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun RemoveDialog(
+    opened: MutableState<Boolean>,
+    name: String,
+    remove: () -> Unit
 ) {
     if (opened.value) {
         AlertDialog(
@@ -227,34 +319,16 @@ private fun RemoveAlertDialog(
             },
             text = {
                 Text(
-                    text = stringResource(R.string.game_player_remove_msg) + " $playerName ?"
+                    text = stringResource(R.string.game_player_remove_msg) + " $name ?"
                 )
-            },
-            modifier = modifier
-        )
-    }
-}
-
-@Immutable
-data class PlayerSettingActions(
-    val onSelect: (Long) -> Unit,
-    val onBind: (Long, String) -> Unit,
-    val onUnbind: (Long) -> Unit,
-    val onRename: (Long, String) -> Unit,
-    val onRemove: (Long) -> Unit,
-    val onFreeze: (Long) -> Unit,
-    val onUnfreeze: (Long) -> Unit
-) {
-    companion object {
-        val Empty = PlayerSettingActions(
-            {}, { _, _ -> }, {}, { _, _ -> }, {}, {}, {}
+            }
         )
     }
 }
 
 @Composable
 private fun PlayerSettingCardPreview(
-    active: Boolean,
+    frozen: Boolean,
     selected: Boolean
 ) {
     BoardGameAssistantTheme {
@@ -262,12 +336,12 @@ private fun PlayerSettingCardPreview(
             id = 1,
             name = "Hello",
             remote = true,
-            active = active,
+            frozen = frozen,
             selected = selected,
-            menuActions = PlayerSettingActions.Empty,
+            settingActions = PlayerSettingActions.Empty,
             index = 6,
-            count = remember { mutableIntStateOf(10) },
-            onOrderChange = { _, _ -> }
+            playersCount = rememberUpdatedState(10),
+            modifier = Modifier.width(250.dp)
         )
     }
 }
@@ -276,7 +350,7 @@ private fun PlayerSettingCardPreview(
 @Composable
 private fun PlayerSettingCardPreviewSelected() {
     PlayerSettingCardPreview(
-        active = true,
+        frozen = false,
         selected = true
     )
 }
@@ -285,16 +359,16 @@ private fun PlayerSettingCardPreviewSelected() {
 @Composable
 private fun PlayerSettingCardPreviewActive() {
     PlayerSettingCardPreview(
-        active = true,
+        frozen = false,
         selected = false
     )
 }
 
 @Preview
 @Composable
-private fun PlayerSettingCardPreviewInactive() {
+private fun PlayerSettingCardPreviewFrozen() {
     PlayerSettingCardPreview(
-        active = false,
+        frozen = true,
         selected = true
     )
 }

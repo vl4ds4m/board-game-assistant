@@ -56,6 +56,9 @@
     <string name="player_action_move_up">Поставить выше</string>
     <string name="player_action_move_down">Поставить ниже</string>
     <string name="player_action_select">Сделать текущим</string>
+    <string name="player_action_change_order">Изменит порядок</string>
+    <string name="player_action_rename">Переименовать</string>
+    <string name="player_action_rename_dismiss">Отменить</string>
     <string name="player_action_freeze">Заморозить</string>
     <string name="player_action_unfreeze">Разморозить</string>
     <string name="game_master_apply">Применить</string>
@@ -82,4 +85,5 @@
     <string name="player_action_unbind">Отвязать</string>
     <string name="player_action_bind">Привязать к</string>
     <string name="game_player_self_label">Это Вы</string>
+    <string name="player_action_rename_confirm">Применить</string>
 </resources>

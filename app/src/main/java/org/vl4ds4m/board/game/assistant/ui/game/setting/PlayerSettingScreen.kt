@@ -66,10 +66,9 @@ fun PlayerSettingScreen(modifier: Modifier = Modifier) {
         userPlayer = viewModel.userPlayer.collectAsState(),
         currentPlayerId = viewModel.currentPlayerId.collectAsState(),
         addPlayer = viewModel::addPlayer,
-        bindPlayer = viewModel::bindPlayer,
-        onPlayerOrderChange = onPlayerOrderChange,
         playerSettingActions = PlayerSettingActions(
             onSelect = viewModel::changeCurrentPlayerId,
+            onOrderChange = onPlayerOrderChange,
             onBind = viewModel::bindPlayer,
             onUnbind = viewModel::unbindPlayer,
             onRename = viewModel::renamePlayer,
@@ -88,8 +87,6 @@ fun PlayerSettingScreenContent(
     userPlayer: State<NetworkPlayer?>,
     currentPlayerId: State<Long?>,
     addPlayer: (String?, String) -> Unit,
-    bindPlayer: (Long, String) -> Unit,
-    onPlayerOrderChange: ((Long, Int) -> Unit)?,
     playerSettingActions: PlayerSettingActions,
     modifier: Modifier = Modifier
 ) {
@@ -136,12 +133,11 @@ fun PlayerSettingScreenContent(
                     id = id,
                     name = player.name,
                     remote = player.netDevId != null,
-                    active = player.active,
+                    frozen = !player.active,
                     selected = id == currentPlayerId.value,
-                    menuActions = playerSettingActions,
+                    settingActions = playerSettingActions,
                     index = i,
-                    count = count,
-                    onOrderChange = onPlayerOrderChange
+                    playersCount = count
                 )
             }
         }
@@ -197,7 +193,9 @@ fun PlayerSettingScreenContent(
                             add = {
                                 user.run { addPlayer(netDevId, name) }
                             },
-                            bind = { bindPlayer(it, user.netDevId) },
+                            bind = {
+                                playerSettingActions.onBind(it, user.netDevId)
+                            },
                             bindList = unboundPlayers
                         )
                     }
@@ -208,7 +206,9 @@ fun PlayerSettingScreenContent(
                         add = {
                             player.run { addPlayer(netDevId, name) }
                         },
-                        bind = { bindPlayer(it, player.netDevId) },
+                        bind = {
+                            playerSettingActions.onBind(it, player.netDevId)
+                        },
                         bindList = unboundPlayers
                     )
                 }
@@ -240,8 +240,6 @@ private fun PlayerSettingScreenPreview() {
             ),
             currentPlayerId = rememberUpdatedState(null),
             addPlayer = { _, _ -> },
-            bindPlayer = { _, _ -> },
-            onPlayerOrderChange = { _, _ -> },
             playerSettingActions = PlayerSettingActions.Empty,
             modifier = Modifier.fillMaxSize()
         )

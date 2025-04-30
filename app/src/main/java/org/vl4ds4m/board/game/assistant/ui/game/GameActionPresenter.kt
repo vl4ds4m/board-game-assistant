@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.ui.game.component
+package org.vl4ds4m.board.game.assistant.ui.game
 
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.changesCurrentPlayer

@@ -15,7 +15,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.simple.SimpleOrderedGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModelProducer
-import org.vl4ds4m.board.game.assistant.ui.game.component.GameActionPresenter
+import org.vl4ds4m.board.game.assistant.ui.game.GameActionPresenter
 import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameActionPresenter
 
 @Serializable

@@ -1,4 +1,4 @@
-package org.vl4ds4m.board.game.assistant.ui.game.carcassonne
+package org.vl4ds4m.board.game.assistant.ui.game.component
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card

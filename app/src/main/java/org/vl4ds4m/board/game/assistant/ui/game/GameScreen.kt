@@ -40,7 +40,7 @@ import org.vl4ds4m.board.game.assistant.game.gameActionPresenter
 import org.vl4ds4m.board.game.assistant.game.playerStateChangedAction
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
 import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.Timer
+import org.vl4ds4m.board.game.assistant.ui.game.component.Timer
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistoryManager
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistoryState

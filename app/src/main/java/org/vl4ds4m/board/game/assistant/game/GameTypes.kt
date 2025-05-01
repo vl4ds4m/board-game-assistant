@@ -16,7 +16,13 @@ import org.vl4ds4m.board.game.assistant.ui.game.simple.SimpleOrderedGameViewMode
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModelProducer
 import org.vl4ds4m.board.game.assistant.ui.game.GameActionPresenter
+import org.vl4ds4m.board.game.assistant.ui.game.GameUI
+import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameUI
+import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameUI
 import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameActionPresenter
+import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameUI
+import org.vl4ds4m.board.game.assistant.ui.game.simple.FreeGameUI
+import org.vl4ds4m.board.game.assistant.ui.game.simple.SimpleOrderedGameUI
 
 @Serializable
 sealed interface GameType {
@@ -28,6 +34,8 @@ sealed interface GameType {
     fun createGameEnv(): GameEnv
 
     val viewModelProducer: GameViewModelProducer<GameViewModel>
+
+    val gameUiFactory: GameUI.Factory
 
     companion object {
         val entries: List<GameType> = listOf(
@@ -60,6 +68,8 @@ data object Free : GameType {
     override fun createGameEnv() = FreeGameEnv()
 
     override val viewModelProducer = FreeGameViewModel
+
+    override val gameUiFactory = FreeGameUI
 }
 
 @Serializable
@@ -74,6 +84,8 @@ data object SimpleOrdered : OrderedGameType {
     override fun createGameEnv() = SimpleOrderedGameEnv()
 
     override val viewModelProducer = SimpleOrderedGameViewModel
+
+    override val gameUiFactory = SimpleOrderedGameUI
 }
 
 @Serializable
@@ -85,6 +97,8 @@ data object Dice : OrderedGameType {
     override fun createGameEnv() = DiceGameEnv()
 
     override val viewModelProducer = DiceGameViewModel
+
+    override val gameUiFactory = DiceGameUI
 }
 
 @Serializable
@@ -96,6 +110,8 @@ data object Carcassonne : OrderedGameType {
     override fun createGameEnv() = CarcassonneGameEnv()
 
     override val viewModelProducer = CarcassonneGameViewModel
+
+    override val gameUiFactory = CarcassonneGameUI
 }
 
 @Serializable
@@ -107,6 +123,8 @@ data object Monopoly : OrderedGameType {
     override fun createGameEnv() = MonopolyGameEnv()
 
     override val viewModelProducer = MonopolyGameViewModel
+
+    override val gameUiFactory = MonopolyGameUI
 }
 
 val GameType.gameActionPresenter: GameActionPresenter

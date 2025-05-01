@@ -61,6 +61,8 @@ abstract class GameViewModel(
         }
     }
 
+    fun createGameUi(): GameUI = type.gameUiFactory.create(this)
+
     override fun onCleared() {
         if (initialized.value) {
             Log.d(TAG, "Complete game process")

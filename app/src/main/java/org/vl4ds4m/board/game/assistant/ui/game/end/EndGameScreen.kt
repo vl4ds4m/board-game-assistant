@@ -24,6 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.component.PlayerStats
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
@@ -75,7 +76,9 @@ fun EndGameScreenContent(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp)
-        )
+        ) {
+            PlayerStats(it)
+        }
         Spacer(Modifier.size(48.dp))
     }
 

@@ -3,12 +3,14 @@ package org.vl4ds4m.board.game.assistant.ui.game
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -26,11 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import org.vl4ds4m.board.game.assistant.States
-import org.vl4ds4m.board.game.assistant.game.Carcassonne
-import org.vl4ds4m.board.game.assistant.game.Dice
-import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.GameType
-import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
@@ -39,8 +37,6 @@ import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.game.gameActionPresenter
 import org.vl4ds4m.board.game.assistant.game.playerStateChangedAction
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
-import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.component.Timer
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistoryManager
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistoryState
@@ -48,10 +44,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenu
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.game.component.StandardCounter
-import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.simple.FreeGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.simple.SimpleOrderedGameScreen
+import org.vl4ds4m.board.game.assistant.ui.game.component.Timer
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -97,40 +90,25 @@ fun GameScreen(
             if (completed) navActions.completeGame()
         }
     }
-    when (type) {
-        is Free          -> FreeGameScreen(modifier)
-        is SimpleOrdered -> SimpleOrderedGameScreen(modifier)
-        is Dice          -> DiceGameScreen(modifier)
-        is Carcassonne   -> CarcassonneGameScreen(modifier)
-        is Monopoly      -> MonopolyGameScreen(modifier)
-    }
-}
-
-@Composable
-fun GameScreen(
-    selectPlayer: ((Long) -> Unit)?,
-    modifier: Modifier = Modifier,
-    masterActions: @Composable () -> Unit
-) {
-    val viewModel = viewModel<GameViewModel>()
     val timer = produceState<Int?>(null, viewModel) {
         viewModel.timeout.combine(viewModel.secondsToEnd) { timeout, seconds ->
             value = seconds.takeIf { timeout }
         }.launchIn(this)
     }
-    val presenter = viewModel.type.gameActionPresenter
+    val gameUi = remember { viewModel.createGameUi() }
     val actions = produceState(listOf()) {
         viewModel.actions.combine(viewModel.players) { actions, players ->
-            value = actions.map { presenter.showAction(it, players) }
+            value = actions.map { gameUi.actionPresenter.showAction(it, players) }
         }.launchIn(this)
     }
     GameScreenContent(
         players = viewModel.players.collectAsState(),
         currentPlayerId = viewModel.currentPlayerId.collectAsState(),
         actions = actions,
-        selectPlayer = selectPlayer,
+        selectPlayer = gameUi.onPlayerSelected,
         timer = timer,
-        masterActions = masterActions,
+        playerStats = gameUi.playerStats,
+        masterActions = gameUi.masterActions,
         modifier = modifier
     )
 }
@@ -142,6 +120,7 @@ fun GameScreenContent(
     actions: State<List<String>>,
     selectPlayer: ((Long) -> Unit)?,
     timer: State<Int?>,
+    playerStats: @Composable RowScope.(State<PlayerState>) -> Unit,
     masterActions: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -168,6 +147,7 @@ fun GameScreenContent(
             players = activePlayers,
             currentPlayerId = currentPlayerId,
             onSelectPlayer = selectPlayer,
+            playerStats = playerStats,
             modifier = Modifier
                 .weight(3f)
                 .padding(horizontal = 16.dp)
@@ -203,6 +183,11 @@ private fun GameScreenPreview() {
             actions = rememberUpdatedState(previewActions),
             selectPlayer = null,
             timer = rememberUpdatedState(157),
+            playerStats = {
+                Spacer(Modifier.weight(1f))
+                Text("Stats")
+                Spacer(Modifier.weight(1f))
+            },
             masterActions = {
                 StandardCounter(
                     addPoints = {},

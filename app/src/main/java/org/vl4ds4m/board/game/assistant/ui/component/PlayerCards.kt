@@ -23,10 +23,12 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -55,7 +57,7 @@ fun PlayerCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(50.dp)
+            .height(60.dp)
             .clip(shape),
         shape = shape,
         colors = CardDefaults.cardColors(
@@ -130,25 +132,29 @@ fun PlayerState(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier//.padding(end = 8.dp)
+        modifier = modifier
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 4.dp)
-                .fillMaxWidth(),
-            content = topRow
-        )
-        HorizontalDivider()
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 4.dp)
-                .fillMaxWidth(),
-            content = bottomRow
-        )
+        CompositionLocalProvider(
+            LocalTextStyle provides MaterialTheme.typography.bodyMedium
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 4.dp)
+                    .fillMaxWidth(),
+                content = topRow
+            )
+            HorizontalDivider()
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 4.dp)
+                    .fillMaxWidth(),
+                content = bottomRow
+            )
+        }
     }
 }
 

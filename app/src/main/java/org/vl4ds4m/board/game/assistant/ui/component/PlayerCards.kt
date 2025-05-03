@@ -44,7 +44,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
-import org.vl4ds4m.board.game.assistant.ui.game.component.MonopolyField
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -147,6 +146,7 @@ fun PlayerState(
             )
             HorizontalDivider()
             Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .weight(1f)
@@ -386,109 +386,6 @@ private fun NewRemotePlayerCardPreview() {
             bind = {},
             bindList = rememberUpdatedState(listOf(1L to "Oret")),
             modifier = Modifier.width(300.dp)
-        )
-    }
-}
-
-@Composable
-fun PlayerInGameCard(
-    rating: Int,
-    name: String,
-    active: Boolean,
-    score: Int,
-    selected: Boolean,
-    onSelect: (() -> Unit)?,
-    modifier: Modifier = Modifier,
-    position: Int? = null, // TODO Make different cards
-) {
-    Card(
-        modifier = modifier
-            .height(60.dp)
-            .fillMaxWidth()
-            .clickable(
-                enabled = onSelect != null,
-                onClick = onSelect ?: {}
-            ),
-        colors = CardDefaults.cardColors(
-            containerColor = with(MaterialTheme.colorScheme) {
-                if (selected) surfaceContainerHigh
-                else surfaceContainerLow
-            }
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    horizontal = 12.dp,
-                    vertical = 4.dp
-                ),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "$rating. ",
-                style = MaterialTheme.typography.titleLarge
-            )
-            Spacer(Modifier.width(8.dp))
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Player image",
-                modifier = Modifier.size(40.dp)
-            )
-            Spacer(Modifier.width(12.dp))
-            Text(
-                text = name,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Spacer(Modifier.width(8.dp))
-            if (!active) {
-                Icon(
-                    painter = painterResource(R.drawable.frozen_24px),
-                    contentDescription = "Frozen",
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(Modifier.size(4.dp))
-            }
-            Column(
-                horizontalAlignment = Alignment.End
-            ) {
-                Text(
-                    text = "$score point(s)",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                position?.let { pos ->
-                    Spacer(Modifier.size(8.dp))
-                    MonopolyField(pos)
-                }
-            }
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun SimplePlayerInGameCardPreview() {
-    PlayerInGameCardPreview(false)
-}
-
-@Preview
-@Composable
-private fun CurrentPlayerInGameCardPreview() {
-    PlayerInGameCardPreview(true)
-}
-
-@Composable
-private fun PlayerInGameCardPreview(current: Boolean) {
-    BoardGameAssistantTheme {
-        PlayerInGameCard(
-            rating = 1,
-            name = "Fedya",
-            active = false,
-            score = 1234,
-            selected = current,
-            onSelect = null,
-            position = 6
         )
     }
 }

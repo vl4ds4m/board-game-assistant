@@ -31,6 +31,10 @@ class MonopolyGameUI private constructor(game: MonopolyGame) :
     companion object : GameUI.Factory by GameUI {
         override fun create(game: Game) = MonopolyGameUI(game as MonopolyGame)
 
+        override val playerStats: PlayerStats = {
+            MonopolyPlayerStats(it)
+        }
+
         override val actionPresenter = MonopolyGameActionPresenter
     }
 }

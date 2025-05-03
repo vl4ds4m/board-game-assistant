@@ -332,7 +332,9 @@ fun NewRemotePlayerCard(
 
 val String.playerName: String get() = trim()
 
-val String.isValidPlayerName: Boolean get() = length >= 3
+val String.isValidPlayerName: Boolean get() = playerName.run {
+    length in 3 .. 20
+}
 
 private data class PlayerAction(
     val name: String,

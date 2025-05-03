@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.vl4ds4m.board.game.assistant.R
+import org.vl4ds4m.board.game.assistant.ui.component.isValidPlayerName
+import org.vl4ds4m.board.game.assistant.ui.component.playerName
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -73,9 +75,9 @@ fun ProfileScreenContent(
             singleLine = true
         )
         Button(
-            onClick = { saveUserName(userName) },
-            enabled = userName.isNotBlank() &&
-                userName.trim() != userNameFlow.collectAsState().value
+            onClick = { saveUserName(userName.playerName) },
+            enabled = userName.isValidPlayerName &&
+                userName.playerName != userNameFlow.collectAsState().value
         ) {
             Text(stringResource(R.string.profile_save_changes))
         }

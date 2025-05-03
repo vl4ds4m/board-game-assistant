@@ -42,16 +42,12 @@ class GameSetupViewModel private constructor(
         mPlayers.removeAt(index)
     }
 
-    fun movePlayerUp(index: Int) {
-        if (index !in players.indices || index == 0) return
+    fun changePlayerOrder(index: Int, newPosition: Int) {
+        if (index !in players.indices) return
+        if (newPosition !in players.indices) return
+        if (index == newPosition) return
         val player = mPlayers.removeAt(index)
-        mPlayers.add(index - 1, player)
-    }
-
-    fun movePlayerDown(index: Int) {
-        if (index !in players.indices || index == players.lastIndex) return
-        val player = mPlayers.removeAt(index)
-        mPlayers.add(index + 1, player)
+        mPlayers.add(newPosition, player)
     }
 
     fun startGame() {

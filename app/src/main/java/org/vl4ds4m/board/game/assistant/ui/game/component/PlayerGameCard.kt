@@ -43,13 +43,11 @@ fun PlayerGameCard(
                     name = name,
                     modifier = Modifier.weight(1f)
                 )
-                if (remote || frozen) {
-                    Spacer(Modifier.width(8.dp))
-                    PlayerIndicators(
-                        remote = remote,
-                        frozen = frozen
-                    )
-                }
+                Spacer(Modifier.width(8.dp))
+                PlayerIndicators(
+                    remote = remote,
+                    frozen = frozen
+                )
             },
             bottomRow = stats
         )

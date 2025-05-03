@@ -36,8 +36,8 @@ import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.network.NetworkPlayer
-import org.vl4ds4m.board.game.assistant.ui.component.NewRemotePlayerCard
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.component.RemotePlayerCard
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -188,7 +188,7 @@ fun PlayerSettingScreenContent(
             ) {
                 newUserPlayer.value?.let { user ->
                     item {
-                        NewRemotePlayerCard(
+                        RemotePlayerCard(
                             name = "${user.name} (${stringResource(R.string.game_player_self_label)})",
                             add = {
                                 user.run { addPlayer(netDevId, name) }
@@ -201,7 +201,7 @@ fun PlayerSettingScreenContent(
                     }
                 }
                 items(newRemotePlayers.value) { player ->
-                    NewRemotePlayerCard(
+                    RemotePlayerCard(
                         name = player.name,
                         add = {
                             player.run { addPlayer(netDevId, name) }

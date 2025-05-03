@@ -30,9 +30,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.map
 import org.vl4ds4m.board.game.assistant.R
-import org.vl4ds4m.board.game.assistant.ui.component.NewPlayerCard
-import org.vl4ds4m.board.game.assistant.ui.component.NewRemotePlayerCard
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.component.RemotePlayerCard
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -60,10 +59,11 @@ fun NewGamePlayersScreen(
         remotePlayers = remotePlayers,
         userPlayer = userPlayer,
         addPlayer = viewModel::addPlayer,
-        renamePlayer = viewModel::renamePlayer,
-        removePlayer = viewModel::removePlayerAt,
-        movePlayerUp = viewModel::movePlayerUp,
-        movePlayerDown = viewModel::movePlayerDown,
+        setupActions = PlayerSetupActions(
+            onRename = viewModel::renamePlayer,
+            onRemove = viewModel::removePlayerAt,
+            onOrderChange = viewModel::changePlayerOrder
+        ),
         onStartGame = onStartGame,
         modifier = modifier
     )
@@ -75,10 +75,7 @@ fun NewGamePlayersScreenContent(
     remotePlayers: State<List<NewPlayer>>,
     userPlayer: State<NewPlayer?>,
     addPlayer: (String, String?) -> Unit,
-    renamePlayer: (Int, String) -> Unit,
-    removePlayer: (Int) -> Unit,
-    movePlayerUp: (Int) -> Unit,
-    movePlayerDown: (Int) -> Unit,
+    setupActions: PlayerSetupActions,
     onStartGame: () -> Unit,
     modifier: Modifier = Modifier
 ) = Column(
@@ -117,6 +114,7 @@ fun NewGamePlayersScreenContent(
                 .wrapContentSize()
         )
     } else {
+        val playersCount = rememberUpdatedState(players.size)
         LazyColumn(
             modifier = Modifier
                 .weight(2f)
@@ -125,15 +123,12 @@ fun NewGamePlayersScreenContent(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             itemsIndexed(players) { index, player ->
-                NewPlayerCard(
+                PlayerSetupCard(
+                    index = index,
                     name = player.name,
                     remote = player.netDevId != null,
-                    editName = { renamePlayer(index, it) },
-                    remove = { removePlayer(index) },
-                    moveUp = { movePlayerUp(index) }
-                        .takeIf { index != 0 },
-                    moveDown = { movePlayerDown(index) }
-                        .takeIf { index != players.lastIndex }
+                    setupActions = setupActions,
+                    playersCount = playersCount
                 )
             }
         }
@@ -185,7 +180,7 @@ fun NewGamePlayersScreenContent(
         ) {
             newUserPlayer.value?.let {
                 item {
-                    NewRemotePlayerCard(
+                    RemotePlayerCard(
                         name = "${it.name} (${stringResource(R.string.game_player_self_label)})",
                         add = {
                             it.run { addPlayer(name, netDevId) }
@@ -196,7 +191,7 @@ fun NewGamePlayersScreenContent(
                 }
             }
             items(newRemotePlayers.value) { player ->
-                NewRemotePlayerCard(
+                RemotePlayerCard(
                     name = player.name,
                     add = {
                         player.run { addPlayer(name, netDevId) }
@@ -244,10 +239,7 @@ private fun NewGamePlayersScreenPreview(
             remotePlayers = rememberUpdatedState(remotePlayers),
             userPlayer = rememberUpdatedState(NewPlayer("Oreo", "oi32j")),
             addPlayer = { _, _ -> },
-            renamePlayer = { _, _ -> },
-            removePlayer = {},
-            movePlayerUp = {},
-            movePlayerDown = {},
+            setupActions = PlayerSetupActions.Empty,
             onStartGame = {}
         )
     }

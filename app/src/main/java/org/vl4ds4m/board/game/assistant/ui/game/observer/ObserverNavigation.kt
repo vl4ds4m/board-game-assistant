@@ -42,6 +42,9 @@ fun NavGraphBuilder.observerNavigation(
         val players = remember {
             derivedStateOf { session.value.players.toMap() }
         }
+        val gameUiFactory = remember {
+            derivedStateOf { session.value.type.uiFactory }
+        }
         when (observer.value) {
             NetworkGameState.REGISTRATION -> ObserverStartupScreen()
             NetworkGameState.IN_GAME -> {
@@ -63,12 +66,16 @@ fun NavGraphBuilder.observerNavigation(
                 }
                 ObserverGameScreen(
                     players = players,
+                    gameUiFactory = gameUiFactory,
                     currentPlayerId = currentPlayerId,
                     actions = actions,
                     timer = timer
                 )
             }
-            NetworkGameState.END_GAME -> ObserverEndScreen(players)
+            NetworkGameState.END_GAME -> ObserverEndScreen(
+                players = players,
+                gameUiFactory = gameUiFactory
+            )
             NetworkGameState.EXIT -> onBackClick()
         }
     }
@@ -77,7 +84,7 @@ fun NavGraphBuilder.observerNavigation(
 private val emptySession = GameSession(
     completed = false,
     type = SimpleOrdered,
-    name = "Default",
+    name = "Game",
     players = listOf(),
     currentPlayerId = null,
     nextNewPlayerId = 1L,

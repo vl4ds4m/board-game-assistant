@@ -1,23 +1,23 @@
 package org.vl4ds4m.board.game.assistant.ui.game.simple
 
 import androidx.compose.runtime.Composable
+import org.vl4ds4m.board.game.assistant.game.Game
+import org.vl4ds4m.board.game.assistant.game.simple.SimpleOrderedGame
 import org.vl4ds4m.board.game.assistant.ui.game.GameUI
-import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.component.StandardCounter
 
-class SimpleOrderedGameUI private constructor(vm: SimpleOrderedGameViewModel) :
-    GameUI by GameUI.create(vm, false)
+class SimpleOrderedGameUI private constructor(game: SimpleOrderedGame) :
+    GameUI by GameUI.create(game)
 {
     override val masterActions: @Composable () -> Unit = {
         StandardCounter(
-            addPoints = vm::addPoints,
+            addPoints = game::addPoints,
             applyEnabled = null,
-            selectNextPlayer = vm::changeCurrentPlayerId
+            selectNextPlayer = game::changeCurrentPlayerId
         )
     }
 
-    companion object : GameUI.Factory {
-        override fun create(viewModel: GameViewModel): GameUI =
-            SimpleOrderedGameUI(viewModel as SimpleOrderedGameViewModel)
+    companion object : GameUI.Factory by GameUI {
+        override fun create(game: Game) = SimpleOrderedGameUI(game as SimpleOrderedGame)
     }
 }

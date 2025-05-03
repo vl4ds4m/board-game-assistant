@@ -61,7 +61,7 @@ abstract class GameViewModel(
         }
     }
 
-    fun createGameUi(): GameUI = type.gameUiFactory.create(this)
+    val gameUi: GameUI = gameEnv.type.uiFactory.create(gameEnv)
 
     override fun onCleared() {
         if (initialized.value) {

@@ -23,8 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.component.PlayerStats
+import org.vl4ds4m.board.game.assistant.ui.game.PlayerStats
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
@@ -36,6 +37,7 @@ fun EndGameScreen(
     val viewModel = viewModel<GameViewModel>()
     EndGameScreenContent(
         players = viewModel.players.collectAsState(),
+        playerStats = viewModel.gameUi.playerStats,
         navigateHome = navigateHome,
         modifier = modifier
     )
@@ -44,6 +46,7 @@ fun EndGameScreen(
 @Composable
 fun EndGameScreenContent(
     players: State<Players>,
+    playerStats: PlayerStats,
     navigateHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -73,12 +76,11 @@ fun EndGameScreenContent(
             players = players,
             currentPlayerId = rememberUpdatedState(null),
             onSelectPlayer = null,
+            playerStats = playerStats,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp)
-        ) {
-            PlayerStats(it)
-        }
+        )
         Spacer(Modifier.size(48.dp))
     }
 
@@ -115,6 +117,7 @@ private fun EndGameScreenPreview() {
                     )
                 )
             )),
+            playerStats = GameUI.playerStats,
             navigateHome = {},
             modifier = Modifier.fillMaxSize()
         )

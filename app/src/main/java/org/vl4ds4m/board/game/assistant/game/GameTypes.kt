@@ -35,7 +35,7 @@ sealed interface GameType {
 
     val viewModelProducer: GameViewModelProducer<GameViewModel>
 
-    val gameUiFactory: GameUI.Factory
+    val uiFactory: GameUI.Factory
 
     companion object {
         val entries: List<GameType> = listOf(
@@ -69,7 +69,7 @@ data object Free : GameType {
 
     override val viewModelProducer = FreeGameViewModel
 
-    override val gameUiFactory = FreeGameUI
+    override val uiFactory = FreeGameUI
 }
 
 @Serializable
@@ -85,7 +85,7 @@ data object SimpleOrdered : OrderedGameType {
 
     override val viewModelProducer = SimpleOrderedGameViewModel
 
-    override val gameUiFactory = SimpleOrderedGameUI
+    override val uiFactory = SimpleOrderedGameUI
 }
 
 @Serializable
@@ -98,7 +98,7 @@ data object Dice : OrderedGameType {
 
     override val viewModelProducer = DiceGameViewModel
 
-    override val gameUiFactory = DiceGameUI
+    override val uiFactory = DiceGameUI
 }
 
 @Serializable
@@ -111,7 +111,7 @@ data object Carcassonne : OrderedGameType {
 
     override val viewModelProducer = CarcassonneGameViewModel
 
-    override val gameUiFactory = CarcassonneGameUI
+    override val uiFactory = CarcassonneGameUI
 }
 
 @Serializable
@@ -124,7 +124,7 @@ data object Monopoly : OrderedGameType {
 
     override val viewModelProducer = MonopolyGameViewModel
 
-    override val gameUiFactory = MonopolyGameUI
+    override val uiFactory = MonopolyGameUI
 }
 
 val GameType.gameActionPresenter: GameActionPresenter

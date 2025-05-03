@@ -11,9 +11,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -119,8 +117,9 @@ fun CompletedGameScreenContent(
         )
         PlayersRating(
             players = rememberUpdatedState(players),
-            currentPlayerId = remember { mutableStateOf(null) },
+            currentPlayerId = rememberUpdatedState(null),
             onSelectPlayer = null,
+            playerStats = type.uiFactory.playerStats,
             modifier = modifier
                 .padding(horizontal = 16.dp)
                 .weight(1f)

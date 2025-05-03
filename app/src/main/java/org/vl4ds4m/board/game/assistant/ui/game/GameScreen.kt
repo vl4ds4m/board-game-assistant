@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -43,7 +42,6 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistoryState
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenu
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
-import org.vl4ds4m.board.game.assistant.ui.game.component.StandardCounter
 import org.vl4ds4m.board.game.assistant.ui.game.component.Timer
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
@@ -95,20 +93,20 @@ fun GameScreen(
             value = seconds.takeIf { timeout }
         }.launchIn(this)
     }
-    val gameUi = remember { viewModel.createGameUi() }
+    val ui = viewModel.gameUi
     val actions = produceState(listOf()) {
         viewModel.actions.combine(viewModel.players) { actions, players ->
-            value = actions.map { gameUi.actionPresenter.showAction(it, players) }
+            value = actions.map { ui.actionPresenter.showAction(it, players) }
         }.launchIn(this)
     }
     GameScreenContent(
         players = viewModel.players.collectAsState(),
         currentPlayerId = viewModel.currentPlayerId.collectAsState(),
         actions = actions,
-        selectPlayer = gameUi.onPlayerSelected,
+        selectPlayer = ui.onPlayerSelected,
         timer = timer,
-        playerStats = gameUi.playerStats,
-        masterActions = gameUi.masterActions,
+        playerStats = ui.playerStats,
+        masterActions = ui.masterActions,
         modifier = modifier
     )
 }
@@ -183,18 +181,8 @@ private fun GameScreenPreview() {
             actions = rememberUpdatedState(previewActions),
             selectPlayer = null,
             timer = rememberUpdatedState(157),
-            playerStats = {
-                Spacer(Modifier.weight(1f))
-                Text("Stats")
-                Spacer(Modifier.weight(1f))
-            },
-            masterActions = {
-                StandardCounter(
-                    addPoints = {},
-                    applyEnabled = null,
-                    selectNextPlayer = {}
-                )
-            },
+            playerStats = GameUI.playerStats,
+            masterActions = GameUI.masterActionsPreview,
             modifier = Modifier.fillMaxSize()
         )
     }

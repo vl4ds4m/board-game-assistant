@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.component.Timer
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
@@ -26,6 +27,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 @Composable
 fun ObserverGameScreen(
     players: State<Players>,
+    gameUiFactory: State<GameUI.Factory>,
     currentPlayerId: State<Long?>,
     actions: State<List<String>>,
     timer: State<Int?>,
@@ -54,6 +56,7 @@ fun ObserverGameScreen(
             players = activePlayers,
             currentPlayerId = currentPlayerId,
             onSelectPlayer = null,
+            playerStats = gameUiFactory.value.playerStats,
             modifier = Modifier
                 .weight(5f)
                 .padding(horizontal = 16.dp)
@@ -76,6 +79,7 @@ private fun ObserverGameScreenPreview() {
     BoardGameAssistantTheme {
         ObserverGameScreen(
             players = rememberUpdatedState(previewPlayers),
+            gameUiFactory = rememberUpdatedState(GameUI),
             currentPlayerId = rememberUpdatedState(null),
             actions = rememberUpdatedState(previewActions),
             timer = rememberUpdatedState(945)

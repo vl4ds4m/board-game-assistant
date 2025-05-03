@@ -6,7 +6,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
+import org.vl4ds4m.board.game.assistant.ui.game.component.StandardCounter
 
 typealias PlayerStats = @Composable RowScope.(State<PlayerState>) -> Unit
 
@@ -20,33 +22,47 @@ interface GameUI {
     val actionPresenter: GameActionPresenter
 
     interface Factory {
-        fun create(viewModel: GameViewModel): GameUI
+        fun create(game: Game): GameUI
+
+        val playerStats: PlayerStats
+
+        val actionPresenter: GameActionPresenter
     }
 
-    companion object {
-        fun create(
-            viewModel: GameViewModel,
-            selectAllowed: Boolean
-        ): GameUI = BaseGameUI(viewModel, selectAllowed)
+    companion object : Factory {
+        override fun create(game: Game): GameUI = createBaseUi(game, false)
+
+        override val playerStats: PlayerStats = { state ->
+            Spacer(Modifier.weight(1f))
+            Text("${state.value.score} point(s)")
+        }
+        
+        override val actionPresenter: GameActionPresenter =
+            GameActionPresenter.Default
+        
+        fun createBaseUi(game: Game, selectAllowed: Boolean): GameUI =
+            BaseGameUI(game, selectAllowed)
+
+        val masterActionsPreview: @Composable () -> Unit = {
+            StandardCounter(
+                addPoints = {},
+                applyEnabled = null,
+                selectNextPlayer = {}
+            )
+        }
     }
 }
 
-private class BaseGameUI(
-    viewModel: GameViewModel,
-    selectAllowed: Boolean
-) : GameUI {
-    override val playerStats: PlayerStats = { state: State<PlayerState> ->
-        Spacer(Modifier.weight(1f))
-        Text("${state.value.score} point(s)")
-    }
+private class BaseGameUI(game: Game, selectAllowed: Boolean) : GameUI {
+    override val playerStats: PlayerStats = GameUI.playerStats
 
     override val onPlayerSelected = if (selectAllowed) {
-        viewModel::changeCurrentPlayerId
+        game::changeCurrentPlayerId
     } else {
         null
     }
 
     override val masterActions: @Composable () -> Unit = {}
 
-    override val actionPresenter = GameActionPresenter.Default
+    override val actionPresenter = GameUI.actionPresenter
 }

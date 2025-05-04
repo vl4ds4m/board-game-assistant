@@ -2,28 +2,19 @@ package org.vl4ds4m.board.game.assistant.ui.game.setting
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,7 +28,11 @@ import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.network.NetworkPlayer
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.component.NoPlayersLabel
+import org.vl4ds4m.board.game.assistant.ui.game.component.NoRemotePlayersLabel
+import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersHead
 import org.vl4ds4m.board.game.assistant.ui.game.component.RemotePlayerCard
+import org.vl4ds4m.board.game.assistant.ui.game.component.RemotePlayersHead
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -94,59 +89,38 @@ fun PlayerSettingScreenContent(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        val count = remember { derivedStateOf { players.value.size } }
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.game_players_list),
+        PlayersHead { addPlayer(null, it) }
+        if (players.value.isEmpty()) {
+            NoPlayersLabel(Modifier.weight(2f))
+        } else {
+            LazyColumn(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 16.dp),
-                style = MaterialTheme.typography.titleLarge
-            )
-            val playerPrefix = stringResource(R.string.game_player_prefix)
-            FloatingActionButton(
-                onClick = {
-                    addPlayer(null, "$playerPrefix ${count.value + 1}")
-                }
+                    .weight(2f)
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add a player"
-                )
-            }
-        }
-        LazyColumn(
-            modifier = Modifier
-                .weight(2f)
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            itemsIndexed(
-                items = players.value,
-                key = { _, (id, _) -> id }
-            ) { i, (id, player) ->
-                PlayerSettingCard(
-                    id = id,
-                    name = player.name,
-                    remote = player.netDevId != null,
-                    frozen = !player.active,
-                    selected = id == currentPlayerId.value,
-                    settingActions = playerSettingActions,
-                    index = i,
-                    playersCount = count
-                )
+                itemsIndexed(
+                    items = players.value,
+                    key = { _, (id, _) -> id }
+                ) { i, (id, player) ->
+                    PlayerSettingCard(
+                        id = id,
+                        name = player.name,
+                        remote = player.netDevId != null,
+                        frozen = !player.active,
+                        selected = id == currentPlayerId.value,
+                        settingActions = playerSettingActions,
+                        index = i,
+                        playersCount = remember {
+                            derivedStateOf { players.value.size }
+                        }
+                    )
+                }
             }
         }
         HorizontalDivider()
-        Text(
-            text = stringResource(R.string.game_online_players),
-            modifier = Modifier.padding(start = 16.dp),
-            style = MaterialTheme.typography.titleMedium
-        )
+        RemotePlayersHead()
         val newRemotePlayers = remember {
             derivedStateOf {
                 remotePlayers.value.filterNot { newPlayer ->
@@ -162,13 +136,7 @@ fun PlayerSettingScreenContent(
             }
         }
         if (newRemotePlayers.value.isEmpty() && newUserPlayer.value == null) {
-            Text(
-                text = stringResource(R.string.game_online_players_empty),
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .wrapContentSize()
-            )
+            NoRemotePlayersLabel(Modifier.weight(1f))
         } else {
             val unboundPlayers = remember {
                 derivedStateOf {

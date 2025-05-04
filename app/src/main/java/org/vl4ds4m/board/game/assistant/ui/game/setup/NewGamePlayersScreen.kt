@@ -2,19 +2,13 @@ package org.vl4ds4m.board.game.assistant.ui.game.setup
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,7 +25,11 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.map
 import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.component.NoPlayersLabel
+import org.vl4ds4m.board.game.assistant.ui.game.component.NoRemotePlayersLabel
+import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersHead
 import org.vl4ds4m.board.game.assistant.ui.game.component.RemotePlayerCard
+import org.vl4ds4m.board.game.assistant.ui.game.component.RemotePlayersHead
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -82,37 +80,9 @@ fun NewGamePlayersScreenContent(
     modifier = modifier.padding(16.dp),
     verticalArrangement = Arrangement.spacedBy(16.dp)
 ) {
-    Row(
-        modifier = Modifier.padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = stringResource(R.string.game_players_list),
-            modifier = Modifier
-                .weight(1f)
-                .padding(end = 16.dp),
-            style = MaterialTheme.typography.titleLarge
-        )
-        val playerPrefix = stringResource(R.string.game_player_prefix)
-        FloatingActionButton(
-            onClick = {
-                addPlayer("$playerPrefix ${players.size + 1}", null)
-            }
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add a player"
-            )
-        }
-    }
+    PlayersHead { addPlayer(it, null) }
     if (players.isEmpty()) {
-        Text(
-            text = stringResource(R.string.new_game_players_empty_list),
-            modifier = Modifier
-                .weight(2f)
-                .fillMaxWidth()
-                .wrapContentSize()
-        )
+        NoPlayersLabel(Modifier.weight(2f))
     } else {
         val playersCount = rememberUpdatedState(players.size)
         LazyColumn(
@@ -143,11 +113,7 @@ fun NewGamePlayersScreenContent(
         }
     }
     HorizontalDivider()
-    Text(
-        text = stringResource(R.string.game_online_players),
-        modifier = Modifier.padding(start = 16.dp),
-        style = MaterialTheme.typography.titleMedium
-    )
+    RemotePlayersHead()
     val newRemotePlayers = remember {
         derivedStateOf {
             remotePlayers.value.filterNot { newPlayer ->
@@ -163,13 +129,7 @@ fun NewGamePlayersScreenContent(
         }
     }
     if (newRemotePlayers.value.isEmpty() && newUserPlayer.value == null) {
-        Text(
-            text = stringResource(R.string.game_online_players_empty),
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .wrapContentSize()
-        )
+        NoRemotePlayersLabel(Modifier.weight(1f))
     } else {
         LazyColumn(
             modifier = Modifier

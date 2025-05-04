@@ -1,15 +1,22 @@
 package org.vl4ds4m.board.game.assistant.ui.game.component
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -18,6 +25,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -25,6 +33,65 @@ import androidx.compose.ui.window.DialogProperties
 import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.ui.component.isValidPlayerName
 import org.vl4ds4m.board.game.assistant.ui.component.playerName
+
+@Composable
+fun PlayersHead(
+    modifier: Modifier = Modifier,
+    addPlayer: (String) -> Unit
+) {
+    Row(
+        modifier = modifier.padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(R.string.game_players_list),
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 16.dp),
+            style = MaterialTheme.typography.titleLarge
+        )
+        val playerPrefix = stringResource(R.string.game_player_prefix)
+        FloatingActionButton(
+            onClick = {
+                addPlayer(playerPrefix)
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add a player"
+            )
+        }
+    }
+}
+
+@Composable
+fun NoPlayersLabel(modifier: Modifier = Modifier) {
+    Text(
+        text = stringResource(R.string.new_game_players_empty_list),
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentSize()
+    )
+}
+
+@Composable
+fun RemotePlayersHead() {
+    Text(
+        text = stringResource(R.string.game_online_players),
+        modifier = Modifier.padding(start = 16.dp),
+        style = MaterialTheme.typography.titleMedium
+    )
+}
+
+@Composable
+fun NoRemotePlayersLabel(modifier: Modifier = Modifier) {
+    Text(
+        text = stringResource(R.string.game_online_players_empty),
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentSize()
+    )
+}
 
 @Composable
 fun PlayerSettingButton(

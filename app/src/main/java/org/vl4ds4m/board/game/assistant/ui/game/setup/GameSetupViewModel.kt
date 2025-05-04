@@ -1,25 +1,35 @@
 package org.vl4ds4m.board.game.assistant.ui.game.setup
 
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.data.repository.GameEnvRepository
+import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
 import org.vl4ds4m.board.game.assistant.game.GameType
 
 class GameSetupViewModel private constructor(
-    private val gameEnvRepository: GameEnvRepository
+    private val gameEnvRepository: GameEnvRepository,
+    sessionRepository: GameSessionRepository
 ) : ViewModel() {
-    val type = mutableStateOf<GameType?>(null)
-    val name = mutableStateOf("")
+    val type = MutableStateFlow<GameType?>(null)
 
-    fun createGame(type: GameType) {
+    val defaultNameNum: Flow<Int> = sessionRepository.getAllSessions()
+        .combine(type) { sessions, type ->
+            type ?: 0
+            val count = sessions.count { it.type == type }
+            return@combine count + 1
+        }
+
+    fun createGame(type: GameType, name: String) {
         type.createGameEnv()
-            .also { it.name.value = name.value }
+            .also { it.name.value = name}
             .let { gameEnvRepository.put(it) }
     }
 
@@ -61,7 +71,7 @@ class GameSetupViewModel private constructor(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer<GameSetupViewModel> {
                 val app = BoardGameAssistantApp.from(this)
-                GameSetupViewModel(app.gameEnvRepository)
+                GameSetupViewModel(app.gameEnvRepository, app.sessionRepository)
             }
         }
     }

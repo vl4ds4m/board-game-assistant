@@ -166,7 +166,7 @@ open class GameEnv(final override val type: GameType) : Game {
     final override val completed: StateFlow<Boolean> = mCompleted.asStateFlow()
 
     final override fun changeSecondsToEnd(seconds: Int) {
-        if (seconds > 0) mSecondsToEnd.value = seconds
+        if (seconds >= 0) mSecondsToEnd.value = seconds
     }
 
     private val timer: Timer = Timer()

@@ -88,3 +88,7 @@ data class GameHistoryState(
     val revert: () -> Unit,
     val repeat: () -> Unit
 )
+
+val String.gameName: String get() = trim()
+
+val String.isValidGameName: Boolean get() = gameName.length in 3 .. 25

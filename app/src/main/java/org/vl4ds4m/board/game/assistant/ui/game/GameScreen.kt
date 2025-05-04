@@ -26,6 +26,7 @@ import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.vl4ds4m.board.game.assistant.States
 import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.GameType
@@ -93,9 +94,14 @@ fun GameScreen(
             value = seconds.takeIf { timeout }
         }.launchIn(this)
     }
+    val userId = produceState<String?>(null) {
+        viewModel.userPlayer.onEach { value = it?.netDevId }
+            .launchIn(this)
+    }
     val ui = viewModel.gameUi
     GameScreenContent(
         players = viewModel.players.collectAsState(),
+        userId = userId,
         currentPlayerId = viewModel.currentPlayerId.collectAsState(),
         actions = viewModel.actions.collectAsState(),
         showAction = ui.actionLog,
@@ -110,6 +116,7 @@ fun GameScreen(
 @Composable
 fun GameScreenContent(
     players: State<Players>,
+    userId: State<String?>,
     currentPlayerId: State<Long?>,
     actions: State<Actions>,
     showAction: @Composable (GameAction, Players) -> String,
@@ -140,6 +147,7 @@ fun GameScreenContent(
         }
         PlayersRating(
             players = activePlayers,
+            userId = userId,
             currentPlayerId = currentPlayerId,
             onSelectPlayer = selectPlayer,
             playerStats = playerStats,
@@ -176,6 +184,7 @@ private fun GameScreenPreview() {
     BoardGameAssistantTheme {
         GameScreenContent(
             players = rememberUpdatedState(previewPlayers),
+            userId = rememberUpdatedState(previewUserId),
             currentPlayerId = rememberUpdatedState(1),
             actions = rememberUpdatedState(previewActions),
             showAction = GameUI.actionLog,
@@ -188,6 +197,8 @@ private fun GameScreenPreview() {
     }
 }
 
+const val previewUserId = "unique_user_id"
+
 val previewPlayers: Players = sequence {
     yield("Abc" to 123)
     yield("Def" to 74)
@@ -196,7 +207,7 @@ val previewPlayers: Players = sequence {
     repeat(10) { yield("Copy" to 111) }
 }.mapIndexed { i, (name, score) ->
     (i + 1L) to Player(
-        netDevId = null,
+        netDevId = previewUserId.takeIf { i == 3 },
         name = name,
         active = true,
         state = PlayerState(score, mapOf())

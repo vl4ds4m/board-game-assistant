@@ -32,6 +32,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 fun PlayerSettingCard(
     id: Long,
     name: String,
+    user: Boolean,
     remote: Boolean,
     frozen: Boolean,
     selected: Boolean,
@@ -50,6 +51,7 @@ fun PlayerSettingCard(
             topRow = {
                 PlayerName(
                     name = name,
+                    user = user,
                     modifier = Modifier.fillMaxWidth()
                 )
             },
@@ -167,6 +169,7 @@ private fun PlayerSettingCardPreview(
         PlayerSettingCard(
             id = 1,
             name = "Hello",
+            user = true,
             remote = true,
             frozen = frozen,
             selected = selected,

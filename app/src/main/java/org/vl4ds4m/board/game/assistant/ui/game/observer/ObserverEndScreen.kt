@@ -23,12 +23,14 @@ import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.game.previewPlayers
+import org.vl4ds4m.board.game.assistant.ui.game.previewUserId
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun ObserverEndScreen(
     players: State<Players>,
     gameUiFactory: State<GameUI.Factory>,
+    userId: State<String?>,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -52,6 +54,7 @@ fun ObserverEndScreen(
         HorizontalDivider()
         PlayersRating(
             players = players,
+            userId = userId,
             currentPlayerId = rememberUpdatedState(null),
             onSelectPlayer = null,
             playerStats = gameUiFactory.value.playerStats,
@@ -69,7 +72,8 @@ private fun ObserverEndScreenPreview() {
     BoardGameAssistantTheme {
         ObserverEndScreen(
             players = rememberUpdatedState(previewPlayers),
-            gameUiFactory = rememberUpdatedState(GameUI)
+            gameUiFactory = rememberUpdatedState(GameUI),
+            userId = rememberUpdatedState(previewUserId)
         )
     }
 }

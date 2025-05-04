@@ -16,13 +16,11 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
@@ -107,6 +105,9 @@ fun PlayerSettingScreenContent(
                     PlayerSettingCard(
                         id = id,
                         name = player.name,
+                        user = userPlayer.value?.let {
+                            it.netDevId == player.netDevId
+                        } ?: false,
                         remote = player.netDevId != null,
                         frozen = !player.active,
                         selected = id == currentPlayerId.value,
@@ -157,7 +158,8 @@ fun PlayerSettingScreenContent(
                 newUserPlayer.value?.let { user ->
                     item {
                         RemotePlayerCard(
-                            name = "${user.name} (${stringResource(R.string.game_player_self_label)})",
+                            name = user.name,
+                            user = true,
                             add = {
                                 user.run { addPlayer(netDevId, name) }
                             },
@@ -171,6 +173,7 @@ fun PlayerSettingScreenContent(
                 items(newRemotePlayers.value) { player ->
                     RemotePlayerCard(
                         name = player.name,
+                        user = false,
                         add = {
                             player.run { addPlayer(netDevId, name) }
                         },

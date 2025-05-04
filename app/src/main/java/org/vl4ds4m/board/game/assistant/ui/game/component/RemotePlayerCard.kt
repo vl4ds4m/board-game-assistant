@@ -18,6 +18,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 @Composable
 fun RemotePlayerCard(
     name: String,
+    user: Boolean,
     add: () -> Unit,
     bind: ((Long) -> Unit)?,
     bindList: State<List<Pair<Long, String>>>?,
@@ -30,6 +31,7 @@ fun RemotePlayerCard(
         PlayerIcon(name)
         PlayerName(
             name = name,
+            user = user,
             modifier = Modifier.weight(1f)
         )
         if (bind != null && bindList != null) {
@@ -51,6 +53,7 @@ private fun RemotePlayerCardPreview() {
     BoardGameAssistantTheme {
         RemotePlayerCard(
             name = "Player",
+            user = true,
             add = {},
             bind = {},
             bindList = rememberUpdatedState(listOf(1L to "Oret")),

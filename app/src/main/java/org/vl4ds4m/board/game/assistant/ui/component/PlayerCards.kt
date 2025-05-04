@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
@@ -99,9 +100,14 @@ fun PlayerIcon(playerName: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun PlayerName(name: String, modifier: Modifier = Modifier) {
+fun PlayerName(name: String, user: Boolean, modifier: Modifier = Modifier) {
+    val text = name + if (user) {
+        " (" + stringResource(R.string.game_player_self_label) + ")"
+    } else {
+        ""
+    }
     Text(
-        text = name,
+        text = text,
         modifier = modifier,
         style = MaterialTheme.typography.bodyMedium,
         maxLines = 1

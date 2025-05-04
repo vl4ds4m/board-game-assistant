@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
 import org.vl4ds4m.board.game.assistant.data.repository.UserDataRepository
@@ -26,6 +28,9 @@ class GameObserverViewModel(
     val observerState: StateFlow<NetworkGameState> = observer.observerState
 
     val sessionState: StateFlow<GameSession?> = observer.sessionState
+
+    val userId: StateFlow<String?> = userDataRepository.netDevId
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     init {
         observer.startObserve(sessionInfo)

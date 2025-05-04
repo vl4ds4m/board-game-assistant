@@ -21,6 +21,7 @@ import org.vl4ds4m.board.game.assistant.ui.component.PlayerState
 fun PlayerGameCard(
     position: Int,
     name: String,
+    user: Boolean,
     remote: Boolean,
     frozen: Boolean,
     stats: @Composable RowScope.() -> Unit,
@@ -41,6 +42,7 @@ fun PlayerGameCard(
             topRow = {
                 PlayerName(
                     name = name,
+                    user = user,
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(Modifier.width(8.dp))
@@ -60,6 +62,7 @@ private fun PlayerGameCardPreview() {
     PlayerGameCard(
         position = 73,
         name = "Abdildfhmud Treasd lj eli sdf",
+        user = true,
         remote = true,
         frozen = true,
         stats = {

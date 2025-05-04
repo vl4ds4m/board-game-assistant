@@ -25,6 +25,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 fun PlayerSetupCard(
     index: Int,
     name: String,
+    user: Boolean,
     remote: Boolean,
     setupActions: PlayerSetupActions,
     playersCount: State<Int>,
@@ -40,6 +41,7 @@ fun PlayerSetupCard(
             topRow = {
                 PlayerName(
                     name = name,
+                    user = user,
                     modifier = Modifier.fillMaxWidth()
                 )
             },
@@ -71,6 +73,7 @@ private fun PlayerSetupCardPreview() {
         PlayerSetupCard(
             index = 5,
             name = "Player",
+            user = true,
             remote = true,
             setupActions = PlayerSetupActions.Empty,
             playersCount = rememberUpdatedState(12),

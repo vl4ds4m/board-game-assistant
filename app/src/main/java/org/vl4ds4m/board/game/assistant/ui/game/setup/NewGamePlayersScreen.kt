@@ -96,6 +96,9 @@ fun NewGamePlayersScreenContent(
                 PlayerSetupCard(
                     index = index,
                     name = player.name,
+                    user = userPlayer.value?.let {
+                        it.netDevId == player.netDevId
+                    } ?: false,
                     remote = player.netDevId != null,
                     setupActions = setupActions,
                     playersCount = playersCount
@@ -141,7 +144,8 @@ fun NewGamePlayersScreenContent(
             newUserPlayer.value?.let {
                 item {
                     RemotePlayerCard(
-                        name = "${it.name} (${stringResource(R.string.game_player_self_label)})",
+                        name = it.name,
+                        user = true,
                         add = {
                             it.run { addPlayer(name, netDevId) }
                         },
@@ -153,6 +157,7 @@ fun NewGamePlayersScreenContent(
             items(newRemotePlayers.value) { player ->
                 RemotePlayerCard(
                     name = player.name,
+                    user = false,
                     add = {
                         player.run { addPlayer(name, netDevId) }
                     },

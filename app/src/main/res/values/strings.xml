@@ -88,4 +88,6 @@
     <string name="game_player_self_label">It\'s you</string>
     <string name="game_log_monopoly_to_prison">goes to Prison</string>
     <string name="game_log_monopoly_from_prison">goes from Prison</string>
+    <string name="game_action_exit_confirm">Confirm</string>
+    <string name="game_action_exit_text">Are you sure to stop the game?</string>
 </resources>

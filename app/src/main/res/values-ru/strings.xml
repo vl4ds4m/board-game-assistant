@@ -88,4 +88,6 @@
     <string name="player_action_rename_confirm">Применить</string>
     <string name="game_log_monopoly_to_prison">отправляется в Тюрьму</string>
     <string name="game_log_monopoly_from_prison">выходит из Тюрьмы</string>
+    <string name="game_action_exit_confirm">Подтвердить</string>
+    <string name="game_action_exit_text">Вы уверены, что хотите приостановить игру?</string>
 </resources>

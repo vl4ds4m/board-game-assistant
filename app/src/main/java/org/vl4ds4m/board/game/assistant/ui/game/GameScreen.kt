@@ -9,9 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -20,12 +24,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
+import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.States
 import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.GameType
@@ -59,9 +65,15 @@ fun GameScreen(
             producer = type.viewModelProducer
         )
     )
+    StopGameDialog(
+        opened = navActions.stopDialogOpened,
+        onConfirm = navActions.navigateBack
+    )
     topBarUiState.update(
         title = viewModel.name.collectAsState().value,
-        navigateBack = navActions.navigateBack
+        navigateBack = {
+            navActions.stopDialogOpened.value = true
+        }
     ) {
         GameHistoryManager(
             GameHistoryState(
@@ -220,3 +232,25 @@ val previewActions: Actions = sequence {
         ).let { yield(it) }
     }
 }.toList()
+
+@Composable
+fun StopGameDialog(
+    opened: MutableState<Boolean>,
+    onConfirm: () -> Unit
+) {
+    if (opened.value) {
+        AlertDialog(
+            onDismissRequest = { opened.value = false },
+            confirmButton = {
+                Button(
+                    onClick = onConfirm
+                ) {
+                    Text(stringResource(R.string.game_action_exit_confirm))
+                }
+            },
+            text = {
+                Text(stringResource(R.string.game_action_exit_text))
+            }
+        )
+    }
+}

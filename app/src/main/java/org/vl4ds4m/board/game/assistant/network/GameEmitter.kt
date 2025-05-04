@@ -146,7 +146,7 @@ class GameEmitter(
                         players.value.isBound(networkPlayer),
                     )
                 }
-                delay(2000)
+                delay(1000)
             }
         } finally {
             mRemotePlayers.updateList {

@@ -14,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,10 +21,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import org.vl4ds4m.board.game.assistant.R
+import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.PlayerStats
@@ -40,10 +39,6 @@ fun EndGameScreen(
     val viewModel = viewModel<GameViewModel>()
     EndGameScreenContent(
         players = viewModel.players.collectAsState(),
-        userId = produceState<String?>(null) {
-            viewModel.userPlayer.onEach { value = it?.netDevId }
-                .launchIn(this)
-        },
         playerStats = viewModel.gameUi.playerStats,
         navigateHome = navigateHome,
         modifier = modifier
@@ -53,7 +48,6 @@ fun EndGameScreen(
 @Composable
 fun EndGameScreenContent(
     players: State<Players>,
-    userId: State<String?>,
     playerStats: PlayerStats,
     navigateHome: () -> Unit,
     modifier: Modifier = Modifier
@@ -82,7 +76,6 @@ fun EndGameScreenContent(
         HorizontalDivider()
         PlayersRating(
             players = players,
-            userId = userId,
             currentPlayerId = rememberUpdatedState(null),
             onSelectPlayer = null,
             playerStats = playerStats,
@@ -101,32 +94,23 @@ private fun EndGameScreenPreview() {
     BoardGameAssistantTheme {
         EndGameScreenContent(
             players = rememberUpdatedState(mapOf(
-                1L to org.vl4ds4m.board.game.assistant.game.Player(
+                1L to Player(
                     null, "ssdf", true,
-                    org.vl4ds4m.board.game.assistant.game.data.PlayerState(
-                        123, mapOf()
-                    )
+                    PlayerState(123, mapOf())
                 ),
-                2L to org.vl4ds4m.board.game.assistant.game.Player(
+                2L to Player(
                     null, "n5732h", false,
-                    org.vl4ds4m.board.game.assistant.game.data.PlayerState(
-                        456, mapOf()
-                    )
+                    PlayerState(456, mapOf())
                 ),
-                3L to org.vl4ds4m.board.game.assistant.game.Player(
-                    "ihn", "fhb", true,
-                    org.vl4ds4m.board.game.assistant.game.data.PlayerState(
-                        5, mapOf()
-                    )
+                3L to Player(
+                    null, "fhb", true,
+                    PlayerState(5, mapOf())
                 ),
-                4L to org.vl4ds4m.board.game.assistant.game.Player(
+                4L to Player(
                     null, "yt3", false,
-                    org.vl4ds4m.board.game.assistant.game.data.PlayerState(
-                        434, mapOf()
-                    )
+                    PlayerState(434, mapOf())
                 )
             )),
-            userId = rememberUpdatedState("ihn"),
             playerStats = GameUI.playerStats,
             navigateHome = {},
             modifier = Modifier.fillMaxSize()

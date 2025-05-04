@@ -23,14 +23,12 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.game.previewActions
 import org.vl4ds4m.board.game.assistant.ui.game.previewPlayers
-import org.vl4ds4m.board.game.assistant.ui.game.previewUserId
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun ObserverGameScreen(
     players: State<Players>,
     gameUiFactory: State<GameUI.Factory>,
-    userId: State<String?>,
     currentPlayerId: State<Long?>,
     actions: State<Actions>,
     timer: State<Int?>,
@@ -57,7 +55,6 @@ fun ObserverGameScreen(
         }
         PlayersRating(
             players = activePlayers,
-            userId = userId,
             currentPlayerId = currentPlayerId,
             onSelectPlayer = null,
             playerStats = gameUiFactory.value.playerStats,
@@ -86,7 +83,6 @@ private fun ObserverGameScreenPreview() {
         ObserverGameScreen(
             players = rememberUpdatedState(previewPlayers),
             gameUiFactory = rememberUpdatedState(GameUI),
-            userId = rememberUpdatedState(previewUserId),
             currentPlayerId = rememberUpdatedState(null),
             actions = rememberUpdatedState(previewActions),
             timer = rememberUpdatedState(945)

@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.Flow
 import org.vl4ds4m.board.game.assistant.data.entity.GameActionEntity
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionData
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionEntity
+import org.vl4ds4m.board.game.assistant.data.entity.PlayerData
 import org.vl4ds4m.board.game.assistant.data.entity.PlayerEntity
+import org.vl4ds4m.board.game.assistant.data.entity.UserEntity
 import org.vl4ds4m.board.game.assistant.data.view.GameSessionInfoView
 
 @Dao
@@ -26,7 +28,7 @@ interface GameSessionDao {
     suspend fun insertSession(data: GameSessionData) {
         insertSession(data.entity)
         deletePlayers(getPlayers(data.entity.id))
-        insertPlayers(data.players)
+        insertPlayersData(data.players)
         deleteActions(getActions(data.entity.id))
         insertActions(data.actions)
     }
@@ -43,8 +45,19 @@ interface GameSessionDao {
     @Delete
     suspend fun deletePlayers(entities: List<PlayerEntity>)
 
+    @Transaction
+    suspend fun insertPlayersData(data: List<PlayerData>) {
+        val users = data.mapNotNull { it.user }
+        insertUsers(users)
+        val players = data.map { it.player }
+        insertPlayers(players)
+    }
+
     @Insert
     suspend fun insertPlayers(entities: List<PlayerEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertUsers(entities: List<UserEntity>)
 
     @Query(
         "SELECT * FROM ${GameActionEntity.TABLE_NAME} " +

@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import org.vl4ds4m.board.game.assistant.States
+import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.Players
@@ -44,8 +45,8 @@ open class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
         }
     }
 
-    final override fun addPlayer(netDevId: String?, name: String, state: PlayerState): Long {
-        val id = super.addPlayer(netDevId, name, state)
+    final override fun addPlayer(user: User?, name: String, state: PlayerState): Long {
+        val id = super.addPlayer(user, name, state)
         mOrderedPlayerIds.updateList { add(id) }
         return id
     }

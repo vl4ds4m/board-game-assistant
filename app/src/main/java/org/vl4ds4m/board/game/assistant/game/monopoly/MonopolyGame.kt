@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
@@ -34,13 +35,13 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
     private val currentPlayerState: Pair<Long, PlayerState>?
         get() = currentPlayer?.let { (id, player) -> id to player.state }
 
-    override fun addPlayer(netDevId: String?, name: String): Long {
+    override fun addPlayer(user: User?, name: String): Long {
         val state = monopolyPlayerState(
             score = 0,
             position = 1,
             inPrison = false
         )
-        return addPlayer(netDevId, name, state)
+        return addPlayer(user, name, state)
     }
 
     private val mInPrison = MutableStateFlow(false)

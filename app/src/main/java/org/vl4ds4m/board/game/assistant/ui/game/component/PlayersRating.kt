@@ -19,7 +19,6 @@ import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 @Composable
 fun PlayersRating(
     players: State<Map<Long, Player>>,
-    userId: State<String?>,
     currentPlayerId: State<Long?>,
     onSelectPlayer: ((Long) -> Unit)?,
     modifier: Modifier = Modifier,
@@ -56,8 +55,8 @@ fun PlayersRating(
             PlayerGameCard(
                 position = i + 1,
                 name = player.name,
-                user = userId.value?.let { it == player.netDevId } ?: false,
-                remote = player.netDevId != null,
+                user = player.user?.self ?: false,
+                remote = player.user != null,
                 frozen = !player.active,
                 stats = { playerStats(playerState) },
                 selected = id == currentPlayerId.value,

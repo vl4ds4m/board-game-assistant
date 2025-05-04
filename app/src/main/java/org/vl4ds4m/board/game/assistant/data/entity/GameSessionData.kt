@@ -8,10 +8,11 @@ data class GameSessionData(
     val entity: GameSessionEntity,
 
     @Relation(
+        entity = PlayerEntity::class,
         parentColumn = GameSessionEntity.ID,
         entityColumn = PlayerEntity.SESSION_ID
     )
-    val players: List<PlayerEntity>,
+    val players: List<PlayerData>,
 
     @Relation(
         parentColumn = GameSessionEntity.ID,

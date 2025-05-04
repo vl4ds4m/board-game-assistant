@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
-import org.vl4ds4m.board.game.assistant.network.NetworkPlayer
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.component.NoPlayersLabel
 import org.vl4ds4m.board.game.assistant.ui.game.component.NoRemotePlayersLabel
@@ -53,10 +53,17 @@ fun PlayerSettingScreen(modifier: Modifier = Modifier) {
             flow.map { it.toList() }
         }
     }.collectAsState(listOf())
+    val remotePlayers = viewModel.remotePlayers.collectAsState(listOf())
+    val newRemotePlayers = remember {
+        derivedStateOf {
+            remotePlayers.value.filterNot { remotePlayer ->
+                players.value.any { (_, p) -> p.user?.netDevId == remotePlayer.netDevId }
+            }
+        }
+    }
     PlayerSettingScreenContent(
         players = players,
-        remotePlayers = viewModel.remotePlayers.collectAsState(),
-        userPlayer = viewModel.userPlayer.collectAsState(),
+        remotePlayers = newRemotePlayers,
         currentPlayerId = viewModel.currentPlayerId.collectAsState(),
         addPlayer = viewModel::addPlayer,
         playerSettingActions = PlayerSettingActions(
@@ -76,10 +83,9 @@ fun PlayerSettingScreen(modifier: Modifier = Modifier) {
 @Composable
 fun PlayerSettingScreenContent(
     players: State<List<Pair<Long, Player>>>,
-    remotePlayers: State<List<NetworkPlayer>>,
-    userPlayer: State<NetworkPlayer?>,
+    remotePlayers: State<List<User>>,
     currentPlayerId: State<Long?>,
-    addPlayer: (String?, String) -> Unit,
+    addPlayer: (User?, String) -> Unit,
     playerSettingActions: PlayerSettingActions,
     modifier: Modifier = Modifier
 ) {
@@ -105,10 +111,8 @@ fun PlayerSettingScreenContent(
                     PlayerSettingCard(
                         id = id,
                         name = player.name,
-                        user = userPlayer.value?.let {
-                            it.netDevId == player.netDevId
-                        } ?: false,
-                        remote = player.netDevId != null,
+                        user = player.user?.self ?: false,
+                        remote = player.user != null,
                         frozen = !player.active,
                         selected = id == currentPlayerId.value,
                         settingActions = playerSettingActions,
@@ -122,30 +126,14 @@ fun PlayerSettingScreenContent(
         }
         HorizontalDivider()
         RemotePlayersHead()
-        val newRemotePlayers = remember {
-            derivedStateOf {
-                remotePlayers.value.filterNot { newPlayer ->
-                    players.value.any { (_, p) -> p.netDevId == newPlayer.netDevId }
-                }
-            }
-        }
-        val newUserPlayer = remember {
-            derivedStateOf {
-                userPlayer.value?.takeUnless { user ->
-                    players.value.any { (_, p) -> p.netDevId == user.netDevId }
-                }
-            }
-        }
-        if (newRemotePlayers.value.isEmpty() && newUserPlayer.value == null) {
+        if (remotePlayers.value.isEmpty()) {
             NoRemotePlayersLabel(Modifier.weight(1f))
         } else {
             val unboundPlayers = remember {
                 derivedStateOf {
-                    players.value.filter { (_, p) ->
-                        p.netDevId == null
-                    }.map { (id, p) ->
-                        id to p.name
-                    }
+                    players.value
+                        .filter { (_, p) -> p.user == null }
+                        .map { (id, p) -> id to p.name }
                 }
             }
             LazyColumn(
@@ -155,30 +143,13 @@ fun PlayerSettingScreenContent(
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                newUserPlayer.value?.let { user ->
-                    item {
-                        RemotePlayerCard(
-                            name = user.name,
-                            user = true,
-                            add = {
-                                user.run { addPlayer(netDevId, name) }
-                            },
-                            bind = {
-                                playerSettingActions.onBind(it, user.netDevId)
-                            },
-                            bindList = unboundPlayers
-                        )
-                    }
-                }
-                items(newRemotePlayers.value) { player ->
+                items(remotePlayers.value) { player ->
                     RemotePlayerCard(
                         name = player.name,
-                        user = false,
-                        add = {
-                            player.run { addPlayer(netDevId, name) }
-                        },
+                        user = player.self,
+                        add = { addPlayer(player, player.name) },
                         bind = {
-                            playerSettingActions.onBind(it, player.netDevId)
+                            playerSettingActions.onBind(it, player)
                         },
                         bindList = unboundPlayers
                     )
@@ -195,19 +166,16 @@ private fun PlayerSettingScreenPreview() {
         PlayerSettingScreenContent(
             players = rememberUpdatedState(
                 listOf(
-                    1L to Player("f", "Abc", true, PlayerState(0, mapOf())),
-                    2L to Player(null, "Def", true, PlayerState(0, mapOf())),
-                    3L to Player("rte", "Def", false, PlayerState(0, mapOf())),
+                    1L to Player(null, "Abc", true, PlayerState(0, mapOf())),
+                    2L to Player(User.Empty, "Def", true, PlayerState(0, mapOf())),
+                    3L to Player(null, "Def", false, PlayerState(0, mapOf()))
                 )
             ),
             remotePlayers = rememberUpdatedState(
                 listOf(
-                    NetworkPlayer(name = "Tre", netDevId = "fgdfg"),
-                    NetworkPlayer(name = "Pdf", netDevId = "65hgf"),
+                    User(name = "Tre", netDevId = "fgdfg", self = true),
+                    User(name = "Pdf", netDevId = "65hgf", self = false)
                 )
-            ),
-            userPlayer = rememberUpdatedState(
-                NetworkPlayer(name = "Oreo", netDevId = "oi32j")
             ),
             currentPlayerId = rememberUpdatedState(null),
             addPlayer = { _, _ -> },

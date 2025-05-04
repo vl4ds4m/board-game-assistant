@@ -2,6 +2,7 @@ package org.vl4ds4m.board.game.assistant.game
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 
@@ -24,11 +25,11 @@ interface Game {
             players.value[id]?.let { player -> id to player }
         }
 
-    fun addPlayer(netDevId: String?, name: String): Long
+    fun addPlayer(user: User?, name: String): Long
 
     fun removePlayer(id: Long)
 
-    fun bindPlayer(id: Long, netDevId: String)
+    fun bindPlayer(id: Long, user: User)
 
     fun unbindPlayer(id: Long)
 

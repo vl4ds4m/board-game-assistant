@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.vl4ds4m.board.game.assistant.States
+import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.GameType
@@ -48,15 +49,15 @@ open class GameEnv(final override val type: GameType) : Game {
         history += currentPlayerChangedAction(ids)
     }
 
-    override fun addPlayer(netDevId: String?, name: String): Long =
-        addPlayer(netDevId, name, PlayerState(0, mapOf()))
+    override fun addPlayer(user: User?, name: String): Long =
+        addPlayer(user, name, PlayerState(0, mapOf()))
 
     private val nextNewPlayerId: AtomicLong = AtomicLong(0)
 
-    protected open fun addPlayer(netDevId: String?, name: String, state: PlayerState): Long {
+    protected open fun addPlayer(user: User?, name: String, state: PlayerState): Long {
         val id = nextNewPlayerId.incrementAndGet()
         val player = Player(
-            netDevId = netDevId,
+            user = user,
             name = name,
             active = true,
             state = state
@@ -89,17 +90,17 @@ open class GameEnv(final override val type: GameType) : Game {
         }
     }
 
-    final override fun bindPlayer(id: Long, netDevId: String) {
+    final override fun bindPlayer(id: Long, user: User) {
         mPlayers.updateMap {
             val player = get(id) ?: return
-            put(id, player.copy(netDevId = netDevId))
+            put(id, player.copy(user = user))
         }
     }
 
     final override fun unbindPlayer(id: Long) {
         mPlayers.updateMap {
             val player = get(id) ?: return
-            put(id, player.copy(netDevId = null))
+            put(id, player.copy(user = null))
         }
     }
 

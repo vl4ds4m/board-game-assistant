@@ -16,6 +16,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.vl4ds4m.board.game.assistant.closeAndLog
+import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
@@ -31,8 +32,8 @@ class GameEmitter(
     private val scope: CoroutineScope,
     private val sessionEmitter: SessionEmitter
 ) {
-    private val mRemotePlayers = MutableStateFlow<List<NetworkPlayer>>(listOf())
-    val remotePlayers: StateFlow<List<NetworkPlayer>> = mRemotePlayers.asStateFlow()
+    private val mRemotePlayers = MutableStateFlow<List<User>>(listOf())
+    val remotePlayers: StateFlow<List<User>> = mRemotePlayers.asStateFlow()
 
     private var serverSocket: ServerSocket? = null
     private val playerSockets = MutableStateFlow<List<Socket>?>(null)
@@ -123,7 +124,7 @@ class GameEmitter(
     ): Unit = withContext(Dispatchers.IO) {
         val networkPlayer = input.readObject()
             .let { it as String }
-            .let { Json.decodeFromString<NetworkPlayer>(it) }
+            .let { Json.decodeFromString<User>(it) }
             .also {
                 mRemotePlayers.updateList { add(it) }
             }
@@ -170,7 +171,7 @@ class GameEmitter(
 
     private fun emitInGameState(
         session: GameSession,
-        networkPlayer: NetworkPlayer,
+        networkPlayer: User,
         output: ObjectOutputStream,
         input: ObjectInputStream
     ) {
@@ -205,10 +206,8 @@ class GameEmitter(
     }
 }
 
-private fun Players.isBound(
-    networkPlayer: NetworkPlayer
-): Boolean = values.any {
-    it.netDevId == networkPlayer.netDevId
+private fun Players.isBound(networkPlayer: User): Boolean = values.any {
+    it.user?.netDevId == networkPlayer.netDevId
 }
 
 private const val TAG = "GameEmitter"

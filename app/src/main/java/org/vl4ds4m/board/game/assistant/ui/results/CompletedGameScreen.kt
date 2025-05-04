@@ -11,7 +11,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -20,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
+import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.Player
@@ -60,7 +60,6 @@ fun CompletedGameScreen(
         CompletedGameScreenContent(
             type = it.type,
             players = it.players.toMap(),
-            userId = viewModel.userId.collectAsState().value,
             startTime = it.startTime,
             stopTime = it.stopTime,
             duration = it.duration,
@@ -80,7 +79,6 @@ fun CompletedGameScreen(
 fun CompletedGameScreenContent(
     type: GameType,
     players: Players,
-    userId: String?,
     startTime: Long?,
     stopTime: Long?,
     duration: Long?,
@@ -120,7 +118,6 @@ fun CompletedGameScreenContent(
         )
         PlayersRating(
             players = rememberUpdatedState(players),
-            userId = rememberUpdatedState(userId),
             currentPlayerId = rememberUpdatedState(null),
             onSelectPlayer = null,
             playerStats = type.uiFactory.playerStats,
@@ -161,25 +158,24 @@ private fun CompletedGameScreenPreview() {
             type = Free,
             players = mapOf(
                 1L to Player(
-                    netDevId = null,
+                    user = null,
                     name = "Abv",
                     active = true,
                     state = PlayerState(45, mapOf())
                 ),
                 2L to Player(
-                    netDevId = "ert",
+                    user = User(netDevId = "ert", self = false, name = "a"),
                     name = "Efo",
                     active = false,
                     state = PlayerState(123, mapOf())
                 ),
                 3L to Player(
-                    netDevId = null,
+                    user = null,
                     name = "Urt",
                     active = true,
                     state = PlayerState(59, mapOf())
                 )
             ),
-            userId = "ert",
             startTime = System.currentTimeMillis() - 11_000,
             stopTime = System.currentTimeMillis(),
             duration = 5_320,

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
@@ -28,8 +29,17 @@ class GameObserverViewModel(
     val observerState: StateFlow<NetworkGameState> = observer.observerState
 
     val sessionState: StateFlow<GameSession?> = observer.sessionState
-
-    val userId: StateFlow<String?> = userDataRepository.netDevId
+        .combine(userDataRepository.netDevId) { session, netDevId ->
+            session?.let {
+                val players = session.players.map { (id, player) ->
+                    val user = player.user?.let {
+                        it.copy(self = it.netDevId == netDevId)
+                    }
+                    id to player.copy(user = user)
+                }
+                session.copy(players = players)
+            }
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     init {

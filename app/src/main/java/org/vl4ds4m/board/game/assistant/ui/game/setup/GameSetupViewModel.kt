@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
+import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.data.repository.GameEnvRepository
 import org.vl4ds4m.board.game.assistant.game.GameType
 
@@ -26,10 +27,8 @@ class GameSetupViewModel private constructor(
 
     val players: List<NewPlayer> = mPlayers
 
-    fun addPlayer(name: String, netDevId: String?) {
-        mPlayers.add(
-            NewPlayer(name = name, netDevId = netDevId)
-        )
+    fun addPlayer(name: String, user: User?) {
+        mPlayers.add(NewPlayer(name, user))
     }
 
     fun renamePlayer(index: Int, newName: String) {
@@ -53,7 +52,7 @@ class GameSetupViewModel private constructor(
     fun startGame() {
         val game = gameEnvRepository.extract()
         players.forEach {
-            game.addPlayer(it.netDevId, it.name)
+            game.addPlayer(it.user, it.name)
         }
         game.initialize()
     }

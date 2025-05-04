@@ -3,9 +3,6 @@ package org.vl4ds4m.board.game.assistant.network
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class NetworkPlayer(val name: String, val netDevId: String)
-
-@Serializable
 data class RemoteSessionInfo(
     val id: String,
     val name: String,

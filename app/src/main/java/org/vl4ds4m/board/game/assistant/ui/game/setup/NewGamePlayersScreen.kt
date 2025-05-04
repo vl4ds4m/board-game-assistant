@@ -22,8 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.map
 import org.vl4ds4m.board.game.assistant.R
+import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.component.NoPlayersLabel
 import org.vl4ds4m.board.game.assistant.ui.game.component.NoRemotePlayersLabel
@@ -39,23 +39,18 @@ fun NewGamePlayersScreen(
     onStartGame: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val remotePlayers = gameViewModel.remotePlayers.map { list ->
-        list.map {
-            NewPlayer(
-                name = it.name,
-                netDevId = it.netDevId
-            )
+    val players = viewModel.players
+    val remotePlayers = gameViewModel.remotePlayers.collectAsState(listOf())
+    val newRemotePlayers = remember {
+        derivedStateOf {
+            remotePlayers.value.filterNot { remotePlayer ->
+                players.any { it.user?.netDevId == remotePlayer.netDevId }
+            }
         }
-    }.collectAsState(listOf())
-    val userPlayer = gameViewModel.userPlayer.map {
-        it?.let {
-            NewPlayer(name = it.name, netDevId = it.netDevId)
-        }
-    }.collectAsState(null)
+    }
     NewGamePlayersScreenContent(
-        players = viewModel.players,
-        remotePlayers = remotePlayers,
-        userPlayer = userPlayer,
+        players = players,
+        remotePlayers = newRemotePlayers,
         addPlayer = viewModel::addPlayer,
         setupActions = PlayerSetupActions(
             onRename = viewModel::renamePlayer,
@@ -70,9 +65,8 @@ fun NewGamePlayersScreen(
 @Composable
 fun NewGamePlayersScreenContent(
     players: List<NewPlayer>,
-    remotePlayers: State<List<NewPlayer>>,
-    userPlayer: State<NewPlayer?>,
-    addPlayer: (String, String?) -> Unit,
+    remotePlayers: State<List<User>>,
+    addPlayer: (String, User?) -> Unit,
     setupActions: PlayerSetupActions,
     onStartGame: () -> Unit,
     modifier: Modifier = Modifier
@@ -84,7 +78,6 @@ fun NewGamePlayersScreenContent(
     if (players.isEmpty()) {
         NoPlayersLabel(Modifier.weight(2f))
     } else {
-        val playersCount = rememberUpdatedState(players.size)
         LazyColumn(
             modifier = Modifier
                 .weight(2f)
@@ -96,12 +89,12 @@ fun NewGamePlayersScreenContent(
                 PlayerSetupCard(
                     index = index,
                     name = player.name,
-                    user = userPlayer.value?.let {
-                        it.netDevId == player.netDevId
-                    } ?: false,
-                    remote = player.netDevId != null,
+                    user = player.user?.self ?: false,
+                    remote = player.user != null,
                     setupActions = setupActions,
-                    playersCount = playersCount
+                    playersCount = remember {
+                        derivedStateOf { players.size }
+                    }
                 )
             }
         }
@@ -117,21 +110,7 @@ fun NewGamePlayersScreenContent(
     }
     HorizontalDivider()
     RemotePlayersHead()
-    val newRemotePlayers = remember {
-        derivedStateOf {
-            remotePlayers.value.filterNot { newPlayer ->
-                players.any { it.netDevId == newPlayer.netDevId }
-            }
-        }
-    }
-    val newUserPlayer = remember {
-        derivedStateOf {
-            userPlayer.value?.takeUnless { user ->
-                players.any { it.netDevId == user.netDevId }
-            }
-        }
-    }
-    if (newRemotePlayers.value.isEmpty() && newUserPlayer.value == null) {
+    if (remotePlayers.value.isEmpty()) {
         NoRemotePlayersLabel(Modifier.weight(1f))
     } else {
         LazyColumn(
@@ -141,26 +120,11 @@ fun NewGamePlayersScreenContent(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            newUserPlayer.value?.let {
-                item {
-                    RemotePlayerCard(
-                        name = it.name,
-                        user = true,
-                        add = {
-                            it.run { addPlayer(name, netDevId) }
-                        },
-                        bind = null,
-                        bindList = null
-                    )
-                }
-            }
-            items(newRemotePlayers.value) { player ->
+            items(remotePlayers.value) { player ->
                 RemotePlayerCard(
                     name = player.name,
-                    user = false,
-                    add = {
-                        player.run { addPlayer(name, netDevId) }
-                    },
+                    user = player.self,
+                    add = { addPlayer(player.name, player) },
                     bind = null,
                     bindList = null
                 )
@@ -183,26 +147,26 @@ private fun NewGameWithoutPlayersScreenPreview() {
 
 private val previewPlayers get() = listOf(
     NewPlayer("Player A", null),
-    NewPlayer("Player B", "456"),
+    NewPlayer("Player B", null),
+    NewPlayer("Oreo", User.Empty),
     NewPlayer("Player C", null),
 )
 
 private val previewRemotePlayers get() = listOf(
-    NewPlayer("Remote Player A", "123"),
-    NewPlayer("Remote Player B", "456"),
-    NewPlayer("Remote Player C", "789"),
+    User(name = "Remote Player A", netDevId = "123", self = false),
+    User(name = "Remote Player B", netDevId = "456", self = false),
+    User(name = "Remote Player C", netDevId = "789", self = true),
 )
 
 @Composable
 private fun NewGamePlayersScreenPreview(
     players: List<NewPlayer>,
-    remotePlayers: List<NewPlayer>
+    remotePlayers: List<User>
 ) {
     BoardGameAssistantTheme {
         NewGamePlayersScreenContent(
             players = players,
             remotePlayers = rememberUpdatedState(remotePlayers),
-            userPlayer = rememberUpdatedState(NewPlayer("Oreo", "oi32j")),
             addPlayer = { _, _ -> },
             setupActions = PlayerSetupActions.Empty,
             onStartGame = {}

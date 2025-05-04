@@ -4,11 +4,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.data.dao.GameSessionDao
 import org.vl4ds4m.board.game.assistant.data.entity.GameActionEntity
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionData
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionEntity
+import org.vl4ds4m.board.game.assistant.data.entity.PlayerData
 import org.vl4ds4m.board.game.assistant.data.entity.PlayerEntity
+import org.vl4ds4m.board.game.assistant.data.entity.UserEntity
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
@@ -68,14 +71,22 @@ private val GameSessionData.gameSession
         currentActionPosition = entity.currentActionPosition
     )
 
-private val List<PlayerEntity>.gamePlayers: OrderedPlayers
-    get() = map {
-        it.id to Player(
-            netDevId = it.netDevId,
-            name = it.name,
-            active = it.active,
-            state = PlayerState.fromJson(it.state)
-        )
+private val List<PlayerData>.gamePlayers: OrderedPlayers
+    get() = map { data ->
+        data.player.let { player ->
+            player.id to Player(
+                user = data.user?.let { user ->
+                    User(
+                        netDevId = user.id,
+                        name = user.name,
+                        self = false
+                    )
+                },
+                name = player.name,
+                active = player.active,
+                state = PlayerState.fromJson(player.state)
+            )
+        }
     }
 
 private val List<GameActionEntity>.gameActions: List<GameAction>
@@ -97,17 +108,24 @@ private fun GameSession.asEntity(id: String) = GameSessionEntity(
     currentActionPosition = currentActionPosition
 )
 
-private fun GameSession.getPlayers(sessionId: String): List<PlayerEntity> =
-    players.mapIndexed { index, (id, player) ->
-        PlayerEntity(
+private fun GameSession.getPlayers(sessionId: String): List<PlayerData> =
+    players.mapIndexed { index, (id, p) ->
+        val player = PlayerEntity(
             sessionId = sessionId,
             id = id,
-            netDevId = player.netDevId,
-            name = player.name,
-            active = player.active,
-            state = player.state.toJson(),
+            userId = p.user?.netDevId,
+            name = p.name,
+            active = p.active,
+            state = p.state.toJson(),
             order = index
         )
+        val user = p.user?.let {
+            UserEntity(
+                id = it.netDevId,
+                name = it.name,
+            )
+        }
+        PlayerData(player = player, user = user)
     }
 
 

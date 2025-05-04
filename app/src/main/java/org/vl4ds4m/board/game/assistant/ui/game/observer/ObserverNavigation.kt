@@ -44,7 +44,6 @@ fun NavGraphBuilder.observerNavigation(
         val gameUiFactory = remember {
             derivedStateOf { session.value.type.uiFactory }
         }
-        val userId = viewModel.userId.collectAsState()
         when (observer.value) {
             NetworkGameState.REGISTRATION -> ObserverStartupScreen()
             NetworkGameState.IN_GAME -> {
@@ -62,7 +61,6 @@ fun NavGraphBuilder.observerNavigation(
                 ObserverGameScreen(
                     players = players,
                     gameUiFactory = gameUiFactory,
-                    userId = userId,
                     currentPlayerId = currentPlayerId,
                     actions = actions,
                     timer = timer
@@ -70,8 +68,7 @@ fun NavGraphBuilder.observerNavigation(
             }
             NetworkGameState.END_GAME -> ObserverEndScreen(
                 players = players,
-                gameUiFactory = gameUiFactory,
-                userId = userId
+                gameUiFactory = gameUiFactory
             )
             NetworkGameState.EXIT -> onBackClick()
         }

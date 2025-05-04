@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,6 +43,7 @@ import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.ui.game.component.NextPlayerButton
 import org.vl4ds4m.board.game.assistant.ui.game.component.ResetButton
+import org.vl4ds4m.board.game.assistant.ui.game.component.Score
 import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreField
 import org.vl4ds4m.board.game.assistant.ui.game.previewPlayers
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
@@ -167,23 +169,21 @@ private fun Accounting(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val money = rememberSaveable { mutableIntStateOf(0) }
+        val money = rememberSaveable(saver = Score.Saver) { Score() }
         val moneyFilled = remember {
-            derivedStateOf { money.intValue > 0 }
+            derivedStateOf { money.points > 0 }
         }
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ResetButton { money.intValue = 0 }
+            ResetButton(money)
             ScoreField(
                 score = money,
-                label = "money",
-                modifier = Modifier
-                    .width(110.dp)
+                label = "money"
             )
             IconButton(
-                onClick = { spendMoney(money.intValue) },
+                onClick = { spendMoney(money.points) },
                 enabled = moneyFilled.value,
                 modifier = Modifier
                     .background(
@@ -214,7 +214,7 @@ private fun Accounting(
                 }
             }
             IconButton(
-                onClick = { addMoney(money.intValue) },
+                onClick = { addMoney(money.points) },
                 enabled = moneyFilled.value,
                 modifier = Modifier
                     .background(
@@ -274,7 +274,7 @@ private fun Accounting(
                 onClick = {
                     val sender = fromId.longValue
                     val receiver = toId.longValue
-                    val amount = money.intValue
+                    val amount = money.points
                     if (sender != -1L && receiver != -1L && amount > 0) {
                         transferMoney(sender, receiver, amount)
                     }
@@ -313,6 +313,7 @@ private fun TransferParticipant(
     Box(modifier) {
         FilledTonalButton(
             onClick = { expanded.value = true },
+            contentPadding = PaddingValues(6.dp),
             modifier = Modifier.width(100.dp)
         ) {
             Text(

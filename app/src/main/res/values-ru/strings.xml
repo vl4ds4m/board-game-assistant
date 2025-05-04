@@ -86,4 +86,6 @@
     <string name="player_action_bind">Привязать к</string>
     <string name="game_player_self_label">Это Вы</string>
     <string name="player_action_rename_confirm">Применить</string>
+    <string name="game_log_monopoly_to_prison">отправляется в Тюрьму</string>
+    <string name="game_log_monopoly_from_prison">выходит из Тюрьмы</string>
 </resources>

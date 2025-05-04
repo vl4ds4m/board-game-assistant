@@ -8,21 +8,19 @@ import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.game.monopoly.MonopolyGameEnv
 import org.vl4ds4m.board.game.assistant.game.simple.FreeGameEnv
 import org.vl4ds4m.board.game.assistant.game.simple.SimpleOrderedGameEnv
-import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.simple.FreeGameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.simple.SimpleOrderedGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModelProducer
-import org.vl4ds4m.board.game.assistant.ui.game.GameActionPresenter
-import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameUI
+import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameUI
-import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameActionPresenter
+import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameUI
+import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.simple.FreeGameUI
+import org.vl4ds4m.board.game.assistant.ui.game.simple.FreeGameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.simple.SimpleOrderedGameUI
+import org.vl4ds4m.board.game.assistant.ui.game.simple.SimpleOrderedGameViewModel
 
 @Serializable
 sealed interface GameType {
@@ -126,9 +124,3 @@ data object Monopoly : OrderedGameType {
 
     override val uiFactory = MonopolyGameUI
 }
-
-val GameType.gameActionPresenter: GameActionPresenter
-    get() = when (this) {
-        Free, SimpleOrdered, Dice, Carcassonne -> GameActionPresenter.Default
-        Monopoly -> MonopolyGameActionPresenter
-    }

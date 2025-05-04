@@ -27,13 +27,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import org.vl4ds4m.board.game.assistant.States
+import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.Players
-import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.game.currentPlayerChangedAction
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
-import org.vl4ds4m.board.game.assistant.game.gameActionPresenter
+import org.vl4ds4m.board.game.assistant.game.log.GameAction
 import org.vl4ds4m.board.game.assistant.game.playerStateChangedAction
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
@@ -94,15 +94,11 @@ fun GameScreen(
         }.launchIn(this)
     }
     val ui = viewModel.gameUi
-    val actions = produceState(listOf()) {
-        viewModel.actions.combine(viewModel.players) { actions, players ->
-            value = actions.map { ui.actionPresenter.showAction(it, players) }
-        }.launchIn(this)
-    }
     GameScreenContent(
         players = viewModel.players.collectAsState(),
         currentPlayerId = viewModel.currentPlayerId.collectAsState(),
-        actions = actions,
+        actions = viewModel.actions.collectAsState(),
+        showAction = ui.actionLog,
         selectPlayer = ui.onPlayerSelected,
         timer = timer,
         playerStats = ui.playerStats,
@@ -115,7 +111,8 @@ fun GameScreen(
 fun GameScreenContent(
     players: State<Players>,
     currentPlayerId: State<Long?>,
-    actions: State<List<String>>,
+    actions: State<Actions>,
+    showAction: @Composable (GameAction, Players) -> String,
     selectPlayer: ((Long) -> Unit)?,
     timer: State<Int?>,
     playerStats: @Composable RowScope.(State<PlayerState>) -> Unit,
@@ -152,7 +149,9 @@ fun GameScreenContent(
         )
         HorizontalDivider()
         GameHistory(
+            players = players,
             actions = actions,
+            showAction = showAction,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp)
@@ -179,6 +178,7 @@ private fun GameScreenPreview() {
             players = rememberUpdatedState(previewPlayers),
             currentPlayerId = rememberUpdatedState(1),
             actions = rememberUpdatedState(previewActions),
+            showAction = GameUI.actionLog,
             selectPlayer = null,
             timer = rememberUpdatedState(157),
             playerStats = GameUI.playerStats,
@@ -203,7 +203,7 @@ val previewPlayers: Players = sequence {
     )
 }.toMap()
 
-val previewActions: List<String> = sequence {
+val previewActions: Actions = sequence {
     repeat(10) {
         playerStateChangedAction(
             id = 1L,
@@ -219,7 +219,5 @@ val previewActions: List<String> = sequence {
             )
         ).let { yield(it) }
     }
-}.map {
-    SimpleOrdered.gameActionPresenter.showAction(it, previewPlayers)
 }.toList()
 

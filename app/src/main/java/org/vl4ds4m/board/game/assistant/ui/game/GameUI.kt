@@ -19,14 +19,14 @@ interface GameUI {
 
     val masterActions: @Composable () -> Unit
 
-    val actionPresenter: GameActionPresenter
+    val actionLog: ActionLog
 
     interface Factory {
         fun create(game: Game): GameUI
 
         val playerStats: PlayerStats
 
-        val actionPresenter: GameActionPresenter
+        val actionLog: ActionLog
     }
 
     companion object : Factory {
@@ -37,8 +37,8 @@ interface GameUI {
             Text("${state.value.score} point(s)")
         }
         
-        override val actionPresenter: GameActionPresenter =
-            GameActionPresenter.Default
+        override val actionLog: ActionLog =
+            GameActionPresenter.actionLog
         
         fun createBaseUi(game: Game, selectAllowed: Boolean): GameUI =
             BaseGameUI(game, selectAllowed)
@@ -64,5 +64,5 @@ private class BaseGameUI(game: Game, selectAllowed: Boolean) : GameUI {
 
     override val masterActions: @Composable () -> Unit = {}
 
-    override val actionPresenter = GameUI.actionPresenter
+    override val actionLog = GameUI.actionLog
 }

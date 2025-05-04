@@ -15,12 +15,15 @@ import java.util.Locale
 @Composable
 fun RowScope.MonopolyPlayerStats(state: State<PlayerState>) {
     Spacer(Modifier.weight(1f))
-    val field = monopolyFields[state.value.position ?: 0]
-    Text(field?.let { stringResource(field.resId) } ?: "???")
+    Text(monopolyField(state.value.position ?: 0))
     Text("|")
     val money = state.value.score
     Text(showMoney(money))
 }
+
+@Composable
+fun monopolyField(position: Int): String =
+    monopolyFields[position]?.let { stringResource(it.resId) } ?: "???"
 
 private fun showMoney(money: Int): String {
     val m = money / 1_000_000

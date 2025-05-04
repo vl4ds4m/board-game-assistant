@@ -1,5 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui.game
 
+import androidx.compose.runtime.Composable
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.changesCurrentPlayer
 import org.vl4ds4m.board.game.assistant.game.changesPlayerState
@@ -8,8 +9,10 @@ import org.vl4ds4m.board.game.assistant.game.log.GameAction
 import org.vl4ds4m.board.game.assistant.game.playerId
 import org.vl4ds4m.board.game.assistant.game.playerStates
 
+typealias ActionLog = @Composable (action: GameAction, players: Players) -> String
+
 interface GameActionPresenter {
-    fun showAction(action: GameAction, players: Players): String
+    val actionLog: ActionLog
 
     fun getPlayerName(players: Players, id: Long?): String {
         id ?: return "[nobody]"
@@ -19,28 +22,26 @@ interface GameActionPresenter {
     val fallback: String
         get() = "Unknown event"
 
-    companion object {
-        val Default: GameActionPresenter = BaseGameActionPresenter()
-    }
+    companion object : GameActionPresenter by BaseGameActionPresenter()
 }
 
 private class BaseGameActionPresenter : GameActionPresenter {
-    override fun showAction(action: GameAction, players: Players): String {
+    override val actionLog: ActionLog = f@{ action, players ->
         when {
             action.changesCurrentPlayer -> {
-                val ids = action.currentPlayerIds ?: return fallback
+                val ids = action.currentPlayerIds ?: return@f fallback
                 val prevPlayer = getPlayerName(players, ids.prev)
                 val nextPlayer = getPlayerName(players, ids.next)
-                return "$prevPlayer -> $nextPlayer"
+                return@f "$prevPlayer -> $nextPlayer"
             }
             action.changesPlayerState -> {
-                val playerId = action.playerId ?: return fallback
+                val playerId = action.playerId ?: return@f fallback
                 val name = getPlayerName(players, playerId)
-                val states = action.playerStates ?: return fallback
+                val states = action.playerStates ?: return@f fallback
                 val changes = states.run {
                     next.score - prev.score
                 }
-                return "$name: " + if (changes == 0) {
+                return@f "$name: " + if (changes == 0) {
                     "no score changes"
                 } else if (changes > 0) {
                     "+$changes point(s)"
@@ -48,7 +49,7 @@ private class BaseGameActionPresenter : GameActionPresenter {
                     "$changes point(s)"
                 }
             }
-            else -> return fallback
+            else -> return@f fallback
         }
     }
 }

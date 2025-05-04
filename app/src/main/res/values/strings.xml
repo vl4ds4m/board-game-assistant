@@ -86,4 +86,6 @@
     <string name="player_action_unbind">Unbind</string>
     <string name="player_action_bind">Bind to</string>
     <string name="game_player_self_label">It\'s you</string>
+    <string name="game_log_monopoly_to_prison">goes to Prison</string>
+    <string name="game_log_monopoly_from_prison">goes from Prison</string>
 </resources>

@@ -11,7 +11,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
-import org.vl4ds4m.board.game.assistant.game.gameActionPresenter
 import org.vl4ds4m.board.game.assistant.network.NetworkGameState
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
@@ -52,12 +51,7 @@ fun NavGraphBuilder.observerNavigation(
                     derivedStateOf { session.value.currentPlayerId }
                 }
                 val actions = remember {
-                    derivedStateOf {
-                        val presenter = session.value.type.gameActionPresenter
-                        session.value.actions.map {
-                            presenter.showAction(it, players.value)
-                        }
-                    }
+                    derivedStateOf { session.value.actions }
                 }
                 val timer = remember {
                     derivedStateOf {

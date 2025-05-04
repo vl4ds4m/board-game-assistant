@@ -15,6 +15,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.component.Timer
@@ -29,7 +30,7 @@ fun ObserverGameScreen(
     players: State<Players>,
     gameUiFactory: State<GameUI.Factory>,
     currentPlayerId: State<Long?>,
-    actions: State<List<String>>,
+    actions: State<Actions>,
     timer: State<Int?>,
     modifier: Modifier = Modifier
 ) {
@@ -63,7 +64,9 @@ fun ObserverGameScreen(
         )
         HorizontalDivider()
         GameHistory(
+            players = players,
             actions = actions,
+            showAction = gameUiFactory.value.actionLog,
             modifier = Modifier
                 .weight(3f)
                 .padding(horizontal = 16.dp)

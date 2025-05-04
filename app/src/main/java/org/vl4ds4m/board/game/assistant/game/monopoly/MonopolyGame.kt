@@ -37,7 +37,7 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
 
     override fun addPlayer(user: User?, name: String): Long {
         val state = monopolyPlayerState(
-            score = 0,
+            score = 15_000_000,
             position = 1,
             inPrison = false
         )

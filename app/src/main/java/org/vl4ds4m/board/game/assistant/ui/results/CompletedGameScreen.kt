@@ -160,19 +160,17 @@ private fun CompletedGameScreenPreview() {
                 1L to Player(
                     user = null,
                     name = "Abv",
-                    active = true,
                     state = PlayerState(45, mapOf())
                 ),
                 2L to Player(
                     user = User(netDevId = "ert", self = false, name = "a"),
                     name = "Efo",
-                    active = false,
+                    presence = Player.Presence.FROZEN,
                     state = PlayerState(123, mapOf())
                 ),
                 3L to Player(
                     user = null,
                     name = "Urt",
-                    active = true,
                     state = PlayerState(59, mapOf())
                 )
             ),

@@ -48,13 +48,12 @@ fun ObserverGameScreen(
             )
         }
         HorizontalDivider()
-        val activePlayers = remember {
-            derivedStateOf {
-                players.value.filterValues { it.active }
-            }
-        }
         PlayersRating(
-            players = activePlayers,
+            players = remember {
+                derivedStateOf {
+                    players.value.filterValues { it.active }
+                }
+            },
             currentPlayerId = currentPlayerId,
             onSelectPlayer = null,
             playerStats = gameUiFactory.value.playerStats,

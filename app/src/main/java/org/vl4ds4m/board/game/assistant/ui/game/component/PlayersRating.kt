@@ -13,12 +13,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.vl4ds4m.board.game.assistant.game.Player
+import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 
 @Composable
 fun PlayersRating(
-    players: State<Map<Long, Player>>,
+    players: State<Players>,
     currentPlayerId: State<Long?>,
     onSelectPlayer: ((Long) -> Unit)?,
     modifier: Modifier = Modifier,
@@ -27,6 +27,7 @@ fun PlayersRating(
     val rating = remember {
         derivedStateOf {
             players.value.toList()
+                .filter { (_, p) -> !p.removed }
                 .sortedBy { (_, p) -> p }
         }
     }
@@ -57,7 +58,7 @@ fun PlayersRating(
                 name = player.name,
                 user = player.user?.self ?: false,
                 remote = player.user != null,
-                frozen = !player.active,
+                frozen = player.frozen,
                 stats = { playerStats(playerState) },
                 selected = id == currentPlayerId.value,
                 onCardSelected = onSelectPlayer?.let { select ->

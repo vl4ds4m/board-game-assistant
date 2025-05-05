@@ -3,6 +3,7 @@ package org.vl4ds4m.board.game.assistant.data.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import org.vl4ds4m.board.game.assistant.game.Player
 
 @Entity(
     tableName = PlayerEntity.TABLE_NAME,
@@ -37,8 +38,8 @@ data class PlayerEntity(
     @ColumnInfo(name = NAME)
     val name: String,
 
-    @ColumnInfo(name = ACTIVE)
-    val active: Boolean,
+    @ColumnInfo(name = PRESENCE)
+    val presence: Player.Presence,
 
     @ColumnInfo(name = STATE)
     val state: String,
@@ -52,7 +53,7 @@ data class PlayerEntity(
         const val ID = "player_id"
         const val USER_ID = "user_net_dev_id"
         const val NAME = "nickname"
-        const val ACTIVE = "active"
+        const val PRESENCE = "player_presence"
         const val STATE = "player_state"
         const val ORDER = "move_order"
     }

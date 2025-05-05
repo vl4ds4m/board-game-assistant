@@ -1,7 +1,6 @@
 package org.vl4ds4m.board.game.assistant.game.env
 
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -18,8 +17,16 @@ open class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
     private val mNextPlayerId: MutableStateFlow<Long?> = MutableStateFlow(null)
     final override val nextPlayerId = mCurrentPlayerId.asStateFlow()
 
-    private val mOrderedPlayerIds: MutableStateFlow<List<Long>> = MutableStateFlow(listOf())
-    final override val orderedPlayerIds: StateFlow<List<Long>> = mOrderedPlayerIds.asStateFlow()
+    private val nextPlayerIdUpdater = Initializable { scope ->
+        players.combine(orderedPlayerIds) { ps, ids ->
+            ps to ids
+        }.combine(currentPlayerId) { (ps, ids), id ->
+            val nextId = getNextActivePlayerId(ps, ids, id)
+            mNextPlayerId.value = nextId
+        }.launchIn(scope)
+    }
+
+    private val orderedPlayerIds = MutableStateFlow<List<Long>>(listOf())
 
     final override fun changeCurrentPlayerId() {
         mCurrentPlayerId.updateAndGetStates { currentId ->
@@ -36,7 +43,7 @@ open class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
     }
 
     final override fun changePlayerOrder(id: Long, order: Int) {
-        mOrderedPlayerIds.updateList {
+        orderedPlayerIds.updateList {
             if (order !in indices) return
             val index = indexOf(id)
             if (index == -1 || index == order) return
@@ -45,18 +52,22 @@ open class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
         }
     }
 
+    final override val orderedPlayersUpdater = Initializable { scope ->
+        players.combine(orderedPlayerIds) { ps, ids ->
+            mOrderedPlayers.value = ids.mapNotNull { id ->
+                ps[id]?.let { p -> id to p }
+            }
+        }.launchIn(scope)
+    }
+
     final override fun addPlayer(user: User?, name: String, state: PlayerState): Long {
         val id = super.addPlayer(user, name, state)
-        mOrderedPlayerIds.updateList { add(id) }
+        orderedPlayerIds.updateList { add(id) }
         return id
     }
 
     final override fun removePlayer(id: Long) {
-        val (ids, _) = mOrderedPlayerIds.updateList {
-            val index = indexOf(id)
-            if (index == -1) return
-            removeAt(index)
-        }
+        val ids = orderedPlayerIds.value
         val (players, _) = remove(id) ?: return
         val states = updateCurrentIdOnEqual(id, players, ids) ?: return
         addCurrentPlayerChangedAction(states)
@@ -78,22 +89,13 @@ open class OrderedGameEnv(type: GameType) : OrderedGame, GameEnv(type) {
         addCurrentPlayerChangedAction(ids)
     }
 
-    private val nextPlayerIdObserver = Initializable { scope ->
-        players.combine(orderedPlayerIds) { ps, ids ->
-            ps to ids
-        }.combine(currentPlayerId) { (ps, ids), id ->
-            val nextId = getNextActivePlayerId(ps, ids, id)
-            mNextPlayerId.value = nextId
-        }.launchIn(scope)
-    }
-
     override val initializables: Array<Initializable> =
-        super.initializables + nextPlayerIdObserver
+        super.initializables + nextPlayerIdUpdater
 
-    final override var playersIds: List<Long>
+    final override var mPlayersIds: List<Long>
         get() = orderedPlayerIds.value
         set(value) {
-            mOrderedPlayerIds.value = value
+            orderedPlayerIds.value = value
         }
 }
 

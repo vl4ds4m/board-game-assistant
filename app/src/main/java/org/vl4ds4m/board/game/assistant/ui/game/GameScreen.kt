@@ -147,13 +147,12 @@ fun GameScreenContent(
             )
         }
         HorizontalDivider()
-        val activePlayers = remember {
-            derivedStateOf {
-                players.value.filterValues { it.active }
-            }
-        }
         PlayersRating(
-            players = activePlayers,
+            players = remember {
+                derivedStateOf {
+                    players.value.filterValues { it.active }
+                }
+            },
             currentPlayerId = currentPlayerId,
             onSelectPlayer = selectPlayer,
             playerStats = playerStats,
@@ -212,7 +211,7 @@ val previewPlayers: Players = sequence {
     (i + 1L) to Player(
         user = null,
         name = name,
-        active = true,
+        presence = Player.Presence.ACTIVE,
         state = PlayerState(score, mapOf())
     )
 }.toMap()

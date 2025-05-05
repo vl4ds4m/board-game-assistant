@@ -4,11 +4,14 @@ import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.vl4ds4m.board.game.assistant.States
 import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.GameType
+import org.vl4ds4m.board.game.assistant.game.OrderedPlayers
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.changesCurrentPlayer
@@ -30,6 +33,16 @@ open class GameEnv(final override val type: GameType) : Game {
 
     private val mPlayers: MutableStateFlow<Players> = MutableStateFlow(mapOf())
     final override val players: StateFlow<Players> = mPlayers.asStateFlow()
+
+    protected val mOrderedPlayers = MutableStateFlow<OrderedPlayers>(listOf())
+    final override val orderedPlayers: StateFlow<OrderedPlayers> =
+        mOrderedPlayers.asStateFlow()
+
+    protected open val orderedPlayersUpdater = Initializable { scope ->
+        players.onEach {
+            mOrderedPlayers.value = it.toList()
+        }.launchIn(scope)
+    }
 
     protected val mCurrentPlayerId: MutableStateFlow<Long?> = MutableStateFlow(null)
     final override val currentPlayerId: StateFlow<Long?> = mCurrentPlayerId.asStateFlow()
@@ -59,7 +72,6 @@ open class GameEnv(final override val type: GameType) : Game {
         val player = Player(
             user = user,
             name = name,
-            active = true,
             state = state
         )
         mPlayers.updateMap { put(id, player) }
@@ -77,7 +89,12 @@ open class GameEnv(final override val type: GameType) : Game {
     }
 
     protected fun remove(id: Long): States<Players>? = mPlayers.updateMap {
-        remove(id) ?: return null
+        val player = get(id) ?: return null
+        val newPlayer = player.copy(
+            presence = Player.Presence.REMOVED,
+            user = null
+        )
+        put(id, newPlayer)
     }
 
     private fun updateCurrentIdOnEqual(
@@ -92,7 +109,7 @@ open class GameEnv(final override val type: GameType) : Game {
 
     final override fun bindPlayer(id: Long, user: User) {
         mPlayers.updateMap {
-            val player = get(id) ?: return
+            val player = get(id)?.takeIf { !it.removed } ?: return
             put(id, player.copy(user = user))
         }
     }
@@ -122,15 +139,15 @@ open class GameEnv(final override val type: GameType) : Game {
         return mPlayers.updateMap {
             val player = get(playerId) ?: return null
             if (!player.active) return null
-            put(playerId, player.copy(active = false))
+            put(playerId, player.copy(presence = Player.Presence.FROZEN))
         }
     }
 
     final override fun unfreezePlayer(id: Long) {
         mPlayers.updateMap {
             val player = get(id) ?: return
-            if (player.active) return
-            put(id, player.copy(active = true))
+            if (!player.frozen) return
+            put(id, player.copy(presence = Player.Presence.ACTIVE))
         }
         val ids = mCurrentPlayerId.updateAndGetStates { it ?: id }
         addCurrentPlayerChangedAction(ids)
@@ -138,7 +155,7 @@ open class GameEnv(final override val type: GameType) : Game {
 
     final override fun changePlayerState(id: Long, state: PlayerState) {
         val (oldPlayers, newPlayers) = mPlayers.updateMap {
-            val player = get(id) ?: return
+            val player = get(id)?.takeIf { it.active } ?: return
             if (player.state == state) return
             put(id, player.copy(state = state))
         }
@@ -250,14 +267,19 @@ open class GameEnv(final override val type: GameType) : Game {
         }
     }
 
-    open val initializables: Array<Initializable> = arrayOf(timer)
+    open val initializables: Array<Initializable>
+        get() = arrayOf(timer, orderedPlayersUpdater)
+
+    protected open var mPlayersIds: List<Long>
+        get() = emptyPlayersIds
+        set(_) {}
 
     fun load(session: GameSession): Unit = session.let {
         mCompleted.value = it.completed
         name.value = it.name
         it.players.let { ps ->
             mPlayers.value = ps.toMap()
-            playersIds = ps.map { p -> p.first }
+            mPlayersIds = ps.map { (id, _) -> id }
         }
         mCurrentPlayerId.value = it.currentPlayerId
         nextNewPlayerId.set(it.nextNewPlayerId)
@@ -273,9 +295,7 @@ open class GameEnv(final override val type: GameType) : Game {
         completed = completed.value,
         type = type,
         name = name.value,
-        players = players.value.let { ps ->
-            playersIds.map { it to ps[it]!! }
-        },
+        players = Game.getOrderedPlayers(mPlayersIds, players.value),
         currentPlayerId = currentPlayerId.value,
         nextNewPlayerId = nextNewPlayerId.get(),
         startTime = startTime,
@@ -286,10 +306,8 @@ open class GameEnv(final override val type: GameType) : Game {
         actions = history.actionsContainer,
         currentActionPosition = history.nextActionIndex
     )
-
-    protected open var playersIds: List<Long>
-        get() = players.value.keys.toList()
-        set(_) {}
 }
 
 private const val TAG = "GameEnvironment"
+
+private val emptyPlayersIds = listOf<Long>()

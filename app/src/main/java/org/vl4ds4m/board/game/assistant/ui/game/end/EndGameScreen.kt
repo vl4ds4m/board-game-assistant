@@ -95,19 +95,19 @@ private fun EndGameScreenPreview() {
         EndGameScreenContent(
             players = rememberUpdatedState(mapOf(
                 1L to Player(
-                    null, "ssdf", true,
+                    null, "ssdf",
                     PlayerState(123, mapOf())
                 ),
                 2L to Player(
-                    null, "n5732h", false,
+                    null, "n5732h", Player.Presence.FROZEN,
                     PlayerState(456, mapOf())
                 ),
                 3L to Player(
-                    null, "fhb", true,
+                    null, "fhb",
                     PlayerState(5, mapOf())
                 ),
                 4L to Player(
-                    null, "yt3", false,
+                    null, "yt3", Player.Presence.REMOVED,
                     PlayerState(434, mapOf())
                 )
             )),

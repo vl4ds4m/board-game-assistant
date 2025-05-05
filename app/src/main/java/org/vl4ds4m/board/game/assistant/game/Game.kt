@@ -7,6 +7,7 @@ import org.vl4ds4m.board.game.assistant.game.log.GameAction
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 
 typealias Players = Map<Long, Player>
+typealias OrderedPlayers = List<Pair<Long, Player>>
 typealias Actions = List<GameAction>
 
 interface Game {
@@ -15,6 +16,8 @@ interface Game {
     val name: MutableStateFlow<String>
 
     val players: StateFlow<Players>
+
+    val orderedPlayers: StateFlow<OrderedPlayers>
 
     val currentPlayerId: StateFlow<Long?>
 
@@ -70,4 +73,12 @@ interface Game {
     fun revert()
 
     fun repeat()
+
+    companion object {
+        fun getOrderedPlayers(ids: List<Long>, players: Players): OrderedPlayers =
+            if (ids.isEmpty()) players.toList()
+            else ids.mapNotNull { id ->
+                players[id]?.let { p -> id to p }
+            }
+    }
 }

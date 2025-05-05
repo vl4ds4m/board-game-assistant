@@ -204,19 +204,17 @@ val gameSessionsPreview: List<GameSession> get() = listOf(
             1L to Player(
                 user = null,
                 name = "Abc",
-                active = true,
                 state = PlayerState(120, mapOf())
             ),
             2L to Player(
                 user = null,
                 name = "Def",
-                active = false,
+                presence = Player.Presence.FROZEN,
                 state = PlayerState(36, mapOf())
             ),
             3L to Player(
                 user = null,
                 name = "Foo",
-                active = true,
                 state = PlayerState(154, mapOf())
             )
         ),
@@ -238,19 +236,16 @@ val gameSessionsPreview: List<GameSession> get() = listOf(
             1L to Player(
                 user = null,
                 name = "Bar",
-                active = true,
                 state = PlayerState(1220, mapOf())
             ),
             2L to Player(
                 user = null,
                 name = "Conf",
-                active = true,
                 state = PlayerState(376, mapOf())
             ),
             3L to Player(
                 user = null,
                 name = "Leak",
-                active = true,
                 state = PlayerState(532, mapOf())
             )
         ),
@@ -272,25 +267,22 @@ val gameSessionsPreview: List<GameSession> get() = listOf(
             1L to Player(
                 user = null,
                 name = "Bar",
-                active = true,
                 state = PlayerState(12, mapOf())
             ),
             2L to Player(
                 user = null,
                 name = "Conf",
-                active = true,
+                presence = Player.Presence.REMOVED,
                 state = PlayerState(37, mapOf())
             ),
             3L to Player(
                 user = null,
                 name = "Leak",
-                active = true,
                 state = PlayerState(53, mapOf())
             ),
             4L to Player(
                 user = null,
                 name = "Flick",
-                active = true,
                 state = PlayerState(32, mapOf())
             )
         ),

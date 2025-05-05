@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
 import org.vl4ds4m.board.game.assistant.data.User
@@ -32,10 +34,11 @@ abstract class GameViewModel(
         GameEmitter(gameEnv, viewModelScope, it)
     }
 
-    val remotePlayers: Flow<List<User>> = gameEmitter.remotePlayers
+    val remotePlayers: StateFlow<List<User>> = gameEmitter.remotePlayers
         .combine(app.userDataRepository.user) { users, user ->
             users.map { it.copy(self = false) } + user
         }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
 
     private val sessionId: String = if (sessionId == null) {
         UUID.randomUUID().toString()

@@ -13,10 +13,10 @@ import org.vl4ds4m.board.game.assistant.data.entity.PlayerData
 import org.vl4ds4m.board.game.assistant.data.entity.PlayerEntity
 import org.vl4ds4m.board.game.assistant.data.entity.UserEntity
 import org.vl4ds4m.board.game.assistant.game.GameType
+import org.vl4ds4m.board.game.assistant.game.OrderedPlayers
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
-import org.vl4ds4m.board.game.assistant.game.data.OrderedPlayers
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
 
@@ -83,7 +83,7 @@ private val List<PlayerData>.gamePlayers: OrderedPlayers
                     )
                 },
                 name = player.name,
-                active = player.active,
+                presence = player.presence,
                 state = PlayerState.fromJson(player.state)
             )
         }
@@ -115,7 +115,7 @@ private fun GameSession.getPlayers(sessionId: String): List<PlayerData> =
             id = id,
             userId = p.user?.netDevId,
             name = p.name,
-            active = p.active,
+            presence = p.presence,
             state = p.state.toJson(),
             order = index
         )

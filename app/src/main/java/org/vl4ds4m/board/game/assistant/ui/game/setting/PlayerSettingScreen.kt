@@ -19,10 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.game.OrderedGame
+import org.vl4ds4m.board.game.assistant.game.OrderedPlayers
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
@@ -36,23 +35,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 @Composable
 fun PlayerSettingScreen(modifier: Modifier = Modifier) {
     val viewModel = viewModel<GameViewModel>()
-    val onPlayerOrderChange: ((Long, Int) -> Unit)?
-    val players = viewModel.players.let { flow ->
-        if (viewModel is OrderedGame) {
-            onPlayerOrderChange = viewModel::changePlayerOrder
-            viewModel.orderedPlayerIds.combine(flow) { ids, players ->
-                buildList {
-                    for (id in ids) {
-                        val player = players[id] ?: continue
-                        add(id to player)
-                    }
-                }
-            }
-        } else {
-            onPlayerOrderChange = null
-            flow.map { it.toList() }
-        }
-    }.collectAsState(listOf())
+    val players = viewModel.players.collectAsState()
     val remotePlayers = viewModel.remotePlayers.collectAsState(listOf())
     val newRemotePlayers = remember {
         derivedStateOf {
@@ -62,13 +45,14 @@ fun PlayerSettingScreen(modifier: Modifier = Modifier) {
         }
     }
     PlayerSettingScreenContent(
-        players = players,
+        players = viewModel.orderedPlayers.collectAsState(),
         remotePlayers = newRemotePlayers,
         currentPlayerId = viewModel.currentPlayerId.collectAsState(),
         addPlayer = viewModel::addPlayer,
         playerSettingActions = PlayerSettingActions(
             onSelect = viewModel::changeCurrentPlayerId,
-            onOrderChange = onPlayerOrderChange,
+            onOrderChange = if (viewModel is OrderedGame)
+                viewModel::changePlayerOrder else null,
             onBind = viewModel::bindPlayer,
             onUnbind = viewModel::unbindPlayer,
             onRename = viewModel::renamePlayer,
@@ -82,19 +66,20 @@ fun PlayerSettingScreen(modifier: Modifier = Modifier) {
 
 @Composable
 fun PlayerSettingScreenContent(
-    players: State<List<Pair<Long, Player>>>,
+    players: State<OrderedPlayers>,
     remotePlayers: State<List<User>>,
     currentPlayerId: State<Long?>,
     addPlayer: (User?, String) -> Unit,
     playerSettingActions: PlayerSettingActions,
     modifier: Modifier = Modifier
 ) {
+    val playersInGame = players.value.filterNot { (_, p) -> p.removed }
     Column(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         PlayersHead { addPlayer(null, it) }
-        if (players.value.isEmpty()) {
+        if (playersInGame.isEmpty()) {
             NoPlayersLabel(Modifier.weight(2f))
         } else {
             LazyColumn(
@@ -105,7 +90,7 @@ fun PlayerSettingScreenContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 itemsIndexed(
-                    items = players.value,
+                    items = playersInGame,
                     key = { _, (id, _) -> id }
                 ) { i, (id, player) ->
                     PlayerSettingCard(
@@ -113,13 +98,11 @@ fun PlayerSettingScreenContent(
                         name = player.name,
                         user = player.user?.self ?: false,
                         remote = player.user != null,
-                        frozen = !player.active,
+                        frozen = player.frozen,
                         selected = id == currentPlayerId.value,
                         settingActions = playerSettingActions,
                         index = i,
-                        playersCount = remember {
-                            derivedStateOf { players.value.size }
-                        }
+                        playersCount = rememberUpdatedState(playersInGame.size)
                     )
                 }
             }
@@ -129,13 +112,9 @@ fun PlayerSettingScreenContent(
         if (remotePlayers.value.isEmpty()) {
             NoRemotePlayersLabel(Modifier.weight(1f))
         } else {
-            val unboundPlayers = remember {
-                derivedStateOf {
-                    players.value
-                        .filter { (_, p) -> p.user == null }
-                        .map { (id, p) -> id to p.name }
-                }
-            }
+            val unboundPlayers = playersInGame
+                .filter { (_, p) -> p.user == null }
+                .map { (id, p) -> id to p.name }
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
@@ -151,7 +130,7 @@ fun PlayerSettingScreenContent(
                         bind = {
                             playerSettingActions.onBind(it, player)
                         },
-                        bindList = unboundPlayers
+                        bindList = rememberUpdatedState(unboundPlayers)
                     )
                 }
             }
@@ -166,9 +145,9 @@ private fun PlayerSettingScreenPreview() {
         PlayerSettingScreenContent(
             players = rememberUpdatedState(
                 listOf(
-                    1L to Player(null, "Abc", true, PlayerState(0, mapOf())),
-                    2L to Player(User.Empty, "Def", true, PlayerState(0, mapOf())),
-                    3L to Player(null, "Def", false, PlayerState(0, mapOf()))
+                    1L to Player(null, "Abc", PlayerState(0, mapOf())),
+                    2L to Player(User.Empty, "Def", PlayerState(0, mapOf())),
+                    3L to Player(null, "Def", Player.Presence.FROZEN, PlayerState(0, mapOf()))
                 )
             ),
             remotePlayers = rememberUpdatedState(

@@ -95,9 +95,11 @@ fun GameScreen(
             viewModel.stop()
         }
     }
-    LaunchedEffect(viewModel, navActions) {
+    LaunchedEffect(viewModel) {
         viewModel.completed.collect { completed ->
-            if (completed) navActions.completeGame()
+            if (completed) {
+                navActions.completeGame()
+            }
         }
     }
     val timer = produceState<Int?>(null, viewModel) {

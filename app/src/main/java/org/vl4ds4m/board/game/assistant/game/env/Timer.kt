@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
@@ -24,28 +25,44 @@ class Timer : Initializable {
     }
 
     fun start(
+        enabled: StateFlow<Boolean>,
         secondsToEnd: MutableStateFlow<Int>,
-        completed: MutableStateFlow<Boolean>
+        onTimeout: () -> Unit
     ) {
         stop()
         job = scope?.launch {
-            var timeout = false
-            while (!timeout) {
-                secondsToEnd.update { seconds ->
-                    if (seconds > 0) {
-                        delay(1.seconds)
-                        seconds - 1
-                    } else {
-                        timeout = true
-                        0
+            var timer: Job? = null
+            enabled.collect { on ->
+                timer?.cancel()
+                if (on) {
+                    timer = launch {
+                        startCountdown(secondsToEnd, onTimeout)
                     }
                 }
             }
-            completed.value = true
         }
     }
 
     fun stop() {
         job?.cancel()
     }
+}
+
+private suspend fun startCountdown(
+    secondsToEnd: MutableStateFlow<Int>,
+    onTimeout: () -> Unit
+) {
+    var timeout = false
+    while (!timeout) {
+        secondsToEnd.update { seconds ->
+            if (seconds > 0) {
+                delay(1.seconds)
+                seconds - 1
+            } else {
+                timeout = true
+                0
+            }
+        }
+    }
+    onTimeout()
 }

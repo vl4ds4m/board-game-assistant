@@ -183,9 +183,7 @@ open class GameEnv(final override val type: GameType) : Game {
             startTime = millis
         }
         lastStart = millis
-        if (timeout.value) {
-            timer.start(mSecondsToEnd, mCompleted)
-        }
+        timer.start(timeout, mSecondsToEnd, ::complete)
     }
 
     final override fun stop() {
@@ -266,8 +264,8 @@ open class GameEnv(final override val type: GameType) : Game {
         startTime = it.startTime
         stopTime = it.stopTime
         duration = it.duration
-        timeout.value = it.timeout
         mSecondsToEnd.value = it.secondsUntilEnd
+        timeout.value = it.timeout
         history.setup(it.actions, it.currentActionPosition)
     }
 

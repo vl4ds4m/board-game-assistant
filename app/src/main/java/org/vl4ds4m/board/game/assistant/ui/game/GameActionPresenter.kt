@@ -26,30 +26,39 @@ interface GameActionPresenter {
 }
 
 private class BaseGameActionPresenter : GameActionPresenter {
-    override val actionLog: ActionLog = f@{ action, players ->
-        when {
+    override val actionLog: ActionLog = { action, players ->
+        val log = when {
             action.changesCurrentPlayer -> {
-                val ids = action.currentPlayerIds ?: return@f fallback
-                val prevPlayer = getPlayerName(players, ids.prev)
-                val nextPlayer = getPlayerName(players, ids.next)
-                return@f "$prevPlayer -> $nextPlayer"
+                logCurrentPlayerChanged(action, players)
             }
             action.changesPlayerState -> {
-                val playerId = action.playerId ?: return@f fallback
-                val name = getPlayerName(players, playerId)
-                val states = action.playerStates ?: return@f fallback
-                val changes = states.run {
-                    next.score - prev.score
-                }
-                return@f "$name: " + if (changes == 0) {
-                    "no score changes"
-                } else if (changes > 0) {
-                    "+$changes point(s)"
-                } else {
-                    "$changes point(s)"
-                }
+                logPlayerStateChanged(action, players)
             }
-            else -> return@f fallback
+            else -> null
+        }
+        log ?: fallback
+    }
+
+    private fun logCurrentPlayerChanged(action: GameAction, players: Players): String? {
+        val ids = action.currentPlayerIds ?: return null
+        val prevPlayer = getPlayerName(players, ids.prev)
+        val nextPlayer = getPlayerName(players, ids.next)
+        return "$prevPlayer -> $nextPlayer"
+    }
+
+    private fun logPlayerStateChanged(action: GameAction, players: Players): String? {
+        val playerId = action.playerId ?: return null
+        val name = getPlayerName(players, playerId)
+        val states = action.playerStates ?: return null
+        val changes = states.run {
+            next.score - prev.score
+        }
+        return "$name: " + if (changes == 0) {
+            "no score changes"
+        } else if (changes > 0) {
+            "+$changes point(s)"
+        } else {
+            "$changes point(s)"
         }
     }
 }

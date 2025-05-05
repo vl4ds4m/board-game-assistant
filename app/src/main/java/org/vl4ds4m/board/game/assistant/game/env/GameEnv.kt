@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicLong
 open class GameEnv(final override val type: GameType) : Game {
     final override val name: MutableStateFlow<String> = MutableStateFlow("")
 
-    private val mPlayers: MutableStateFlow<Players> = MutableStateFlow(mapOf())
+    protected val mPlayers: MutableStateFlow<Players> = MutableStateFlow(mapOf())
     final override val players: StateFlow<Players> = mPlayers.asStateFlow()
 
     protected val mOrderedPlayers = MutableStateFlow<OrderedPlayers>(listOf())
@@ -47,7 +47,7 @@ open class GameEnv(final override val type: GameType) : Game {
     protected val mCurrentPlayerId: MutableStateFlow<Long?> = MutableStateFlow(null)
     final override val currentPlayerId: StateFlow<Long?> = mCurrentPlayerId.asStateFlow()
 
-    private val history = GameActionsHistory()
+    protected val history = GameActionsHistory()
 
     final override fun changeCurrentPlayerId(id: Long) {
         players.value[id]
@@ -232,6 +232,10 @@ open class GameEnv(final override val type: GameType) : Game {
 
     final override fun revert() {
         val action = history.revert() ?: return
+        revert(action)
+    }
+
+    open fun revert(action: GameAction) {
         when {
             action.changesCurrentPlayer -> {
                 val ids = action.currentPlayerIds ?: return
@@ -246,6 +250,10 @@ open class GameEnv(final override val type: GameType) : Game {
 
     final override fun repeat() {
         val action = history.repeat() ?: return
+        repeat(action)
+    }
+
+    open fun repeat(action: GameAction) {
         when {
             action.changesCurrentPlayer -> {
                 val ids = action.currentPlayerIds ?: return

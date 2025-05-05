@@ -33,10 +33,11 @@ fun GameHistory(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         items(actions.value) { action ->
-            Text(
-                text = showAction(action, players.value),
-                maxLines = 1
-            )
+            showAction(action, players.value)
+                .split('\n')
+                .forEach {
+                    Text(text = it, maxLines = 1)
+                }
         }
     }
 }

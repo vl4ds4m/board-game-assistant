@@ -14,6 +14,8 @@ import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.game.env.Initializable
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
+import org.vl4ds4m.board.game.assistant.game.log.GameAction
+import org.vl4ds4m.board.game.assistant.updateMap
 
 interface MonopolyGame : OrderedGame {
     val inPrison: StateFlow<Boolean>
@@ -59,35 +61,34 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
         super.initializables + inPrisonObserver
 
     override fun addMoney(money: Int) {
-        currentPlayerId.value?.let {
-            addMoney(it, money)
+        currentPlayerState?.let { (id, state) ->
+            addMoney(state, money)?.let { newState ->
+                changePlayerState(id, newState)
+            }
         }
     }
 
-    private fun addMoney(playerId: Long, money: Int): PlayerState? {
+    private fun addMoney(state: PlayerState, money: Int): PlayerState? {
         if (money <= 0) return null
-        val state = players.value[playerId]?.state ?: return null
         return state.run {
             copy(score = score + money)
-        }.also {
-            changePlayerState(playerId, it)
         }
+
     }
 
     override fun spendMoney(money: Int) {
-        currentPlayerId.value?.let {
-            spendMoney(it, money)
+        currentPlayerState?.let { (id, state) ->
+            spendMoney(state, money)?.let { newState ->
+                changePlayerState(id, newState)
+            }
         }
     }
 
-    private fun spendMoney(playerId: Long, money: Int): PlayerState? {
+    private fun spendMoney(state: PlayerState, money: Int): PlayerState? {
         if (money <= 0) return null
-        val state = players.value[playerId]?.state ?: return null
         if (state.score < money) return null
         return state.run {
             copy(score = score - money)
-        }.also {
-            changePlayerState(playerId, it)
         }
     }
 
@@ -97,7 +98,7 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
         state.inPrison?.takeUnless { it } ?: return
         val position = state.position ?: return
         var newCycle = false
-        val newPosState = (position + steps).let {
+        var newState = (position + steps).let {
             if (it > MonopolyField.COUNT) {
                 newCycle = true
                 it % MonopolyField.COUNT
@@ -107,35 +108,84 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
         }.let {
             state.updatePosition(it)
         }
-        changePlayerState(id, newPosState)
-        if (newCycle) addMoney(id, Ahead.MONEY)
+        if (newCycle) {
+            newState = addMoney(newState, Ahead.MONEY) ?: return
+        }
+        changePlayerState(id, newState)
     }
 
     override fun moveToPrison() {
         val (id, state) = currentPlayerState ?: return
         state.inPrison?.takeUnless { it } ?: return
-        val prisonPosState = state.updatePosition(Prison.POSITION)
-        changePlayerState(id, prisonPosState)
-        val inPrisonState = prisonPosState.updateInPrison(true)
-        changePlayerState(id, inPrisonState)
+        val newState = state
+            .updatePosition(Prison.POSITION)
+            .updateInPrison(true)
+        changePlayerState(id, newState)
     }
 
     override fun leavePrison(rescued: Boolean) {
         val (id, state) = currentPlayerState ?: return
         state.inPrison?.takeIf { it } ?: return
-        val beforeFreeState =
-            if (!rescued) spendMoney(id, Prison.FINE) ?: return
-            else state
-        changePlayerState(id, beforeFreeState.updateInPrison(false))
+        var newState = if (rescued) state
+            else spendMoney(state, Prison.FINE) ?: return
+        newState = newState.updateInPrison(false)
+        changePlayerState(id, newState)
     }
 
     override fun transferMoney(senderId: Long, receiverId: Long, money: Int) {
         if (senderId == receiverId) return
         if (money <= 0) return
-        val senderState = players.value[senderId]?.state ?: return
-        if (senderState.score < money) return
-        if (receiverId !in players.value) return
-        spendMoney(senderId, money) ?: return
-        addMoney(receiverId, money) ?: return
+        val sender = players.value[senderId] ?: return
+        if (sender.state.score < money) return
+        val receiver = players.value[receiverId] ?: return
+        val newSenderState = spendMoney(sender.state, money) ?: return
+        val newReceiverState = addMoney(receiver.state, money) ?: return
+        mPlayers.updateMap {
+            put(senderId, sender.copy(state = newSenderState))
+            put(receiverId, receiver.copy(state = newReceiverState))
+        }
+        history += monopolyPlayersCashChangedAction(
+            senderId = senderId,
+            receiverId = receiverId,
+            amount = money
+        )
+    }
+
+    override fun revert(action: GameAction) {
+        when {
+            action.changesMonopolyPlayersCash -> {
+                updatePlayersCash(action, true)
+            }
+            else -> super.revert(action)
+        }
+    }
+
+    override fun repeat(action: GameAction) {
+        when {
+            action.changesMonopolyPlayersCash -> {
+                updatePlayersCash(action, false)
+            }
+            else -> super.repeat(action)
+        }
+    }
+
+    private fun updatePlayersCash(action: GameAction, revert: Boolean) {
+        val senderId = action.senderId ?: return
+        val receiverId = action.receiverId ?: return
+        val amount = action.monopolyAmount
+            ?.let { if (revert) -it else it }
+            ?: return
+        mPlayers.updateMap {
+            val sender = get(senderId) ?: return
+            val receiver = get(receiverId) ?: return
+            val senderState = sender.state.run {
+                copy(score = score - amount)
+            }
+            val receiverState = receiver.state.run {
+                copy(score = score + amount)
+            }
+            put(senderId, sender.copy(state = senderState))
+            put(receiverId, receiver.copy(state = receiverState))
+        }
     }
 }

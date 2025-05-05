@@ -74,7 +74,9 @@ fun NewGamePlayersScreenContent(
     modifier = modifier.padding(16.dp),
     verticalArrangement = Arrangement.spacedBy(16.dp)
 ) {
-    PlayersHead { addPlayer(it, null) }
+    PlayersHead(rememberUpdatedState(players.size)) {
+        addPlayer(it, null)
+    }
     if (players.isEmpty()) {
         NoPlayersLabel(Modifier.weight(2f))
     } else {

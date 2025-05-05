@@ -36,6 +36,7 @@ import org.vl4ds4m.board.game.assistant.ui.component.playerName
 
 @Composable
 fun PlayersHead(
+    playersCount: State<Int>,
     modifier: Modifier = Modifier,
     addPlayer: (String) -> Unit
 ) {
@@ -53,7 +54,8 @@ fun PlayersHead(
         val playerPrefix = stringResource(R.string.game_player_prefix)
         FloatingActionButton(
             onClick = {
-                addPlayer(playerPrefix)
+                val num = playersCount.value + 1
+                addPlayer("$playerPrefix #$num")
             }
         ) {
             Icon(

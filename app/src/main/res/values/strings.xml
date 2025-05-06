@@ -73,8 +73,9 @@
     <string name="game_monopoly_move_prefix">Move</string>
     <string name="game_monopoly_to_prison">To prison</string>
     <string name="game_monopoly_from_prison">Leave prison</string>
-    <string name="game_monopoly_positioning">To positioning</string>
-    <string name="game_monopoly_accounting">To accounting</string>
+    <string name="game_monopoly_positioning">Position</string>
+    <string name="game_monopoly_accounting">Account</string>
+    <string name="game_monopoly_transferring">Transfer</string>
     <string name="game_monopoly_pay">Pay</string>
     <string name="game_monopoly_gain">Gain</string>
     <string name="game_monopoly_from_player">From</string>

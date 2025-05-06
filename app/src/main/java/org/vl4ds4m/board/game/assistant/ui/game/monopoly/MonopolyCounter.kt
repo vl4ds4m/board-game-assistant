@@ -1,5 +1,6 @@
 package org.vl4ds4m.board.game.assistant.ui.game.monopoly
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -23,17 +27,20 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,32 +69,53 @@ fun MonopolyCounter(
     transferMoney: (PID, PID, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val firstPanel = rememberSaveable { mutableStateOf(true) }
-    if (firstPanel.value) {
-        Positioning(
-            toAccounting = { firstPanel.value = false },
-            movePlayer = movePlayer,
-            inPrison = inPrison,
-            moveToPrison = moveToPrison,
-            leavePrison = leavePrison,
-            selectNextPlayer = selectNextPlayer,
-            modifier = modifier
-        )
-    } else {
-        Accounting(
-            toPositioning = { firstPanel.value = true },
-            players = players,
-            addMoney = addMoney,
-            spendMoney = spendMoney,
-            transferMoney = transferMoney,
-            modifier = modifier
-        )
+    val panel = rememberSaveable { mutableStateOf(Panel.Positioning.name) }
+    val navigatePanel: (Panel) -> Unit = { panel.value = it.name }
+    val steps = rememberSaveable { mutableIntStateOf(2) }
+    val money = rememberSaveable(saver = Score.Saver) { Score() }
+    val sender = rememberSaveable(saver = TransferSide.Saver) { TransferSide() }
+    val receiver = rememberSaveable(saver = TransferSide.Saver) { TransferSide() }
+    when (panel.value) {
+        Panel.Positioning.name -> {
+            Positioning(
+                navigate = navigatePanel,
+                steps = steps,
+                movePlayer = movePlayer,
+                inPrison = inPrison,
+                moveToPrison = moveToPrison,
+                leavePrison = leavePrison,
+                selectNextPlayer = selectNextPlayer,
+                modifier = modifier
+            )
+        }
+        Panel.Accounting.name -> {
+            Accounting(
+                navigate = navigatePanel,
+                money = money,
+                addMoney = addMoney,
+                spendMoney = spendMoney,
+                modifier = modifier
+            )
+        }
+        Panel.Transferring.name -> {
+            Transferring(
+                navigate = navigatePanel,
+                money = money,
+                sender = sender,
+                receiver = receiver,
+                players = players,
+                transferMoney = transferMoney,
+                modifier = modifier
+            )
+        }
+        else -> {}
     }
 }
 
 @Composable
 private fun Positioning(
-    toAccounting: () -> Unit,
+    navigate: (Panel) -> Unit,
+    steps: MutableIntState,
     movePlayer: (Int) -> Unit,
     inPrison: State<Boolean>,
     moveToPrison: () -> Unit,
@@ -104,12 +132,11 @@ private fun Positioning(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val steps = rememberSaveable { mutableIntStateOf(1) }
             Slider(
                 value = steps.intValue.toFloat(),
                 onValueChange = { steps.intValue = it.roundToInt() },
-                valueRange = 1f .. 12f,
-                steps = 10,
+                valueRange = 2f .. 12f,
+                steps = 9,
                 modifier = Modifier.width(200.dp)
             )
             Spacer(Modifier.size(24.dp))
@@ -146,22 +173,41 @@ private fun Positioning(
                 modifier = Modifier.width(130.dp)
             )
         }
+        Navigation(
+            destA = Panel.Accounting,
+            destB = Panel.Transferring,
+            navigate = navigate
+        )
+    }
+}
+
+@Composable
+private fun Navigation(destA: Panel, destB: Panel, navigate: (Panel) -> Unit) {
+    Row {
         OutlinedButton(
-            onClick = toAccounting,
-            modifier = Modifier.width(180.dp)
+            onClick = { navigate(destA) },
+            contentPadding = PaddingValues(6.dp),
+            modifier = Modifier.width(120.dp)
         ) {
-            Text(stringResource(R.string.game_monopoly_accounting))
+            Text(stringResource(destA.resId))
+        }
+        Spacer(Modifier.width(12.dp))
+        OutlinedButton(
+            onClick = { navigate(destB) },
+            contentPadding = PaddingValues(6.dp),
+            modifier = Modifier.width(120.dp)
+        ) {
+            Text(stringResource(destB.resId))
         }
     }
 }
 
 @Composable
 private fun Accounting(
-    toPositioning: () -> Unit,
-    players: State<Players>,
+    navigate: (Panel) -> Unit,
+    money: Score,
     addMoney: (Int) -> Unit,
     spendMoney: (Int) -> Unit,
-    transferMoney: (PID, PID, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -169,10 +215,6 @@ private fun Accounting(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val money = rememberSaveable(saver = Score.Saver) { Score() }
-        val moneyFilled = remember {
-            derivedStateOf { money.points > 0 }
-        }
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -182,104 +224,103 @@ private fun Accounting(
                 score = money,
                 label = "money"
             )
-            IconButton(
-                onClick = { spendMoney(money.points) },
-                enabled = moneyFilled.value,
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceContainer,
-                        shape = MaterialTheme.shapes.large
-                    )
-                    .height(44.dp)
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.keyboard_arrow_down_24px),
-                        contentDescription = "Arrow up",
-                        modifier = Modifier
-                            .size(24.dp)
-                            .rotate(180f)
-                            .align(Alignment.TopCenter)
-                    )
-                    Icon(
-                        painter = painterResource(R.drawable.credit_card_24px),
-                        contentDescription = "Credit card",
-                        modifier = Modifier
-                            .size(28.dp)
-                            .align(Alignment.BottomCenter)
-                    )
-                }
+            val moneyFilled = remember {
+                derivedStateOf { money.points > 0 }
             }
-            IconButton(
-                onClick = { addMoney(money.points) },
-                enabled = moneyFilled.value,
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceContainer,
-                        shape = MaterialTheme.shapes.large
-                    )
-                    .height(44.dp)
+            CashButton(
+                sign = Icons.Filled.KeyboardArrowUp,
+                signDesc = "Spend",
+                enabled = moneyFilled
             ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.keyboard_arrow_down_24px),
-                        contentDescription = "Arrow down",
-                        modifier = Modifier
-                            .size(24.dp)
-                            .align(Alignment.TopCenter)
-                    )
-                    Icon(
-                        painter = painterResource(R.drawable.credit_card_24px),
-                        contentDescription = "Credit card",
-                        modifier = Modifier
-                            .size(28.dp)
-                            .align(Alignment.BottomCenter)
-                    )
-                }
+                spendMoney(money.points)
+            }
+            CashButton(
+                sign = Icons.Default.Add,
+                signDesc = "Add",
+                enabled = moneyFilled
+            ) {
+                addMoney(money.points)
             }
         }
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Navigation(
+            destA = Panel.Positioning,
+            destB = Panel.Transferring,
+            navigate = navigate
+        )
+    }
+}
+
+@Composable
+private fun CashButton(
+    sign: ImageVector,
+    signDesc: String,
+    enabled: State<Boolean>,
+    onClick: () -> Unit
+) {
+    IconButton(
+        onClick = onClick,
+        enabled = enabled.value,
+        modifier = Modifier
+            .background(
+                color = MaterialTheme.colorScheme.surfaceContainer,
+                shape = MaterialTheme.shapes.large
+            )
+            .height(44.dp)
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
         ) {
-            val fromId = rememberSaveable { mutableIntStateOf(NIL_PID) }
-            val fromName = rememberSaveable { mutableStateOf("") }
-            TransferParticipant(
-                player = fromName,
-                label = stringResource(R.string.game_monopoly_from_player),
-                players = players,
-                takePlayer = { id, name ->
-                    fromId.intValue = id
-                    fromName.value = name
-                }
+            Icon(
+                imageVector = sign,
+                contentDescription = signDesc,
+                modifier = Modifier
+                    .size(20.dp)
+                    .align(Alignment.TopCenter)
             )
-            val toId = rememberSaveable { mutableIntStateOf(NIL_PID) }
-            val toName = rememberSaveable { mutableStateOf("") }
-            TransferParticipant(
-                player = toName,
-                label = stringResource(R.string.game_monopoly_to_player),
-                players = players,
-                takePlayer = { id, name ->
-                    toId.intValue = id
-                    toName.value = name
-                }
+            Icon(
+                painter = painterResource(R.drawable.credit_card_24px),
+                contentDescription = "Credit card",
+                modifier = Modifier
+                    .size(28.dp)
+                    .align(Alignment.BottomCenter)
             )
+        }
+    }
+}
+
+@Composable
+private fun Transferring(
+    navigate: (Panel) -> Unit,
+    money: Score,
+    sender: TransferSide,
+    receiver: TransferSide,
+    players: State<Players>,
+    transferMoney: (PID, PID, Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            ResetButton(money)
+            ScoreField(
+                score = money,
+                label = "money"
+            )
+            val enabled = remember {
+                derivedStateOf {
+                    money.points > 0 && sender.ready && receiver.ready
+                }
+            }
             IconButton(
-                onClick = {
-                    val sender = fromId.intValue
-                    val receiver = toId.intValue
-                    val amount = money.points
-                    if (sender != NIL_PID && receiver != NIL_PID && amount > 0) {
-                        transferMoney(sender, receiver, amount)
-                    }
-                },
-                enabled = moneyFilled.value,
+                onClick = { transferMoney(sender.id, receiver.id, money.points) },
+                enabled = enabled.value,
                 modifier = Modifier.background(
                     color = MaterialTheme.colorScheme.surfaceContainer,
                     shape = MaterialTheme.shapes.large
@@ -292,78 +333,121 @@ private fun Accounting(
                 )
             }
         }
-        OutlinedButton(
-            onClick = toPositioning,
-            modifier = Modifier.width(180.dp)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(stringResource(R.string.game_monopoly_positioning))
-        }
-    }
-}
-
-@Composable
-private fun TransferParticipant(
-    player: State<String>,
-    label: String,
-    players: State<Players>,
-    takePlayer: (PID, String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val expanded = remember { mutableStateOf(false) }
-    Box(modifier) {
-        FilledTonalButton(
-            onClick = { expanded.value = true },
-            contentPadding = PaddingValues(6.dp),
-            modifier = Modifier.width(100.dp)
-        ) {
-            Text(
-                text = player.value.ifBlank { label },
-                maxLines = 1
+            TransferParticipant(
+                side = sender,
+                label = stringResource(R.string.game_monopoly_from_player),
+                players = players
             )
+            TransferParticipant(
+                side = receiver,
+                label = stringResource(R.string.game_monopoly_to_player),
+                players = players
+            )
+
         }
-        PlayerSelector(
-            expanded = expanded,
-            players = players,
-            takePlayer = takePlayer
+        Navigation(
+            destA = Panel.Positioning,
+            destB = Panel.Accounting,
+            navigate = navigate
         )
     }
 }
 
 @Composable
-private fun PlayerSelector(
-    expanded: MutableState<Boolean>,
-    players: State<Players>,
-    takePlayer: (PID, String) -> Unit,
-    modifier: Modifier = Modifier
+private fun TransferParticipant(
+    side: TransferSide,
+    label: String,
+    players: State<Players>
 ) {
-    DropdownMenu(
-        expanded = expanded.value,
-        onDismissRequest = {
-            takePlayer(NIL_PID, "")
-            expanded.value = false
-        },
-        modifier = modifier
-    ) {
-        for ((id, player) in players.value) {
-            DropdownMenuItem(
-                text = { Text(player.name) },
-                onClick = {
-                    takePlayer(id, player.name)
-                    expanded.value = false
-                }
+    val expanded = remember { mutableStateOf(false) }
+    Box {
+        FilledTonalButton(
+            onClick = { expanded.value = true },
+            contentPadding = PaddingValues(6.dp),
+            modifier = Modifier.width(120.dp)
+        ) {
+            Text(
+                text = if (side.ready) side.name else label,
+                maxLines = 1
             )
+        }
+        DropdownMenu(
+            expanded = expanded.value,
+            onDismissRequest = {
+                side.reset()
+                expanded.value = false
+            }
+        ) {
+            for ((id, player) in players.value) {
+                DropdownMenuItem(
+                    text = { Text(player.name) },
+                    onClick = {
+                        side.id = id
+                        side.name = player.name
+                        expanded.value = false
+                    }
+                )
+            }
         }
     }
 }
 
-private const val NIL_PID: PID = -1
+private enum class Panel(
+    @StringRes val resId: Int
+) {
+    Positioning(R.string.game_monopoly_positioning),
+    Accounting(R.string.game_monopoly_accounting),
+    Transferring(R.string.game_monopoly_transferring)
+}
+
+@Stable
+private class TransferSide {
+    private val mId = mutableIntStateOf(EMPTY_PID)
+    var id: PID
+        get() = mId.intValue
+        set(value) { mId.intValue = value }
+
+    private val mName: MutableState<String> = mutableStateOf(EMPTY_NAME)
+    var name: String
+        get() = mName.value
+        set(value) { mName.value = value }
+
+    val ready: Boolean get() = id != EMPTY_PID
+
+    fun reset() {
+        id = EMPTY_PID
+        name = EMPTY_NAME
+    }
+
+    companion object {
+        private const val EMPTY_PID: PID = -1
+        private const val EMPTY_NAME: String = ""
+
+        val Saver = mapSaver(
+            save = {
+                mapOf("id" to it.id, "name" to it.name)
+            },
+            restore = { map ->
+                TransferSide().apply {
+                    id = (map["id"] as? PID) ?: EMPTY_PID
+                    name = (map["name"] as? String) ?: EMPTY_NAME
+                }
+            }
+        )
+    }
+}
 
 @Preview
 @Composable
 private fun MonopolyPositioningPreview() {
     BoardGameAssistantTheme {
         Positioning(
-            toAccounting = {},
+            navigate = {},
+            steps = remember { mutableIntStateOf(6) },
             movePlayer = {},
             inPrison = rememberUpdatedState(false),
             moveToPrison = {},
@@ -379,12 +463,33 @@ private fun MonopolyPositioningPreview() {
 private fun MonopolyAccountingPreview() {
     BoardGameAssistantTheme {
         Accounting(
-            toPositioning = {},
+            navigate = {},
+            money = Score().apply { text = "450" },
+            addMoney = {},
+            spendMoney = {},
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun MonopolyTransferringPreview() {
+    BoardGameAssistantTheme {
+        Transferring(
+            navigate = {},
+            money = Score(),
+            sender = TransferSide().apply {
+                id = 1
+                name = "Player A"
+            },
+            receiver = TransferSide().apply {
+                id = 2
+                name = "Player B"
+            },
             players = rememberUpdatedState(
                 detailedGameSessionPreview.players.toMap()
             ),
-            addMoney = {},
-            spendMoney = {},
             transferMoney = { _, _, _ -> },
             modifier = Modifier.fillMaxWidth()
         )

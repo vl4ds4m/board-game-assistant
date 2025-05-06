@@ -74,6 +74,7 @@
     <string name="game_monopoly_from_prison">Из тюрьмы</string>
     <string name="game_monopoly_positioning">Перемещение</string>
     <string name="game_monopoly_accounting">Подсчет</string>
+    <string name="game_monopoly_transferring">Перевод</string>
     <string name="game_monopoly_pay">Снять</string>
     <string name="game_monopoly_gain">Получить</string>
     <string name="game_monopoly_from_player">От кого</string>

@@ -91,4 +91,5 @@
     <string name="game_action_exit_confirm">Confirm</string>
     <string name="game_action_exit_text">Are you sure to stop the game?</string>
     <string name="game_settings_apply">Apply</string>
+    <string name="game_master_points_label" translatable="false">point(s)</string>
 </resources>

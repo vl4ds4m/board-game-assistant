@@ -30,7 +30,7 @@ import org.vl4ds4m.board.game.assistant.R
 fun ScoreField(
     score: Score,
     modifier: Modifier = Modifier,
-    label: String = "point(s)"
+    label: String = stringResource(R.string.game_master_points_label)
 ) {
     TextField(
         value = score.text,

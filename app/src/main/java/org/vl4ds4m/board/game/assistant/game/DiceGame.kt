@@ -34,12 +34,10 @@ class DiceGameEnv : OrderedGameEnv(Dice), DiceGame {
     override val initializables = super.initializables + addEnabledObserver
 
     override fun addPoints(points: Int) {
-        if (points <= 0 || points % 5 != 0) return
+        if ((points !in 1 .. 1000) || points % 5 != 0) return
         val (_, player) = currentPlayer ?: return
         val oldScore = player.state.score
-        if (oldScore == 1000) {
-            return
-        }
+        if (oldScore == 1000) return
         val newScore = (oldScore + points).let {
             if (it > 1000) oldScore - 100
             else it

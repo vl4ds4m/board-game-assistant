@@ -17,6 +17,7 @@ import org.vl4ds4m.board.game.assistant.game.env.Initializable
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
 import org.vl4ds4m.board.game.assistant.updateMap
+import kotlin.math.min
 
 interface MonopolyGame : OrderedGame {
     val inPrison: StateFlow<Boolean>
@@ -66,9 +67,9 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
     }
 
     private fun addMoney(state: PlayerState, money: Int): PlayerState? {
-        if (money <= 0) return null
+        if (money !in validAmount) return null
         return state.run {
-            copy(score = score + money)
+            copy(score = min(score + money, MAX_MONEY))
         }
 
     }
@@ -82,7 +83,7 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
     }
 
     private fun spendMoney(state: PlayerState, money: Int): PlayerState? {
-        if (money <= 0) return null
+        if (money !in validAmount) return null
         if (state.score < money) return null
         return state.run {
             copy(score = score - money)
@@ -131,9 +132,8 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
 
     override fun transferMoney(senderId: PID, receiverId: PID, money: Int) {
         if (senderId == receiverId) return
-        if (money <= 0) return
+        if (money !in validAmount) return
         val sender = players.value[senderId] ?: return
-        if (sender.state.score < money) return
         val receiver = players.value[receiverId] ?: return
         val newSenderState = spendMoney(sender.state, money) ?: return
         val newReceiverState = addMoney(receiver.state, money) ?: return
@@ -186,3 +186,7 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
         }
     }
 }
+
+private const val MAX_MONEY = 999_999_999
+
+private val validAmount = 1 .. MAX_MONEY

@@ -18,7 +18,7 @@ class MonopolyGameUI private constructor(game: MonopolyGame) :
             movePlayer = game::movePlayer,
             inPrison = game.inPrison.collectAsState(),
             moveToPrison = game::moveToPrison,
-            leavePrison = { game.leavePrison(true) },
+            leavePrison = { game.leavePrison(it) },
             selectNextPlayer = game::changeCurrentPid,
             addMoney = game::addMoney,
             spendMoney = game::spendMoney,

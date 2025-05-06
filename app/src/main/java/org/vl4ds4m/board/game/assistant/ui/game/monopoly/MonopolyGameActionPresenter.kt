@@ -71,7 +71,7 @@ class MonopolyGameActionPresenter private constructor(
             if (moneyChanges != 0) {
                 val log = "$player: " +
                     (if (moneyChanges > 0) "+" else "") +
-                    "$moneyChanges y.e."
+                    "$moneyChanges " + stringResource(R.string.game_monopoly_money_k)
                 logs += log
             }
         }

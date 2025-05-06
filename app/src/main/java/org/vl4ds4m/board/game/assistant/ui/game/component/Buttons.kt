@@ -117,14 +117,14 @@ fun ResetButton(score: Score) {
 @Composable
 fun PointsAppender(
     pointsVariants: List<Int>,
-    score: Score
-): Unit = pointsVariants.forEach { points ->
-
+    score: Score,
+    labels: List<String>? = null
+): Unit = pointsVariants.forEachIndexed { i, points ->
     Button(
         onClick = { score += points },
         contentPadding = PaddingValues(6.dp)
     ) {
-        Text("+ $points")
+        Text(labels?.getOrNull(i) ?: "+ $points")
     }
 }
 

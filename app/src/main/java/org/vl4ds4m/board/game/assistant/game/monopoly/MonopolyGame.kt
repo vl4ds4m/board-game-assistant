@@ -39,11 +39,7 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
         get() = currentPlayer?.let { (id, player) -> id to player.state }
 
     override fun addPlayer(user: User?, name: String): PID {
-        val state = monopolyPlayerState(
-            score = 15_000_000,
-            position = 1,
-            inPrison = false
-        )
+        val state = monopolyStartPlayerState()
         return addPlayer(user, name, state)
     }
 

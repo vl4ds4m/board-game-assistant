@@ -73,7 +73,13 @@
     <string name="game_monopoly_to_prison">В тюрьму</string>
     <string name="game_monopoly_from_prison">Из тюрьмы</string>
     <string name="game_monopoly_positioning">Перемещение</string>
+    <string name="game_monopoly_leave_prison_msg">Как покинуть тюрьму?</string>
+    <string name="game_monopoly_leave_prison_free">Бесплатно</string>
+    <string name="game_monopoly_leave_prison_fine">Штраф</string>
     <string name="game_monopoly_accounting">Подсчет</string>
+    <string name="game_monopoly_money_label">деньги, K y.e.</string>
+    <string name="game_monopoly_money_k">K y.e.</string>
+    <string name="game_monopoly_money_m">M y.e.</string>
     <string name="game_monopoly_transferring">Перевод</string>
     <string name="game_monopoly_pay">Снять</string>
     <string name="game_monopoly_gain">Получить</string>

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -29,20 +30,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
@@ -50,6 +50,7 @@ import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.ui.detailedGameSessionPreview
 import org.vl4ds4m.board.game.assistant.ui.game.component.NextPlayerButton
+import org.vl4ds4m.board.game.assistant.ui.game.component.PointsAppender
 import org.vl4ds4m.board.game.assistant.ui.game.component.ResetButton
 import org.vl4ds4m.board.game.assistant.ui.game.component.Score
 import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreField
@@ -62,7 +63,7 @@ fun MonopolyCounter(
     movePlayer: (Int) -> Unit,
     inPrison: State<Boolean>,
     moveToPrison: () -> Unit,
-    leavePrison: () -> Unit,
+    leavePrison: (Boolean) -> Unit,
     selectNextPlayer: () -> Unit,
     addMoney: (Int) -> Unit,
     spendMoney: (Int) -> Unit,
@@ -73,8 +74,8 @@ fun MonopolyCounter(
     val navigatePanel: (Panel) -> Unit = { panel.value = it.name }
     val steps = rememberSaveable { mutableIntStateOf(2) }
     val money = rememberSaveable(saver = Score.Saver) { Score() }
-    val sender = rememberSaveable(saver = TransferSide.Saver) { TransferSide() }
-    val receiver = rememberSaveable(saver = TransferSide.Saver) { TransferSide() }
+    val senderId = rememberSaveable { mutableIntStateOf(EMPTY_PID) }
+    val receiverId = rememberSaveable { mutableIntStateOf(EMPTY_PID) }
     when (panel.value) {
         Panel.Positioning.name -> {
             Positioning(
@@ -101,8 +102,8 @@ fun MonopolyCounter(
             Transferring(
                 navigate = navigatePanel,
                 money = money,
-                sender = sender,
-                receiver = receiver,
+                senderId = senderId,
+                receiverId = receiverId,
                 players = players,
                 transferMoney = transferMoney,
                 modifier = modifier
@@ -119,7 +120,7 @@ private fun Positioning(
     movePlayer: (Int) -> Unit,
     inPrison: State<Boolean>,
     moveToPrison: () -> Unit,
-    leavePrison: () -> Unit,
+    leavePrison: (Boolean) -> Unit,
     selectNextPlayer: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -141,6 +142,7 @@ private fun Positioning(
             )
             Spacer(Modifier.size(24.dp))
             Button(
+                enabled = !inPrison.value,
                 onClick = { movePlayer(steps.intValue) },
                 modifier = Modifier.width(120.dp)
             ) {
@@ -154,10 +156,14 @@ private fun Positioning(
             horizontalArrangement = Arrangement.spacedBy(24.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val prisonDialogOpened = remember { mutableStateOf(false) }
             Button(
                 onClick = {
-                    if (inPrison.value) leavePrison()
-                    else moveToPrison()
+                    if (inPrison.value) {
+                        prisonDialogOpened.value = true
+                    } else {
+                        moveToPrison()
+                    }
                 }
             ) {
                 Text(
@@ -167,6 +173,7 @@ private fun Positioning(
                         stringResource(R.string.game_monopoly_to_prison)
                     }
                 )
+                LeavePrisonDialog(prisonDialogOpened, leavePrison)
             }
             NextPlayerButton(
                 onClick = selectNextPlayer,
@@ -177,6 +184,42 @@ private fun Positioning(
             destA = Panel.Accounting,
             destB = Panel.Transferring,
             navigate = navigate
+        )
+    }
+}
+
+@Composable
+private fun LeavePrisonDialog(
+    opened: MutableState<Boolean>,
+    onConfirm: (Boolean) -> Unit
+) {
+    val dismiss = { opened.value = false }
+    if (opened.value) {
+        AlertDialog(
+            onDismissRequest = dismiss,
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onConfirm(false)
+                        dismiss()
+                    }
+                ) {
+                    Text(stringResource(R.string.game_monopoly_leave_prison_fine))
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        onConfirm(true)
+                        dismiss()
+                    }
+                ) {
+                    Text(stringResource(R.string.game_monopoly_leave_prison_free))
+                }
+            },
+            text = {
+                Text(stringResource(R.string.game_monopoly_leave_prison_msg))
+            }
         )
     }
 }
@@ -220,10 +263,7 @@ private fun Accounting(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             ResetButton(money)
-            ScoreField(
-                score = money,
-                label = "money"
-            )
+            MonopolyScoreField(money)
             val moneyFilled = remember {
                 derivedStateOf { money.points > 0 }
             }
@@ -242,12 +282,29 @@ private fun Accounting(
                 addMoney(money.points)
             }
         }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            PointsAppender(
+                pointsVariants = listOf(10, 100, 1_000),
+                score = money,
+                labels = listOf("+10 K", "+100 K", "+1 M")
+            )
+        }
         Navigation(
             destA = Panel.Positioning,
             destB = Panel.Transferring,
             navigate = navigate
         )
     }
+}
+
+@Composable
+private fun MonopolyScoreField(money: Score) {
+    ScoreField(
+        score = money,
+        label = stringResource(R.string.game_monopoly_money_label)
+    )
 }
 
 @Composable
@@ -293,8 +350,8 @@ private fun CashButton(
 private fun Transferring(
     navigate: (Panel) -> Unit,
     money: Score,
-    sender: TransferSide,
-    receiver: TransferSide,
+    senderId: MutableIntState,
+    receiverId: MutableIntState,
     players: State<Players>,
     transferMoney: (PID, PID, Int) -> Unit,
     modifier: Modifier = Modifier
@@ -309,17 +366,16 @@ private fun Transferring(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             ResetButton(money)
-            ScoreField(
-                score = money,
-                label = "money"
-            )
+            MonopolyScoreField(money)
             val enabled = remember {
                 derivedStateOf {
-                    money.points > 0 && sender.ready && receiver.ready
+                    money.points > 0
+                      && senderId.intValue != EMPTY_PID
+                      && receiverId.intValue != EMPTY_PID
                 }
             }
             IconButton(
-                onClick = { transferMoney(sender.id, receiver.id, money.points) },
+                onClick = { transferMoney(senderId.intValue, receiverId.intValue, money.points) },
                 enabled = enabled.value,
                 modifier = Modifier.background(
                     color = MaterialTheme.colorScheme.surfaceContainer,
@@ -338,12 +394,12 @@ private fun Transferring(
             verticalAlignment = Alignment.CenterVertically
         ) {
             TransferParticipant(
-                side = sender,
+                playerId = senderId,
                 label = stringResource(R.string.game_monopoly_from_player),
                 players = players
             )
             TransferParticipant(
-                side = receiver,
+                playerId = receiverId,
                 label = stringResource(R.string.game_monopoly_to_player),
                 players = players
             )
@@ -359,11 +415,16 @@ private fun Transferring(
 
 @Composable
 private fun TransferParticipant(
-    side: TransferSide,
+    playerId: MutableIntState,
     label: String,
     players: State<Players>
 ) {
     val expanded = remember { mutableStateOf(false) }
+    val playerName = remember {
+        derivedStateOf {
+            players.value[playerId.intValue]?.name ?: label
+        }
+    }
     Box {
         FilledTonalButton(
             onClick = { expanded.value = true },
@@ -371,14 +432,16 @@ private fun TransferParticipant(
             modifier = Modifier.width(120.dp)
         ) {
             Text(
-                text = if (side.ready) side.name else label,
-                maxLines = 1
+                text = playerName.value,
+                maxLines = 1,
+                fontWeight = FontWeight.Bold
+                    .takeIf { playerId.intValue != EMPTY_PID }
             )
         }
         DropdownMenu(
             expanded = expanded.value,
             onDismissRequest = {
-                side.reset()
+                playerId.intValue = EMPTY_PID
                 expanded.value = false
             }
         ) {
@@ -386,8 +449,7 @@ private fun TransferParticipant(
                 DropdownMenuItem(
                     text = { Text(player.name) },
                     onClick = {
-                        side.id = id
-                        side.name = player.name
+                        playerId.intValue = id
                         expanded.value = false
                     }
                 )
@@ -404,42 +466,7 @@ private enum class Panel(
     Transferring(R.string.game_monopoly_transferring)
 }
 
-@Stable
-private class TransferSide {
-    private val mId = mutableIntStateOf(EMPTY_PID)
-    var id: PID
-        get() = mId.intValue
-        set(value) { mId.intValue = value }
-
-    private val mName: MutableState<String> = mutableStateOf(EMPTY_NAME)
-    var name: String
-        get() = mName.value
-        set(value) { mName.value = value }
-
-    val ready: Boolean get() = id != EMPTY_PID
-
-    fun reset() {
-        id = EMPTY_PID
-        name = EMPTY_NAME
-    }
-
-    companion object {
-        private const val EMPTY_PID: PID = -1
-        private const val EMPTY_NAME: String = ""
-
-        val Saver = mapSaver(
-            save = {
-                mapOf("id" to it.id, "name" to it.name)
-            },
-            restore = { map ->
-                TransferSide().apply {
-                    id = (map["id"] as? PID) ?: EMPTY_PID
-                    name = (map["name"] as? String) ?: EMPTY_NAME
-                }
-            }
-        )
-    }
-}
+private const val EMPTY_PID: PID = -1
 
 @Preview
 @Composable
@@ -476,22 +503,16 @@ private fun MonopolyAccountingPreview() {
 @Composable
 private fun MonopolyTransferringPreview() {
     BoardGameAssistantTheme {
-        Transferring(
-            navigate = {},
-            money = Score(),
-            sender = TransferSide().apply {
-                id = 1
-                name = "Player A"
-            },
-            receiver = TransferSide().apply {
-                id = 2
-                name = "Player B"
-            },
-            players = rememberUpdatedState(
-                detailedGameSessionPreview.players.toMap()
-            ),
-            transferMoney = { _, _, _ -> },
-            modifier = Modifier.fillMaxWidth()
-        )
+        with(detailedGameSessionPreview) {
+            Transferring(
+                navigate = {},
+                money = Score(),
+                senderId = remember { mutableIntStateOf(players[0].first) },
+                receiverId = remember { mutableIntStateOf(EMPTY_PID) },
+                players = rememberUpdatedState(players.toMap()),
+                transferMoney = { _, _, _ -> },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }

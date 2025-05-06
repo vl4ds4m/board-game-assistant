@@ -74,7 +74,13 @@
     <string name="game_monopoly_to_prison">To prison</string>
     <string name="game_monopoly_from_prison">Leave prison</string>
     <string name="game_monopoly_positioning">Position</string>
+    <string name="game_monopoly_leave_prison_msg">How to leave prison?</string>
+    <string name="game_monopoly_leave_prison_free">Free</string>
+    <string name="game_monopoly_leave_prison_fine">Fine</string>
     <string name="game_monopoly_accounting">Account</string>
+    <string name="game_monopoly_money_label">money, K</string>
+    <string name="game_monopoly_money_k">K</string>
+    <string name="game_monopoly_money_m">M</string>
     <string name="game_monopoly_transferring">Transfer</string>
     <string name="game_monopoly_pay">Pay</string>
     <string name="game_monopoly_gain">Gain</string>

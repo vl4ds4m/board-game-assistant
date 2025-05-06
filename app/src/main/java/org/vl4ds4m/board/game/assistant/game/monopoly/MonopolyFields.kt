@@ -19,14 +19,14 @@ class MonopolyPenalty(val value: Int) : MonopolyField {
 object Ahead : MonopolyField {
     override val resId = R.string.monopoly_field_ahead
 
-    const val MONEY = 2_000_000
+    const val MONEY = 2_000
 }
 
 object Prison : MonopolyField {
     override val resId = R.string.monopoly_field_prison
 
     const val POSITION = 11
-    const val FINE = 500_000
+    const val FINE = 500
 }
 
 object Parking : MonopolyField {
@@ -78,7 +78,7 @@ val monopolyFields: Map<Int, MonopolyField> = mapOf(
     2  to Property.A[0],
     3  to CommunityChest,
     4  to Property.A[1],
-    5  to MonopolyPenalty(2_000_000),
+    5  to MonopolyPenalty(2_000),
     6  to Terminal.A,
     7  to Property.B[0],
     8  to Chance,
@@ -115,7 +115,7 @@ val monopolyFields: Map<Int, MonopolyField> = mapOf(
     36 to Terminal.D,
     37 to Chance,
     38 to Property.H[0],
-    39 to MonopolyPenalty(1_000_000),
+    39 to MonopolyPenalty(1_000),
     40 to Property.H[1],
 ).also {
     if (it.size != 40) throw AssertionError()

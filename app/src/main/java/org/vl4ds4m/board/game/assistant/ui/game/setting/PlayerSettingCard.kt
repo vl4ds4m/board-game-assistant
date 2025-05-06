@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
+import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.ui.component.PlayerCard
 import org.vl4ds4m.board.game.assistant.ui.component.PlayerIcon
 import org.vl4ds4m.board.game.assistant.ui.component.PlayerIndicators
@@ -30,7 +31,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun PlayerSettingCard(
-    id: Long,
+    id: PID,
     name: String,
     user: Boolean,
     remote: Boolean,
@@ -79,7 +80,7 @@ fun PlayerSettingCard(
 
 @Composable
 private fun actionsMenu(
-    playerId: Long,
+    playerId: PID,
     name: String,
     remote: Boolean,
     frozen: Boolean,

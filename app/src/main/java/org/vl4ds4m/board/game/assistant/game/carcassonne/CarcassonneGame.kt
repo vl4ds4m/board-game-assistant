@@ -23,7 +23,7 @@ class CarcassonneGameEnv : OrderedGameEnv(Carcassonne), CarcassonneGame {
             val score = player.state.run {
                 copy(score = score + points)
             }
-            val id = currentPlayerId.value ?: return
+            val id = currentPid.value ?: return
             changePlayerState(id, score)
         }
     }

@@ -35,6 +35,7 @@ import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.States
 import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.GameType
+import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.currentPlayerChangedAction
@@ -110,7 +111,7 @@ fun GameScreen(
     val ui = viewModel.gameUi
     GameScreenContent(
         players = viewModel.players.collectAsState(),
-        currentPlayerId = viewModel.currentPlayerId.collectAsState(),
+        currentPid = viewModel.currentPid.collectAsState(),
         actions = viewModel.actions.collectAsState(),
         showAction = ui.actionLog,
         selectPlayer = ui.onPlayerSelected,
@@ -124,10 +125,10 @@ fun GameScreen(
 @Composable
 fun GameScreenContent(
     players: State<Players>,
-    currentPlayerId: State<Long?>,
+    currentPid: State<PID?>,
     actions: State<Actions>,
     showAction: @Composable (GameAction, Players) -> String,
-    selectPlayer: ((Long) -> Unit)?,
+    selectPlayer: ((PID) -> Unit)?,
     timer: State<Int?>,
     playerStats: @Composable RowScope.(State<PlayerState>) -> Unit,
     masterActions: @Composable () -> Unit,
@@ -153,7 +154,7 @@ fun GameScreenContent(
                     players.value.filterValues { it.active }
                 }
             },
-            currentPlayerId = currentPlayerId,
+            currentPid = currentPid,
             onSelectPlayer = selectPlayer,
             playerStats = playerStats,
             modifier = Modifier
@@ -183,59 +184,8 @@ fun GameScreenContent(
     }
 }
 
-@Preview
 @Composable
-private fun GameScreenPreview() {
-    BoardGameAssistantTheme {
-        GameScreenContent(
-            players = rememberUpdatedState(previewPlayers),
-            currentPlayerId = rememberUpdatedState(1),
-            actions = rememberUpdatedState(previewActions),
-            showAction = GameUI.actionLog,
-            selectPlayer = null,
-            timer = rememberUpdatedState(157),
-            playerStats = GameUI.playerStats,
-            masterActions = GameUI.masterActionsPreview,
-            modifier = Modifier.fillMaxSize()
-        )
-    }
-}
-
-val previewPlayers: Players = sequence {
-    yield("Abc" to 123)
-    yield("Def" to 74)
-    yield("Foo" to 92123)
-    yield("Bar" to 986)
-    repeat(10) { yield("Copy" to 111) }
-}.mapIndexed { i, (name, score) ->
-    (i + 1L) to Player(
-        user = null,
-        name = name,
-        presence = Player.Presence.ACTIVE,
-        state = PlayerState(score, mapOf())
-    )
-}.toMap()
-
-val previewActions: Actions = sequence {
-    repeat(10) {
-        playerStateChangedAction(
-            id = 1L,
-            States(
-                prev = PlayerState(123, mapOf()),
-                next = PlayerState(678, mapOf())
-            )
-        ).let { yield(it) }
-        currentPlayerChangedAction(
-            States(
-                prev = 3L,
-                next = 2L
-            )
-        ).let { yield(it) }
-    }
-}.toList()
-
-@Composable
-fun StopGameDialog(
+private fun StopGameDialog(
     opened: MutableState<Boolean>,
     onConfirm: () -> Unit
 ) {
@@ -255,3 +205,54 @@ fun StopGameDialog(
         )
     }
 }
+
+@Preview
+@Composable
+private fun GameScreenPreview() {
+    BoardGameAssistantTheme {
+        GameScreenContent(
+            players = rememberUpdatedState(previewPlayers),
+            currentPid = rememberUpdatedState(1),
+            actions = rememberUpdatedState(previewActions),
+            showAction = GameUI.actionLog,
+            selectPlayer = null,
+            timer = rememberUpdatedState(157),
+            playerStats = GameUI.playerStats,
+            masterActions = GameUI.masterActionsPreview,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+val previewPlayers: Players = sequence {
+    yield("Abc" to 123)
+    yield("Def" to 74)
+    yield("Foo" to 92123)
+    yield("Bar" to 986)
+    repeat(10) { yield("Copy" to 111) }
+}.mapIndexed { i, (name, score) ->
+    (i + 1) to Player(
+        user = null,
+        name = name,
+        presence = Player.Presence.ACTIVE,
+        state = PlayerState(score, mapOf())
+    )
+}.toMap()
+
+val previewActions: Actions = sequence {
+    repeat(10) {
+        playerStateChangedAction(
+            id = 1,
+            States(
+                prev = PlayerState(123, mapOf()),
+                next = PlayerState(678, mapOf())
+            )
+        ).let { yield(it) }
+        currentPlayerChangedAction(
+            States(
+                prev = 3,
+                next = 2
+            )
+        ).let { yield(it) }
+    }
+}.toList()

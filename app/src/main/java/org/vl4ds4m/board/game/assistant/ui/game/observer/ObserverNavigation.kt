@@ -47,8 +47,8 @@ fun NavGraphBuilder.observerNavigation(
         when (observer.value) {
             NetworkGameState.REGISTRATION -> ObserverStartupScreen()
             NetworkGameState.IN_GAME -> {
-                val currentPlayerId = remember {
-                    derivedStateOf { session.value.currentPlayerId }
+                val currentPid = remember {
+                    derivedStateOf { session.value.currentPid }
                 }
                 val actions = remember {
                     derivedStateOf { session.value.actions }
@@ -61,7 +61,7 @@ fun NavGraphBuilder.observerNavigation(
                 ObserverGameScreen(
                     players = players,
                     gameUiFactory = gameUiFactory,
-                    currentPlayerId = currentPlayerId,
+                    currentPid = currentPid,
                     actions = actions,
                     timer = timer
                 )
@@ -80,8 +80,8 @@ private val emptySession = GameSession(
     type = SimpleOrdered,
     name = "Game",
     players = listOf(),
-    currentPlayerId = null,
-    nextNewPlayerId = 1L,
+    currentPid = null,
+    nextNewPid = 1,
     startTime = null,
     stopTime = null,
     duration = null,

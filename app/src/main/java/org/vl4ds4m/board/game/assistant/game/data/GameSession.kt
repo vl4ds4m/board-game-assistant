@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.OrderedPlayers
+import org.vl4ds4m.board.game.assistant.game.PID
 
 @Serializable
 data class GameSession(
@@ -11,8 +12,8 @@ data class GameSession(
     val type: GameType,
     val name: String,
     val players: OrderedPlayers,
-    val currentPlayerId: Long?,
-    val nextNewPlayerId: Long,
+    val currentPid: PID?,
+    val nextNewPid: PID,
     val startTime: Long?,
     val stopTime: Long?,
     val duration: Long?,

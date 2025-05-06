@@ -13,7 +13,7 @@ class SimpleOrderedGameUI private constructor(game: SimpleOrderedGame) :
         StandardCounter(
             addPoints = game::addPoints,
             applyEnabled = null,
-            selectNextPlayer = game::changeCurrentPlayerId
+            selectNextPlayer = game::changeCurrentPid
         )
     }
 

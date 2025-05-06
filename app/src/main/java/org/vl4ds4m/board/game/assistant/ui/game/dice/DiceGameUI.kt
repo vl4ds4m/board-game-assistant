@@ -14,7 +14,7 @@ class DiceGameUI private constructor(game: DiceGame) :
         ScoreCounter(
             addPoints = game::addPoints,
             applyEnabled = game.addEnabled.collectAsState(),
-            selectNextPlayer = game::changeCurrentPlayerId,
+            selectNextPlayer = game::changeCurrentPid,
             pointsVariants = listOf(5, 10, 50)
         )
     }

@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.game.Actions
+import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.component.Timer
@@ -29,7 +30,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 fun ObserverGameScreen(
     players: State<Players>,
     gameUiFactory: State<GameUI.Factory>,
-    currentPlayerId: State<Long?>,
+    currentPid: State<PID?>,
     actions: State<Actions>,
     timer: State<Int?>,
     modifier: Modifier = Modifier
@@ -54,7 +55,7 @@ fun ObserverGameScreen(
                     players.value.filterValues { it.active }
                 }
             },
-            currentPlayerId = currentPlayerId,
+            currentPid = currentPid,
             onSelectPlayer = null,
             playerStats = gameUiFactory.value.playerStats,
             modifier = Modifier
@@ -82,7 +83,7 @@ private fun ObserverGameScreenPreview() {
         ObserverGameScreen(
             players = rememberUpdatedState(previewPlayers),
             gameUiFactory = rememberUpdatedState(GameUI),
-            currentPlayerId = rememberUpdatedState(null),
+            currentPid = rememberUpdatedState(null),
             actions = rememberUpdatedState(previewActions),
             timer = rememberUpdatedState(945)
         )

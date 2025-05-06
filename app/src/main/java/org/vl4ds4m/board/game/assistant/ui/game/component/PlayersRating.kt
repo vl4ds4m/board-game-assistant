@@ -13,14 +13,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 
 @Composable
 fun PlayersRating(
     players: State<Players>,
-    currentPlayerId: State<Long?>,
-    onSelectPlayer: ((Long) -> Unit)?,
+    currentPid: State<PID?>,
+    onSelectPlayer: ((PID) -> Unit)?,
     modifier: Modifier = Modifier,
     playerStats: @Composable RowScope.(State<PlayerState>) -> Unit
 ) {
@@ -34,7 +35,7 @@ fun PlayersRating(
     val listState = rememberLazyListState()
     val currentIndex = remember {
         derivedStateOf {
-            currentPlayerId.value?.let { current ->
+            currentPid.value?.let { current ->
                 rating.value.indexOfFirst { (id, _) -> id == current }
                     .takeUnless { it == -1 }
             }
@@ -60,7 +61,7 @@ fun PlayersRating(
                 remote = player.user != null,
                 frozen = player.frozen,
                 stats = { playerStats(playerState) },
-                selected = id == currentPlayerId.value,
+                selected = id == currentPid.value,
                 onCardSelected = onSelectPlayer?.let { select ->
                     { select(id) }
                 }

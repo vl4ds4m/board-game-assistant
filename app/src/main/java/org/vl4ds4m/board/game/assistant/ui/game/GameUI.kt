@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import org.vl4ds4m.board.game.assistant.game.Game
+import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.ui.game.component.StandardCounter
 
@@ -15,7 +16,7 @@ typealias PlayerStats = @Composable RowScope.(State<PlayerState>) -> Unit
 interface GameUI {
     val playerStats: PlayerStats
 
-    val onPlayerSelected: ((Long) -> Unit)?
+    val onPlayerSelected: ((PID) -> Unit)?
 
     val masterActions: @Composable () -> Unit
 
@@ -57,7 +58,7 @@ private class BaseGameUI(game: Game, selectAllowed: Boolean) : GameUI {
     override val playerStats: PlayerStats = GameUI.playerStats
 
     override val onPlayerSelected = if (selectAllowed) {
-        game::changeCurrentPlayerId
+        game::changeCurrentPid
     } else {
         null
     }

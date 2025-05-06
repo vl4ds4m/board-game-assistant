@@ -10,6 +10,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
+import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.ui.component.PlayerCard
 import org.vl4ds4m.board.game.assistant.ui.component.PlayerIcon
 import org.vl4ds4m.board.game.assistant.ui.component.PlayerName
@@ -20,8 +21,8 @@ fun RemotePlayerCard(
     name: String,
     user: Boolean,
     add: () -> Unit,
-    bind: ((Long) -> Unit)?,
-    bindList: State<List<Pair<Long, String>>>?,
+    bind: ((PID) -> Unit)?,
+    bindList: State<List<Pair<PID, String>>>?,
     modifier: Modifier = Modifier
 ) {
     PlayerCard(
@@ -56,7 +57,7 @@ private fun RemotePlayerCardPreview() {
             user = true,
             add = {},
             bind = {},
-            bindList = rememberUpdatedState(listOf(1L to "Oret")),
+            bindList = rememberUpdatedState(listOf(1 to "Oret")),
             modifier = Modifier.width(300.dp)
         )
     }

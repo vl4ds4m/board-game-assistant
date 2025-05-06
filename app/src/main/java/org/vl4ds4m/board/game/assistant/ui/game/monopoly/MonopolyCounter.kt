@@ -27,7 +27,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -40,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
+import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.ui.game.component.NextPlayerButton
 import org.vl4ds4m.board.game.assistant.ui.game.component.ResetButton
@@ -59,7 +59,7 @@ fun MonopolyCounter(
     selectNextPlayer: () -> Unit,
     addMoney: (Int) -> Unit,
     spendMoney: (Int) -> Unit,
-    transferMoney: (Long, Long, Int) -> Unit,
+    transferMoney: (PID, PID, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val firstPanel = rememberSaveable { mutableStateOf(true) }
@@ -161,7 +161,7 @@ private fun Accounting(
     players: State<Players>,
     addMoney: (Int) -> Unit,
     spendMoney: (Int) -> Unit,
-    transferMoney: (Long, Long, Int) -> Unit,
+    transferMoney: (PID, PID, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -248,34 +248,34 @@ private fun Accounting(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val fromId = rememberSaveable { mutableLongStateOf(-1L) }
+            val fromId = rememberSaveable { mutableIntStateOf(NIL_PID) }
             val fromName = rememberSaveable { mutableStateOf("") }
             TransferParticipant(
                 player = fromName,
                 label = stringResource(R.string.game_monopoly_from_player),
                 players = players,
                 takePlayer = { id, name ->
-                    fromId.longValue = id
+                    fromId.intValue = id
                     fromName.value = name
                 }
             )
-            val toId = rememberSaveable { mutableLongStateOf(-1L) }
+            val toId = rememberSaveable { mutableIntStateOf(NIL_PID) }
             val toName = rememberSaveable { mutableStateOf("") }
             TransferParticipant(
                 player = toName,
                 label = stringResource(R.string.game_monopoly_to_player),
                 players = players,
                 takePlayer = { id, name ->
-                    toId.longValue = id
+                    toId.intValue = id
                     toName.value = name
                 }
             )
             IconButton(
                 onClick = {
-                    val sender = fromId.longValue
-                    val receiver = toId.longValue
+                    val sender = fromId.intValue
+                    val receiver = toId.intValue
                     val amount = money.points
-                    if (sender != -1L && receiver != -1L && amount > 0) {
+                    if (sender != NIL_PID && receiver != NIL_PID && amount > 0) {
                         transferMoney(sender, receiver, amount)
                     }
                 },
@@ -306,7 +306,7 @@ private fun TransferParticipant(
     player: State<String>,
     label: String,
     players: State<Players>,
-    takePlayer: (Long, String) -> Unit,
+    takePlayer: (PID, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val expanded = remember { mutableStateOf(false) }
@@ -333,13 +333,13 @@ private fun TransferParticipant(
 private fun PlayerSelector(
     expanded: MutableState<Boolean>,
     players: State<Players>,
-    takePlayer: (Long, String) -> Unit,
+    takePlayer: (PID, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     DropdownMenu(
         expanded = expanded.value,
         onDismissRequest = {
-            takePlayer(-1L, "")
+            takePlayer(NIL_PID, "")
             expanded.value = false
         },
         modifier = modifier
@@ -355,6 +355,8 @@ private fun PlayerSelector(
         }
     }
 }
+
+private const val NIL_PID: PID = -1
 
 @Preview
 @Composable

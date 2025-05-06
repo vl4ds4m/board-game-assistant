@@ -1,10 +1,11 @@
 package org.vl4ds4m.board.game.assistant.ui.game
 
 import androidx.compose.runtime.Composable
+import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.changesCurrentPlayer
 import org.vl4ds4m.board.game.assistant.game.changesPlayerState
-import org.vl4ds4m.board.game.assistant.game.currentPlayerIds
+import org.vl4ds4m.board.game.assistant.game.currentPIDs
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
 import org.vl4ds4m.board.game.assistant.game.playerId
 import org.vl4ds4m.board.game.assistant.game.playerStates
@@ -14,7 +15,7 @@ typealias ActionLog = @Composable (action: GameAction, players: Players) -> Stri
 interface GameActionPresenter {
     val actionLog: ActionLog
 
-    fun getPlayerName(players: Players, id: Long?): String {
+    fun getPlayerName(players: Players, id: PID?): String {
         id ?: return "[nobody]"
         return players[id]?.name ?: "[removed]"
     }
@@ -40,7 +41,7 @@ private class BaseGameActionPresenter : GameActionPresenter {
     }
 
     private fun logCurrentPlayerChanged(action: GameAction, players: Players): String? {
-        val ids = action.currentPlayerIds ?: return null
+        val ids = action.currentPIDs ?: return null
         val prevPlayer = getPlayerName(players, ids.prev)
         val nextPlayer = getPlayerName(players, ids.next)
         return "$prevPlayer -> $nextPlayer"

@@ -11,7 +11,7 @@ class CarcassonneGameUI private constructor(game: CarcassonneGame) :
     override val masterActions: @Composable () -> Unit = {
         CarcassonneCounter(
             addPoints = game::addPoints,
-            selectNextPlayer = game::changeCurrentPlayerId
+            selectNextPlayer = game::changeCurrentPid
         )
     }
 

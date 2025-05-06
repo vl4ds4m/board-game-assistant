@@ -3,9 +3,9 @@ package org.vl4ds4m.board.game.assistant.game
 import kotlinx.coroutines.flow.StateFlow
 
 interface OrderedGame : Game {
-    val nextPlayerId: StateFlow<Long?>
+    val nextPid: StateFlow<PID?>
 
-    fun changeCurrentPlayerId()
+    fun changeCurrentPid()
 
-    fun changePlayerOrder(id: Long, order: Int)
+    fun changePlayerOrder(id: PID, order: Int)
 }

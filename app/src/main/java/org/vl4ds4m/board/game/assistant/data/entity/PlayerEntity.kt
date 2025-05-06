@@ -3,6 +3,7 @@ package org.vl4ds4m.board.game.assistant.data.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Player
 
 @Entity(
@@ -30,7 +31,7 @@ data class PlayerEntity(
     val sessionId: String,
 
     @ColumnInfo(name = ID)
-    val id: Long,
+    val id: PID,
 
     @ColumnInfo(name = USER_ID)
     val userId: String?,

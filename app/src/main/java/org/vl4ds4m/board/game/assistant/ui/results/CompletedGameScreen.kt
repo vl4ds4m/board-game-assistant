@@ -118,7 +118,7 @@ fun CompletedGameScreenContent(
         )
         PlayersRating(
             players = rememberUpdatedState(players),
-            currentPlayerId = rememberUpdatedState(null),
+            currentPid = rememberUpdatedState(null),
             onSelectPlayer = null,
             playerStats = type.uiFactory.playerStats,
             modifier = modifier
@@ -157,18 +157,18 @@ private fun CompletedGameScreenPreview() {
         CompletedGameScreenContent(
             type = Free,
             players = mapOf(
-                1L to Player(
+                1 to Player(
                     user = null,
                     name = "Abv",
                     state = PlayerState(45, mapOf())
                 ),
-                2L to Player(
+                2 to Player(
                     user = User(netDevId = "ert", self = false, name = "a"),
                     name = "Efo",
                     presence = Player.Presence.FROZEN,
                     state = PlayerState(123, mapOf())
                 ),
-                3L to Player(
+                3 to Player(
                     user = null,
                     name = "Urt",
                     state = PlayerState(59, mapOf())

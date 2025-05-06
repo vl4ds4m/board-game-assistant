@@ -1,10 +1,11 @@
 package org.vl4ds4m.board.game.assistant.game.monopoly
 
+import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
 
 fun monopolyPlayersCashChangedAction(
-    senderId: Long,
-    receiverId: Long,
+    senderId: PID,
+    receiverId: PID,
     amount: Int
 ) = GameAction(
     type = MONOPOLY_CHANGE_PLAYERS_CASH,
@@ -18,11 +19,11 @@ fun monopolyPlayersCashChangedAction(
 val GameAction.changesMonopolyPlayersCash: Boolean
     get() = type == MONOPOLY_CHANGE_PLAYERS_CASH
 
-val GameAction.senderId: Long?
-    get() = data[MONOPOLY_SENDER_ID]?.toLongOrNull()
+val GameAction.senderId: PID?
+    get() = data[MONOPOLY_SENDER_ID]?.toIntOrNull()
 
-val GameAction.receiverId: Long?
-    get() = data[MONOPOLY_RECEIVER_ID]?.toLongOrNull()
+val GameAction.receiverId: PID?
+    get() = data[MONOPOLY_RECEIVER_ID]?.toIntOrNull()
 
 val GameAction.monopolyAmount: Int?
     get() = data[MONOPOLY_AMOUNT]?.toIntOrNull()

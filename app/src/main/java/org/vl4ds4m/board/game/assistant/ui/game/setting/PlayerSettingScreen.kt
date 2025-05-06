@@ -22,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.OrderedPlayers
+import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
@@ -47,10 +48,10 @@ fun PlayerSettingScreen(modifier: Modifier = Modifier) {
     PlayerSettingScreenContent(
         players = viewModel.orderedPlayers.collectAsState(),
         remotePlayers = newRemotePlayers,
-        currentPlayerId = viewModel.currentPlayerId.collectAsState(),
+        currentPid = viewModel.currentPid.collectAsState(),
         addPlayer = viewModel::addPlayer,
         playerSettingActions = PlayerSettingActions(
-            onSelect = viewModel::changeCurrentPlayerId,
+            onSelect = viewModel::changeCurrentPid,
             onOrderChange = if (viewModel is OrderedGame)
                 viewModel::changePlayerOrder else null,
             onBind = viewModel::bindPlayer,
@@ -68,7 +69,7 @@ fun PlayerSettingScreen(modifier: Modifier = Modifier) {
 fun PlayerSettingScreenContent(
     players: State<OrderedPlayers>,
     remotePlayers: State<List<User>>,
-    currentPlayerId: State<Long?>,
+    currentPid: State<PID?>,
     addPlayer: (User?, String) -> Unit,
     playerSettingActions: PlayerSettingActions,
     modifier: Modifier = Modifier
@@ -101,7 +102,7 @@ fun PlayerSettingScreenContent(
                         user = player.user?.self ?: false,
                         remote = player.user != null,
                         frozen = player.frozen,
-                        selected = id == currentPlayerId.value,
+                        selected = id == currentPid.value,
                         settingActions = playerSettingActions,
                         index = i,
                         playersCount = rememberUpdatedState(playersInGame.size)
@@ -147,9 +148,9 @@ private fun PlayerSettingScreenPreview() {
         PlayerSettingScreenContent(
             players = rememberUpdatedState(
                 listOf(
-                    1L to Player(null, "Abc", PlayerState(0, mapOf())),
-                    2L to Player(User.Empty, "Def", PlayerState(0, mapOf())),
-                    3L to Player(null, "Def", Player.Presence.FROZEN, PlayerState(0, mapOf()))
+                    1 to Player(null, "Abc", PlayerState(0, mapOf())),
+                    2 to Player(User.Empty, "Def", PlayerState(0, mapOf())),
+                    3 to Player(null, "Def", Player.Presence.FROZEN, PlayerState(0, mapOf()))
                 )
             ),
             remotePlayers = rememberUpdatedState(
@@ -158,7 +159,7 @@ private fun PlayerSettingScreenPreview() {
                     User(name = "Pdf", netDevId = "65hgf", self = false)
                 )
             ),
-            currentPlayerId = rememberUpdatedState(null),
+            currentPid = rememberUpdatedState(null),
             addPlayer = { _, _ -> },
             playerSettingActions = PlayerSettingActions.Empty,
             modifier = Modifier.fillMaxSize()

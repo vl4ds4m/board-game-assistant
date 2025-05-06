@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.onEach
 import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.game.Monopoly
 import org.vl4ds4m.board.game.assistant.game.OrderedGame
+import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.game.env.Initializable
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
@@ -30,14 +31,14 @@ interface MonopolyGame : OrderedGame {
 
     fun leavePrison(rescued: Boolean)
 
-    fun transferMoney(senderId: Long, receiverId: Long, money: Int)
+    fun transferMoney(senderId: PID, receiverId: PID, money: Int)
 }
 
 class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
-    private val currentPlayerState: Pair<Long, PlayerState>?
+    private val currentPlayerState: Pair<PID, PlayerState>?
         get() = currentPlayer?.let { (id, player) -> id to player.state }
 
-    override fun addPlayer(user: User?, name: String): Long {
+    override fun addPlayer(user: User?, name: String): PID {
         val state = monopolyPlayerState(
             score = 15_000_000,
             position = 1,
@@ -50,7 +51,7 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
     override val inPrison: StateFlow<Boolean> = mInPrison.asStateFlow()
 
     private val inPrisonObserver = Initializable { scope ->
-        currentPlayerId.combine(players) { id, p -> p[id] }
+        currentPid.combine(players) { id, p -> p[id] }
             .map { it?.state?.inPrison }
             .filterNotNull()
             .onEach { mInPrison.value = it }
@@ -132,7 +133,7 @@ class MonopolyGameEnv : OrderedGameEnv(Monopoly), MonopolyGame {
         changePlayerState(id, newState)
     }
 
-    override fun transferMoney(senderId: Long, receiverId: Long, money: Int) {
+    override fun transferMoney(senderId: PID, receiverId: PID, money: Int) {
         if (senderId == receiverId) return
         if (money <= 0) return
         val sender = players.value[senderId] ?: return

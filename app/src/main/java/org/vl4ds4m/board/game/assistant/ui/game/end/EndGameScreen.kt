@@ -76,7 +76,7 @@ fun EndGameScreenContent(
         HorizontalDivider()
         PlayersRating(
             players = players,
-            currentPlayerId = rememberUpdatedState(null),
+            currentPid = rememberUpdatedState(null),
             onSelectPlayer = null,
             playerStats = playerStats,
             modifier = Modifier
@@ -94,19 +94,19 @@ private fun EndGameScreenPreview() {
     BoardGameAssistantTheme {
         EndGameScreenContent(
             players = rememberUpdatedState(mapOf(
-                1L to Player(
+                1 to Player(
                     null, "ssdf",
                     PlayerState(123, mapOf())
                 ),
-                2L to Player(
+                2 to Player(
                     null, "n5732h", Player.Presence.FROZEN,
                     PlayerState(456, mapOf())
                 ),
-                3L to Player(
+                3 to Player(
                     null, "fhb",
                     PlayerState(5, mapOf())
                 ),
-                4L to Player(
+                4 to Player(
                     null, "yt3", Player.Presence.REMOVED,
                     PlayerState(434, mapOf())
                 )

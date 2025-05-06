@@ -52,7 +52,7 @@ fun ObserverEndScreen(
         HorizontalDivider()
         PlayersRating(
             players = players,
-            currentPlayerId = rememberUpdatedState(null),
+            currentPid = rememberUpdatedState(null),
             onSelectPlayer = null,
             playerStats = gameUiFactory.value.playerStats,
             modifier = Modifier

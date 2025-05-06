@@ -201,25 +201,25 @@ val gameSessionsPreview: List<GameSession> get() = listOf(
         type = SimpleOrdered,
         name = "Uno 93",
         players = listOf(
-            1L to Player(
+            1 to Player(
                 user = null,
                 name = "Abc",
                 state = PlayerState(120, mapOf())
             ),
-            2L to Player(
+            2 to Player(
                 user = null,
                 name = "Def",
                 presence = Player.Presence.FROZEN,
                 state = PlayerState(36, mapOf())
             ),
-            3L to Player(
+            3 to Player(
                 user = null,
                 name = "Foo",
                 state = PlayerState(154, mapOf())
             )
         ),
-        currentPlayerId = 1L,
-        nextNewPlayerId = 10L,
+        currentPid = 1,
+        nextNewPid = 1,
         startTime = initialTime + 40_000,
         stopTime = initialTime + 45_000,
         duration = 2_000,
@@ -233,24 +233,24 @@ val gameSessionsPreview: List<GameSession> get() = listOf(
         type = Free,
         name = "Poker Counts 28",
         players = listOf(
-            1L to Player(
+            1 to Player(
                 user = null,
                 name = "Bar",
                 state = PlayerState(1220, mapOf())
             ),
-            2L to Player(
+            2 to Player(
                 user = null,
                 name = "Conf",
                 state = PlayerState(376, mapOf())
             ),
-            3L to Player(
+            3 to Player(
                 user = null,
                 name = "Leak",
                 state = PlayerState(532, mapOf())
             )
         ),
-        currentPlayerId = 2L,
-        nextNewPlayerId = 10L,
+        currentPid = 2,
+        nextNewPid = 10,
         startTime = initialTime + 20_000,
         stopTime = initialTime + 35_000,
         duration = 15_000,
@@ -264,30 +264,30 @@ val gameSessionsPreview: List<GameSession> get() = listOf(
         completed = true,
         name = "Imaginarium 74",
         players = listOf(
-            1L to Player(
+            1 to Player(
                 user = null,
                 name = "Bar",
                 state = PlayerState(12, mapOf())
             ),
-            2L to Player(
+            2 to Player(
                 user = null,
                 name = "Conf",
                 presence = Player.Presence.REMOVED,
                 state = PlayerState(37, mapOf())
             ),
-            3L to Player(
+            3 to Player(
                 user = null,
                 name = "Leak",
                 state = PlayerState(53, mapOf())
             ),
-            4L to Player(
+            4 to Player(
                 user = null,
                 name = "Flick",
                 state = PlayerState(32, mapOf())
             )
         ),
-        currentPlayerId = 3L,
-        nextNewPlayerId = 10L,
+        currentPid = 3,
+        nextNewPid = 10,
         startTime = initialTime + 30_000,
         stopTime = initialTime + 40_000,
         duration = 4_000,

@@ -138,6 +138,17 @@ fun NewGamePlayersScreenContent(
 @Preview
 @Composable
 private fun NewGameWithPlayersScreenPreview() {
+    val previewPlayers = listOf(
+        NewPlayer("Player A", null),
+        NewPlayer("Player B", null),
+        NewPlayer("Oreo", User.Empty),
+        NewPlayer("Player C", null),
+    )
+    val previewRemotePlayers = listOf(
+        User(name = "Remote Player A", netDevId = "123", self = false),
+        User(name = "Remote Player B", netDevId = "456", self = false),
+        User(name = "Remote Player C", netDevId = "789", self = true),
+    )
     NewGamePlayersScreenPreview(previewPlayers, previewRemotePlayers)
 }
 
@@ -146,19 +157,6 @@ private fun NewGameWithPlayersScreenPreview() {
 private fun NewGameWithoutPlayersScreenPreview() {
     NewGamePlayersScreenPreview(listOf(), listOf())
 }
-
-private val previewPlayers get() = listOf(
-    NewPlayer("Player A", null),
-    NewPlayer("Player B", null),
-    NewPlayer("Oreo", User.Empty),
-    NewPlayer("Player C", null),
-)
-
-private val previewRemotePlayers get() = listOf(
-    User(name = "Remote Player A", netDevId = "123", self = false),
-    User(name = "Remote Player B", netDevId = "456", self = false),
-    User(name = "Remote Player C", netDevId = "789", self = true),
-)
 
 @Composable
 private fun NewGamePlayersScreenPreview(

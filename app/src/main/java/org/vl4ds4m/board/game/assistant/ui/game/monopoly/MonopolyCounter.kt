@@ -41,11 +41,11 @@ import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.ui.detailedGameSessionPreview
 import org.vl4ds4m.board.game.assistant.ui.game.component.NextPlayerButton
 import org.vl4ds4m.board.game.assistant.ui.game.component.ResetButton
 import org.vl4ds4m.board.game.assistant.ui.game.component.Score
 import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreField
-import org.vl4ds4m.board.game.assistant.ui.game.previewPlayers
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 import kotlin.math.roundToInt
 
@@ -380,7 +380,9 @@ private fun MonopolyAccountingPreview() {
     BoardGameAssistantTheme {
         Accounting(
             toPositioning = {},
-            players = rememberUpdatedState(previewPlayers),
+            players = rememberUpdatedState(
+                detailedGameSessionPreview.players.toMap()
+            ),
             addMoney = {},
             spendMoney = {},
             transferMoney = { _, _, _ -> },

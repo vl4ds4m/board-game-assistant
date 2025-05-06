@@ -2,7 +2,7 @@ package org.vl4ds4m.board.game.assistant.game.data
 
 import org.vl4ds4m.board.game.assistant.game.GameType
 
-class GameSessionInfo(
+data class GameSessionInfo(
     val id: String,
     val completed: Boolean,
     val type: GameType,

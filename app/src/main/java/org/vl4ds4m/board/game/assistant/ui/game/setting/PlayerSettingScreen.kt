@@ -144,21 +144,19 @@ fun PlayerSettingScreenContent(
 @Preview
 @Composable
 private fun PlayerSettingScreenPreview() {
+    val players = listOf(
+        1 to Player(null, "Abc", PlayerState(0, mapOf())),
+        2 to Player(User.Empty, "Def", PlayerState(0, mapOf())),
+        3 to Player(null, "Def", Player.Presence.FROZEN, PlayerState(0, mapOf()))
+    )
+    val remotePlayers = listOf(
+        User(name = "Tre", netDevId = "fgdfg", self = true),
+        User(name = "Pdf", netDevId = "65hgf", self = false)
+    )
     BoardGameAssistantTheme {
         PlayerSettingScreenContent(
-            players = rememberUpdatedState(
-                listOf(
-                    1 to Player(null, "Abc", PlayerState(0, mapOf())),
-                    2 to Player(User.Empty, "Def", PlayerState(0, mapOf())),
-                    3 to Player(null, "Def", Player.Presence.FROZEN, PlayerState(0, mapOf()))
-                )
-            ),
-            remotePlayers = rememberUpdatedState(
-                listOf(
-                    User(name = "Tre", netDevId = "fgdfg", self = true),
-                    User(name = "Pdf", netDevId = "65hgf", self = false)
-                )
-            ),
+            players = rememberUpdatedState(players),
+            remotePlayers = rememberUpdatedState(remotePlayers),
             currentPid = rememberUpdatedState(null),
             addPlayer = { _, _ -> },
             playerSettingActions = PlayerSettingActions.Empty,

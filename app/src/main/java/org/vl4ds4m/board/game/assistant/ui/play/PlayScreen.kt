@@ -24,15 +24,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
-import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.GameType
-import org.vl4ds4m.board.game.assistant.game.Player
-import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
-import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
-import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.component.GameSessionCard
+import org.vl4ds4m.board.game.assistant.ui.sessionsInfoPreview
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -165,7 +161,14 @@ fun PlayScreenContent(
 @Preview
 @Composable
 private fun PlayScreenWithSessionsPreview() {
-    PlayScreenPreview(sessionsInfoPreview, remoteSessionPreview)
+    val sessionsInfo = sessionsInfoPreview.map {
+        it.copy(completed = false)
+    }
+    val remoteSessions = listOf(
+        RemoteSessionInfo("remote_1", "Milki Way", "100.0.0.100", 11234),
+        RemoteSessionInfo("remote_2", "Catch me if you can", "100.0.0.105", 41831)
+    )
+    PlayScreenPreview(sessionsInfo, remoteSessions)
 }
 
 @Preview
@@ -190,128 +193,3 @@ private fun PlayScreenPreview(
         )
     }
 }
-
-private val initialTime: Long = java.time.Instant
-    .parse("2025-01-24T10:15:34.00Z").toEpochMilli()
-
-
-val gameSessionsPreview: List<GameSession> get() = listOf(
-    GameSession(
-        completed = false,
-        type = SimpleOrdered,
-        name = "Uno 93",
-        players = listOf(
-            1 to Player(
-                user = null,
-                name = "Abc",
-                state = PlayerState(120, mapOf())
-            ),
-            2 to Player(
-                user = null,
-                name = "Def",
-                presence = Player.Presence.FROZEN,
-                state = PlayerState(36, mapOf())
-            ),
-            3 to Player(
-                user = null,
-                name = "Foo",
-                state = PlayerState(154, mapOf())
-            )
-        ),
-        currentPid = 1,
-        nextNewPid = 1,
-        startTime = initialTime + 40_000,
-        stopTime = initialTime + 45_000,
-        duration = 2_000,
-        timeout = false,
-        secondsUntilEnd = 0,
-        actions = listOf(),
-        currentActionPosition = 0
-    ),
-    GameSession(
-        completed = false,
-        type = Free,
-        name = "Poker Counts 28",
-        players = listOf(
-            1 to Player(
-                user = null,
-                name = "Bar",
-                state = PlayerState(1220, mapOf())
-            ),
-            2 to Player(
-                user = null,
-                name = "Conf",
-                state = PlayerState(376, mapOf())
-            ),
-            3 to Player(
-                user = null,
-                name = "Leak",
-                state = PlayerState(532, mapOf())
-            )
-        ),
-        currentPid = 2,
-        nextNewPid = 10,
-        startTime = initialTime + 20_000,
-        stopTime = initialTime + 35_000,
-        duration = 15_000,
-        timeout = false,
-        secondsUntilEnd = 0,
-        actions = listOf(),
-        currentActionPosition = 0
-    ),
-    GameSession(
-        type = SimpleOrdered,
-        completed = true,
-        name = "Imaginarium 74",
-        players = listOf(
-            1 to Player(
-                user = null,
-                name = "Bar",
-                state = PlayerState(12, mapOf())
-            ),
-            2 to Player(
-                user = null,
-                name = "Conf",
-                presence = Player.Presence.REMOVED,
-                state = PlayerState(37, mapOf())
-            ),
-            3 to Player(
-                user = null,
-                name = "Leak",
-                state = PlayerState(53, mapOf())
-            ),
-            4 to Player(
-                user = null,
-                name = "Flick",
-                state = PlayerState(32, mapOf())
-            )
-        ),
-        currentPid = 3,
-        nextNewPid = 10,
-        startTime = initialTime + 30_000,
-        stopTime = initialTime + 40_000,
-        duration = 4_000,
-        timeout = false,
-        secondsUntilEnd = 0,
-        actions = listOf(),
-        currentActionPosition = 0
-    )
-)
-
-private val remoteSessionPreview get() = listOf(
-    RemoteSessionInfo("remote_1", "Milki Way", "100.0.0.100", 11234),
-    RemoteSessionInfo("remote_2", "Catch me if you can", "100.0.0.100", 11234)
-)
-
-private val sessionsInfoPreview: List<GameSessionInfo> get() =
-    gameSessionsPreview.filter { !it.completed }
-        .mapIndexed { i, s ->
-            GameSessionInfo(
-                id = i.inc().toString(),
-                completed = s.completed,
-                type = s.type,
-                name = s.name,
-                startTime = s.startTime,
-                stopTime = s.stopTime
-            )
-        }

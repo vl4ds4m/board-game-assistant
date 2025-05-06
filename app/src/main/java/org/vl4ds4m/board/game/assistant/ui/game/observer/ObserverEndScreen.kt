@@ -20,9 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.ui.detailedGameSessionPreview
 import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
-import org.vl4ds4m.board.game.assistant.ui.game.previewPlayers
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -68,7 +68,9 @@ fun ObserverEndScreen(
 private fun ObserverEndScreenPreview() {
     BoardGameAssistantTheme {
         ObserverEndScreen(
-            players = rememberUpdatedState(previewPlayers),
+            players = rememberUpdatedState(
+                detailedGameSessionPreview.players.toMap()
+            ),
             gameUiFactory = rememberUpdatedState(GameUI)
         )
     }

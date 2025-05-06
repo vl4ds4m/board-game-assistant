@@ -19,16 +19,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
-import org.vl4ds4m.board.game.assistant.data.User
-import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.GameType
-import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
-import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.localTime
 import org.vl4ds4m.board.game.assistant.prettyTime
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
+import org.vl4ds4m.board.game.assistant.ui.detailedGameSessionPreview
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 import java.time.LocalDateTime
@@ -154,30 +151,15 @@ private val LocalDateTime.formatted: String get() =
 @Composable
 private fun CompletedGameScreenPreview() {
     BoardGameAssistantTheme {
-        CompletedGameScreenContent(
-            type = Free,
-            players = mapOf(
-                1 to Player(
-                    user = null,
-                    name = "Abv",
-                    state = PlayerState(45, mapOf())
-                ),
-                2 to Player(
-                    user = User(netDevId = "ert", self = false, name = "a"),
-                    name = "Efo",
-                    presence = Player.Presence.FROZEN,
-                    state = PlayerState(123, mapOf())
-                ),
-                3 to Player(
-                    user = null,
-                    name = "Urt",
-                    state = PlayerState(59, mapOf())
-                )
-            ),
-            startTime = System.currentTimeMillis() - 11_000,
-            stopTime = System.currentTimeMillis(),
-            duration = 5_320,
-            modifier = Modifier.fillMaxSize()
-        )
+        with(detailedGameSessionPreview) {
+            CompletedGameScreenContent(
+                type = type,
+                players = players.toMap(),
+                startTime = startTime,
+                stopTime = stopTime,
+                duration = duration,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }

@@ -18,12 +18,11 @@ import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.ui.detailedGameSessionPreview
 import org.vl4ds4m.board.game.assistant.ui.game.GameUI
-import org.vl4ds4m.board.game.assistant.ui.game.component.Timer
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
-import org.vl4ds4m.board.game.assistant.ui.game.previewActions
-import org.vl4ds4m.board.game.assistant.ui.game.previewPlayers
+import org.vl4ds4m.board.game.assistant.ui.game.component.Timer
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -80,12 +79,14 @@ fun ObserverGameScreen(
 @Composable
 private fun ObserverGameScreenPreview() {
     BoardGameAssistantTheme {
-        ObserverGameScreen(
-            players = rememberUpdatedState(previewPlayers),
-            gameUiFactory = rememberUpdatedState(GameUI),
-            currentPid = rememberUpdatedState(null),
-            actions = rememberUpdatedState(previewActions),
-            timer = rememberUpdatedState(945)
-        )
+        with(detailedGameSessionPreview) {
+            ObserverGameScreen(
+                players = rememberUpdatedState(players.toMap()),
+                gameUiFactory = rememberUpdatedState(GameUI),
+                currentPid = rememberUpdatedState(null),
+                actions = rememberUpdatedState(actions),
+                timer = rememberUpdatedState(945)
+            )
+        }
     }
 }

@@ -22,9 +22,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.vl4ds4m.board.game.assistant.R
-import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.Players
-import org.vl4ds4m.board.game.assistant.game.data.PlayerState
+import org.vl4ds4m.board.game.assistant.ui.detailedGameSessionPreview
 import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.PlayerStats
@@ -93,24 +92,9 @@ fun EndGameScreenContent(
 private fun EndGameScreenPreview() {
     BoardGameAssistantTheme {
         EndGameScreenContent(
-            players = rememberUpdatedState(mapOf(
-                1 to Player(
-                    null, "ssdf",
-                    PlayerState(123, mapOf())
-                ),
-                2 to Player(
-                    null, "n5732h", Player.Presence.FROZEN,
-                    PlayerState(456, mapOf())
-                ),
-                3 to Player(
-                    null, "fhb",
-                    PlayerState(5, mapOf())
-                ),
-                4 to Player(
-                    null, "yt3", Player.Presence.REMOVED,
-                    PlayerState(434, mapOf())
-                )
-            )),
+            players = rememberUpdatedState(
+                detailedGameSessionPreview.players.toMap()
+            ),
             playerStats = GameUI.playerStats,
             navigateHome = {},
             modifier = Modifier.fillMaxSize()

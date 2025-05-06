@@ -17,9 +17,6 @@ class ResultsViewModel private constructor(
 
     suspend fun getSession(id: String): GameSession? = sessionRepository.loadSession(id)
 
-    val userId: StateFlow<String?> = app.userDataRepository.netDevId
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
-
     companion object {
         val Factory: ViewModelProvider.Factory = createFactory { ResultsViewModel(it) }
     }

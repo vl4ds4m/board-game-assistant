@@ -6,7 +6,10 @@
     <string name="profile_title">Ваш профиль</string>
     <string name="profile_name_label">Имя</string>
     <string name="results_title">Результаты игр</string>
+    <string name="results_filter_all">Все</string>
     <string name="results_empty_list">Нет завершенных игр</string>
+    <string name="results_date_today">Сегодня</string>
+    <string name="results_date_yesterday">Вчера</string>
     <string name="game_results_title_prefix">Результаты</string>
     <string name="play_title">Игровые сессии</string>
     <string name="play_start_new_game">Начать новую игру</string>

@@ -11,8 +11,9 @@ import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.game.playerStateChangedAction
 
-private val initialTime: Long = java.time.Instant
-    .parse("2025-01-24T10:15:34.00Z").toEpochMilli()
+private val initialTime: Long = System.currentTimeMillis()
+
+private const val day: Long = 24 * 60 * 60 * 1000L
 
 private val loop = 401 .. 404
 
@@ -72,8 +73,8 @@ val detailedGameSessionPreview = GameSession(
     },
     currentPid = 22,
     nextNewPid = 506,
-    startTime = initialTime + 40_000,
-    stopTime = initialTime + 45_000,
+    startTime = initialTime + 40_000 - day,
+    stopTime = initialTime + 45_000 - day,
     duration = 2_000,
     timeout = true,
     secondsUntilEnd = 157,
@@ -170,8 +171,8 @@ val gameSessionsPreview: List<GameSession> = listOf(
         ),
         currentPid = 2,
         nextNewPid = 7,
-        startTime = initialTime + 30_000,
-        stopTime = initialTime + 40_000,
+        startTime = initialTime + 30_000 - 5 * day,
+        stopTime = initialTime + 40_000 - 5 * day,
         duration = 6_340,
         timeout = false,
         secondsUntilEnd = 0,
@@ -208,8 +209,8 @@ val gameSessionsPreview: List<GameSession> = listOf(
         ),
         currentPid = 3,
         nextNewPid = 10,
-        startTime = initialTime + 30_000,
-        stopTime = initialTime + 40_000,
+        startTime = initialTime + 30_000 - day,
+        stopTime = initialTime + 40_000 - day,
         duration = 4_000,
         timeout = false,
         secondsUntilEnd = 0,

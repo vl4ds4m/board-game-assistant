@@ -48,7 +48,7 @@ fun Closeable.closeAndLog(tag: String, title: String) {
     }
 }
 
-val Long.localTime: LocalDateTime get() = Instant.ofEpochMilli(this)
+val Long.localDateTime: LocalDateTime get() = Instant.ofEpochMilli(this)
     .let { LocalDateTime.ofInstant(it, ZoneId.systemDefault()) }
 
 fun prettyTime(seconds: Int): String {

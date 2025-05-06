@@ -1,6 +1,5 @@
 package org.vl4ds4m.board.game.assistant.ui.play
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -106,13 +105,12 @@ fun PlayScreenContent(
                     key = { _, session -> session.id }
                 ) { index, session ->
                     GameSessionCard(
-                        text = "${index + 1}. ${session.name}",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                clickSession(session.id, session.type)
-                            }
-                    )
+                        name = "${index + 1}. ${session.name}",
+                        type = stringResource(session.type.localizedStringId),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        clickSession(session.id, session.type)
+                    }
                 }
             }
         }
@@ -143,15 +141,12 @@ fun PlayScreenContent(
                     key = { _, session -> session.id }
                 ) { index, session ->
                     GameSessionCard(
-                        text = "${index + 1}. ${session.name}",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                session.run {
-                                    clickRemoteGame(id, name, ip, port)
-                                }
-                            }
-                    )
+                        name = "${index + 1}. ${session.name}",
+                        type = "",
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        session.run { clickRemoteGame(id, name, ip, port) }
+                    }
                 }
             }
         }

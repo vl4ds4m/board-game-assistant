@@ -22,7 +22,7 @@ import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
-import org.vl4ds4m.board.game.assistant.localTime
+import org.vl4ds4m.board.game.assistant.localDateTime
 import org.vl4ds4m.board.game.assistant.prettyTime
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
 import org.vl4ds4m.board.game.assistant.ui.detailedGameSessionPreview
@@ -95,11 +95,11 @@ fun CompletedGameScreenContent(
         )
         Param(
             name = stringResource(R.string.game_results_start_time),
-            value = startTime?.localTime?.formatted ?: "no data"
+            value = startTime?.localDateTime?.formatted ?: "no data"
         )
         Param(
             name = stringResource(R.string.game_results_stop_time),
-            value = stopTime?.localTime?.formatted ?: "no data"
+            value = stopTime?.localDateTime?.formatted ?: "no data"
         )
         Param(
             name = stringResource(R.string.game_results_duration),

@@ -1,6 +1,5 @@
 package org.vl4ds4m.board.game.assistant.ui.game
 
-import android.net.nsd.NsdManager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -18,7 +17,6 @@ import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
 import org.vl4ds4m.board.game.assistant.game.Game
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.network.GameEmitter
-import org.vl4ds4m.board.game.assistant.network.SessionEmitter
 import java.util.UUID
 
 abstract class GameViewModel(
@@ -28,11 +26,7 @@ abstract class GameViewModel(
 ) : ViewModel(), Game {
     private val sessionRepository: GameSessionRepository = app.sessionRepository
 
-    private val gameEmitter: GameEmitter = SessionEmitter(
-        app.applicationContext.getSystemService(NsdManager::class.java)
-    ).let {
-        GameEmitter(gameEnv, viewModelScope, it)
-    }
+    private val gameEmitter = GameEmitter(gameEnv, viewModelScope, app.sessionEmitter)
 
     val remotePlayers: StateFlow<List<User>> = gameEmitter.remotePlayers
         .combine(app.userDataRepository.user) { users, user ->

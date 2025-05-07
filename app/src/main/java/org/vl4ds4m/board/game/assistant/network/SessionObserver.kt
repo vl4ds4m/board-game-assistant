@@ -4,6 +4,8 @@ import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo.Companion.TXT_ID
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo.Companion.TXT_NAME
@@ -11,7 +13,10 @@ import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo.Companion.TXT_
 import org.vl4ds4m.board.game.assistant.updateMap
 
 class SessionObserver(private val nsdManager: NsdManager) {
-    val sessions = MutableStateFlow<Map<String, RemoteSessionInfo>>(mapOf())
+    private val mSessions = MutableStateFlow<Map<String, RemoteSessionInfo>>(mapOf())
+    val sessions: StateFlow<Map<String, RemoteSessionInfo>> = mSessions.asStateFlow()
+
+    var ownServiceName: String? = null
 
     private val discoveryListener = object : NsdManager.DiscoveryListener {
         override fun onStartDiscoveryFailed(serviceType: String?, errorCode: Int) {
@@ -20,6 +25,7 @@ class SessionObserver(private val nsdManager: NsdManager) {
 
         override fun onStopDiscoveryFailed(serviceType: String?, errorCode: Int) {
             Log.w(TAG, "Discovery stop failed: ${errorCode.nsdError}")
+            mSessions.value = mapOf()
         }
 
         override fun onDiscoveryStarted(serviceType: String?) {
@@ -28,6 +34,7 @@ class SessionObserver(private val nsdManager: NsdManager) {
 
         override fun onDiscoveryStopped(serviceType: String?) {
             Log.i(TAG, "Discovery stopped")
+            mSessions.value = mapOf()
         }
 
         override fun onServiceFound(serviceInfo: NsdServiceInfo?) {
@@ -44,7 +51,7 @@ class SessionObserver(private val nsdManager: NsdManager) {
         override fun onServiceLost(serviceInfo: NsdServiceInfo?) {
             Log.i(TAG, "Service lost: ${serviceInfo?.serviceName}")
             serviceInfo?.serviceName?.let {
-                sessions.updateMap { remove(it) }
+                mSessions.updateMap { remove(it) }
             }
         }
     }
@@ -57,7 +64,8 @@ class SessionObserver(private val nsdManager: NsdManager) {
         override fun onServiceResolved(serviceInfo: NsdServiceInfo?) {
             Log.i(TAG, "Service resolved: $serviceInfo")
             serviceInfo?.toRemoteSession?.let {
-                sessions.updateMap {
+                if (serviceInfo.serviceName == ownServiceName) return
+                mSessions.updateMap {
                     putIfAbsent(serviceInfo.serviceName, it)
                 }
             }

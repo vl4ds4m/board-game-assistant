@@ -1,6 +1,5 @@
 package org.vl4ds4m.board.game.assistant.ui.play
 
-import android.net.nsd.NsdManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,10 +18,9 @@ class PlayViewModel private constructor(
 ) : SessionViewModel(app) {
     override fun isMatched(session: GameSessionInfo) = !session.completed
 
-    private val sessionObserver: SessionObserver =
-        app.applicationContext.getSystemService(NsdManager::class.java)
-        .let { SessionObserver(it) }
-        .also { it.startDiscovery() }
+    private val sessionObserver: SessionObserver = app.sessionObserver.apply {
+        startDiscovery()
+    }
 
     val remoteSessions: StateFlow<List<RemoteSessionInfo>> =
         sessionObserver.sessions.map { it.values.toList() }

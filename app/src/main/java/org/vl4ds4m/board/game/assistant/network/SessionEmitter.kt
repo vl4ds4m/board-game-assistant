@@ -5,7 +5,31 @@ import android.net.nsd.NsdServiceInfo
 import android.util.Log
 import org.vl4ds4m.board.game.assistant.game.GameType
 
-class SessionEmitter(private val nsdManager: NsdManager) {
+class SessionEmitter(
+    private val nsdManager: NsdManager,
+    private val observer: SessionObserver
+) {
+    private val listener = object : NsdManager.RegistrationListener {
+        override fun onRegistrationFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {
+            Log.w(TAG, "Service registration failed: ${errorCode.nsdError}")
+        }
+
+        override fun onUnregistrationFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {
+            Log.w(TAG, "Service logout failed: ${errorCode.nsdError}")
+            observer.ownServiceName = null
+        }
+
+        override fun onServiceRegistered(serviceInfo: NsdServiceInfo?) {
+            Log.i(TAG, "Service registered: $serviceInfo")
+            observer.ownServiceName = serviceInfo?.serviceName
+        }
+
+        override fun onServiceUnregistered(serviceInfo: NsdServiceInfo?) {
+            Log.i(TAG, "Service logout")
+            observer.ownServiceName = null
+        }
+    }
+
     fun register(id: String, type: GameType, name: String, port: Int) {
         NsdServiceInfo().apply {
             serviceType = SERVICE_TYPE
@@ -25,21 +49,3 @@ class SessionEmitter(private val nsdManager: NsdManager) {
 }
 
 private const val TAG = "SessionEmitter"
-
-private val listener = object : NsdManager.RegistrationListener {
-    override fun onRegistrationFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {
-        Log.w(TAG, "Service registration failed: ${errorCode.nsdError}")
-    }
-
-    override fun onUnregistrationFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {
-        Log.w(TAG, "Service logout failed: ${errorCode.nsdError}")
-    }
-
-    override fun onServiceRegistered(serviceInfo: NsdServiceInfo?) {
-        Log.i(TAG, "Service registered")
-    }
-
-    override fun onServiceUnregistered(serviceInfo: NsdServiceInfo?) {
-        Log.i(TAG, "Service logout")
-    }
-}

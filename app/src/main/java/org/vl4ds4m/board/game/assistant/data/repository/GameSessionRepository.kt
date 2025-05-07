@@ -1,5 +1,6 @@
 package org.vl4ds4m.board.game.assistant.data.repository
 
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -51,6 +52,8 @@ class GameSessionRepository(
             ).let {
                 sessionDao.insertSession(it)
             }
+            Log.d(TAG, "Save GameSession[id = $id, " +
+                    "type = ${session.type}, name = ${session.name}]")
         }
     }
 
@@ -150,3 +153,5 @@ private fun GameSession.getActions(id: String): List<GameActionEntity> =
             action = action.toJson()
         )
     }
+
+private const val TAG = "GameSessionRepository"

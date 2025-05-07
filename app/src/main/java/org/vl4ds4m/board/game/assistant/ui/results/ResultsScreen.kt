@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -54,6 +53,7 @@ fun ResultsScreen(
     ResultsScreenContent(
         sessions = viewModel.sessions.collectAsState(),
         clickSession = clickSession,
+        typeFilters = viewModel.typeFilters,
         modifier = modifier
     )
 }
@@ -62,17 +62,13 @@ fun ResultsScreen(
 fun ResultsScreenContent(
     sessions: State<List<GameSessionInfo>>,
     clickSession: (String) -> Unit,
+    typeFilters: Filters<GameType>,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        val filteredTypes = remember {
-            mutableStateMapOf<GameType, Unit>().apply {
-                GameType.entries.forEach { put(it, Unit) }
-            }
-        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 16.dp)
@@ -93,12 +89,12 @@ fun ResultsScreenContent(
                     painter = painterResource(R.drawable.filter_alt_24px),
                     contentDescription = "Filter results"
                 )
-                FilterMenu(filterExpanded, filteredTypes)
+                TypeFiltersMenu(filterExpanded, typeFilters)
             }
         }
         HorizontalDivider()
         val sortedSessions = sessions.value
-            .filter { filteredTypes.isEmpty() || it.type in filteredTypes }
+            .filter { typeFilters.none || it.type in typeFilters }
             .sortedByDescending { it.stopTime }
         if (sortedSessions.isEmpty()) {
             Text(
@@ -123,15 +119,15 @@ fun ResultsScreenContent(
 }
 
 @Composable
-private fun FilterMenu(
+private fun TypeFiltersMenu(
     expanded: MutableState<Boolean>,
-    checkedTypes: MutableMap<GameType, Unit>
+    types: Filters<GameType>
 ) {
-    val types = GameType.entries
     DropdownMenu(
         expanded = expanded.value,
         onDismissRequest = { expanded.value = false }
     ) {
+        val allTypes = types.rules
         DropdownMenuItem(
             text = {
                 Row(
@@ -143,20 +139,20 @@ private fun FilterMenu(
                         modifier = Modifier.weight(1f)
                     )
                     Checkbox(
-                        checked = types.all { it in checkedTypes },
+                        checked = types.all,
                         onCheckedChange = null
                     )
                 }
             },
             onClick = {
-                if (types.all { it in checkedTypes }) {
-                    checkedTypes.clear()
+                if (types.all) {
+                    allTypes.forEach { types -= it }
                 } else {
-                    types.forEach { checkedTypes[it] = Unit }
+                    allTypes.forEach { types += it }
                 }
             }
         )
-        GameType.entries.forEach { type ->
+        allTypes.forEach { type ->
             DropdownMenuItem(
                 text = {
                     Row(
@@ -168,16 +164,16 @@ private fun FilterMenu(
                             modifier = Modifier.weight(1f)
                         )
                         Checkbox(
-                            checked = type in checkedTypes,
+                            checked = type in types,
                             onCheckedChange = null
                         )
                     }
                 },
                 onClick = {
-                    if (type !in checkedTypes) {
-                        checkedTypes[type] = Unit
+                    if (type !in types) {
+                        types += type
                     } else {
-                        checkedTypes.remove(type)
+                        types -= type
                     }
                 }
             )
@@ -273,6 +269,7 @@ private fun ResultsScreenPreview(sessionsInfo: List<GameSessionInfo>) {
         ResultsScreenContent(
             sessions = remember { mutableStateOf(sessionsInfo) },
             clickSession = {},
+            typeFilters = Filters.empty(),
             modifier = Modifier.fillMaxSize()
         )
     }

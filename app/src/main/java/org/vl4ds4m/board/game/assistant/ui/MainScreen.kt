@@ -107,8 +107,8 @@ private fun isCurrentDestination(
 
 private fun <T : TopRoute> NavController.navigateToTop(route: T) {
     navigate(route) {
-        popUpTo<Play>()
-        launchSingleTop = true
+        popUpTo<Play> { saveState = true }
+        restoreState = true
     }
 }
 

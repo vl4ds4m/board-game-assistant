@@ -43,7 +43,7 @@ fun MainScreen() {
             }
         }
     }
-    val topBarUiState = remember { TopBarUiState.Empty }
+    val topBarUiState = remember { TopBarUiState.createEmpty() }
     MainScreenContent(
         navController = navController,
         onTopScreen = onTopScreen,
@@ -147,7 +147,7 @@ private fun MainScreenPreview(onTopScreen: Boolean) {
             navController = rememberNavController(),
             onTopScreen = remember { mutableStateOf(onTopScreen) },
             isCurrentRoute = { onTopScreen && (it is Play) },
-            topBarUiState = TopBarUiState.Example
+            topBarUiState = TopBarUiState.createExample()
         ) {
             composable<Play> {
                 Text(

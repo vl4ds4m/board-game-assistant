@@ -71,13 +71,13 @@ class TopBarUiState private constructor(
     }
 
     companion object {
-        val Empty get() = TopBarUiState(
+        fun createEmpty() = TopBarUiState(
             title = "",
             navigateBack = {},
             actions = {}
         )
 
-        val Example get() = TopBarUiState(
+        fun createExample() = TopBarUiState(
             title = "Screen title",
             navigateBack = {},
             actions = {
@@ -98,6 +98,6 @@ class TopBarUiState private constructor(
 @Composable
 private fun MainTopBarPreview() {
     BoardGameAssistantTheme {
-        MainTopBar(TopBarUiState.Example)
+        MainTopBar(TopBarUiState.createExample())
     }
 }

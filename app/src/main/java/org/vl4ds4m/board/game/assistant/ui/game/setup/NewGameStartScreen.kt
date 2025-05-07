@@ -82,7 +82,7 @@ fun NewGameStartScreenContent(
         val defaultName = name.value.isEmpty() && type.value != null
         val finalName = if (defaultName) {
             type.value?.let {
-                stringResource(it.localizedStringId) + " #" + defaultNameNum.value
+                stringResource(it.nameResId) + " #" + defaultNameNum.value
             } ?: "New game"
         } else {
             name.value
@@ -109,14 +109,14 @@ fun NewGameStartScreenContent(
                 ) {
                     Spacer(Modifier.width(40.dp))
                     GameCard(
-                        text = stringResource(it.localizedStringId),
+                        text = stringResource(it.nameResId),
                         selected = type.value == it,
                         onClick = { onTypeChanged(it) },
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(Modifier.width(8.dp))
                     Description(
-                        prompt = stringResource(it.localizedStringId),
+                        prompt = stringResource(it.nameResId),
                         content = stringResource(it.descResId)
                     )
                 }

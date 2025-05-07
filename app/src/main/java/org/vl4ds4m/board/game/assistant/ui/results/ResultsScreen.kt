@@ -160,7 +160,7 @@ private fun TypeFiltersMenu(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = stringResource(type.localizedStringId),
+                            text = stringResource(type.nameResId),
                             modifier = Modifier.weight(1f)
                         )
                         Checkbox(
@@ -237,7 +237,7 @@ private fun DateLabel(text: String, first: Boolean) {
 private fun SessionItem(session: GameSessionInfo, onClick: (String) -> Unit) {
     GameSessionCard(
         name = session.name,
-        type = stringResource(session.type.localizedStringId),
+        type = stringResource(session.type.nameResId),
         modifier = Modifier.fillMaxWidth()
     )  {
         onClick(session.id)

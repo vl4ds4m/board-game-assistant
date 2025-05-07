@@ -110,7 +110,7 @@ fun CompletedGameScreenContent(
     ) {
         Param(
             name  = stringResource(R.string.game_results_type),
-            value = stringResource(type.localizedStringId)
+            value = stringResource(type.nameResId)
         )
         Param(
             name = stringResource(R.string.game_results_player_count),

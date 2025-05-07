@@ -108,7 +108,7 @@ fun PlayScreenContent(
                 ) { index, session ->
                     GameSessionCard(
                         name = "${index + 1}. ${session.name}",
-                        type = stringResource(session.type.localizedStringId),
+                        type = stringResource(session.type.nameResId),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         clickSession(session.id, session.type)
@@ -144,7 +144,7 @@ fun PlayScreenContent(
                 ) { index, session ->
                     GameSessionCard(
                         name = "${index + 1}. ${session.name}",
-                        type = stringResource(session.type.localizedStringId),
+                        type = stringResource(session.type.nameResId),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         session.run { clickRemoteGame(session) }

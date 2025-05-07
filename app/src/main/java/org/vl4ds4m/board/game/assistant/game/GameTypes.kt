@@ -27,7 +27,7 @@ sealed interface GameType {
     val title: String
 
     @get:StringRes
-    val localizedStringId: Int
+    val nameResId: Int
 
     @get:StringRes
     val descResId: Int
@@ -64,7 +64,7 @@ sealed interface GameType {
 data object Free : GameType {
     override val title: String = "Free"
 
-    override val localizedStringId = R.string.game_type_free
+    override val nameResId = R.string.game_type_free
 
     override val descResId = R.string.free_game_description
 
@@ -82,7 +82,7 @@ sealed interface OrderedGameType : GameType
 data object SimpleOrdered : OrderedGameType {
     override val title: String = "Ordered"
 
-    override val localizedStringId = R.string.game_type_simple
+    override val nameResId = R.string.game_type_simple
 
     override val descResId = R.string.simple_game_description
 
@@ -97,7 +97,7 @@ data object SimpleOrdered : OrderedGameType {
 data object Dice : OrderedGameType {
     override val title: String = "Dice"
 
-    override val localizedStringId = R.string.game_type_dice
+    override val nameResId = R.string.game_type_dice
 
     override val descResId = R.string.dice_game_description
 
@@ -112,7 +112,7 @@ data object Dice : OrderedGameType {
 data object Carcassonne : OrderedGameType {
     override val title: String = "Carcassonne"
 
-    override val localizedStringId = R.string.game_type_carcassonne
+    override val nameResId = R.string.game_type_carcassonne
 
     override val descResId = R.string.carcassonne_game_description
 
@@ -127,7 +127,7 @@ data object Carcassonne : OrderedGameType {
 data object Monopoly : OrderedGameType {
     override val title: String = "Monopoly"
 
-    override val localizedStringId = R.string.game_type_monopoly
+    override val nameResId = R.string.game_type_monopoly
 
     override val descResId = R.string.monopoly_game_description
 

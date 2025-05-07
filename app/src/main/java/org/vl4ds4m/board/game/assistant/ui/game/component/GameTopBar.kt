@@ -9,7 +9,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,7 +39,7 @@ fun GameHistoryManager(state: GameHistoryState) {
 }
 
 @Composable
-fun GameMenu(actions: GameNavActions) {
+fun GameMenu(navActions: GameNavActions, onGameComplete: () -> Unit) {
     val expanded = remember { mutableStateOf(false) }
     IconButton(
         onClick = { expanded.value = true }
@@ -54,10 +53,10 @@ fun GameMenu(actions: GameNavActions) {
             onDismissRequest = { expanded.value = false }
         ) {
             listOf(
-                stringResource(R.string.game_menu_game_settings)   to actions.openGameSetting,
-                stringResource(R.string.game_menu_player_settings) to actions.openPlayerSetting,
-                stringResource(R.string.game_menu_dice_imitation)  to actions.openDiceImitation,
-                stringResource(R.string.game_menu_complete)        to actions.completeGame,
+                stringResource(R.string.game_menu_game_settings)   to navActions.openGameSetting,
+                stringResource(R.string.game_menu_player_settings) to navActions.openPlayerSetting,
+                stringResource(R.string.game_menu_dice_imitation)  to navActions.openDiceImitation,
+                stringResource(R.string.game_menu_complete)        to onGameComplete,
             ).forEach { (text, action) ->
                 DropdownMenuItem(
                     text = { Text(text) },
@@ -72,8 +71,7 @@ fun GameMenu(actions: GameNavActions) {
 }
 
 @Immutable
-data class GameNavActions(
-    val stopDialogOpened: MutableState<Boolean>,
+class GameNavActions(
     val navigateBack: () -> Unit,
     val openGameSetting: () -> Unit,
     val openPlayerSetting: () -> Unit,
@@ -82,7 +80,7 @@ data class GameNavActions(
 )
 
 @Immutable
-data class GameHistoryState(
+class GameHistoryState(
     val reverted: State<Boolean>,
     val repeatable: State<Boolean>,
     val revert: () -> Unit,

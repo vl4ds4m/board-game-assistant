@@ -1,5 +1,7 @@
 package org.vl4ds4m.board.game.assistant.ui.game
 
+import androidx.activity.addCallback
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +21,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -28,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleStartEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -39,6 +43,7 @@ import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.Users
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
+import org.vl4ds4m.board.game.assistant.ui.MainActivity
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
 import org.vl4ds4m.board.game.assistant.ui.detailedGameSessionPreview
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
@@ -64,15 +69,22 @@ fun GameScreen(
             producer = type.viewModelProducer
         )
     )
+    val stopDialogOpened = remember { mutableStateOf(false) }
+    val openStopDialog = { stopDialogOpened.value = true }
+    LocalActivity.current.let {
+        it as MainActivity
+    }.onBackPressedDispatcher.addCallback(
+        owner = LocalLifecycleOwner.current
+    ) {
+        openStopDialog()
+    }
     StopGameDialog(
-        opened = navActions.stopDialogOpened,
+        opened = stopDialogOpened,
         onConfirm = navActions.navigateBack
     )
     topBarUiState.update(
         title = viewModel.name.collectAsState().value,
-        navigateBack = {
-            navActions.stopDialogOpened.value = true
-        }
+        navigateBack = openStopDialog
     ) {
         GameHistoryManager(
             GameHistoryState(
@@ -82,11 +94,7 @@ fun GameScreen(
                 repeat = viewModel::repeat
             )
         )
-        GameMenu(
-            navActions.copy(
-                completeGame = viewModel::complete
-            )
-        )
+        GameMenu(navActions, viewModel::complete)
     }
     LifecycleStartEffect(viewModel) {
         viewModel.start()
@@ -195,7 +203,10 @@ private fun StopGameDialog(
             onDismissRequest = { opened.value = false },
             confirmButton = {
                 Button(
-                    onClick = onConfirm
+                    onClick = {
+                        opened.value = false
+                        onConfirm()
+                    }
                 ) {
                     Text(stringResource(R.string.game_action_exit_confirm))
                 }

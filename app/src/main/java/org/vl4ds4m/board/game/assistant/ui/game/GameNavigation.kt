@@ -3,7 +3,6 @@ package org.vl4ds4m.board.game.assistant.ui.game
 import androidx.activity.addCallback
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -112,28 +111,19 @@ fun NavGraphBuilder.gameNavigation(
         )
     }
     composable<Game> { entry ->
-        val navActions = GameNavActions(
-            stopDialogOpened = mutableStateOf(false),
-            navigateBack = navigateHome,
-            openGameSetting = { navController.navigate(GameSetting) },
-            openPlayerSetting = { navController.navigate(PlayerSetting) },
-            openDiceImitation = { navController.navigate(DiceImitation) },
-            completeGame = { navController.navigate(End) },
-        )
-        LocalActivity.current.let {
-            it as MainActivity
-        }.run {
-            onBackPressedDispatcher.addCallback(entry) {
-                navActions.stopDialogOpened.value = true
-            }
-        }
         val (type, sessionId) = entry.toRoute<Game>()
             .run { GameType.valueOf(type) to sessionId }
         GameScreen(
             type = type,
             sessionId = sessionId,
             topBarUiState = topBarUiState,
-            navActions = navActions
+            navActions = GameNavActions(
+                navigateBack = navigateHome,
+                openGameSetting = { navController.navigate(GameSetting) },
+                openPlayerSetting = { navController.navigate(PlayerSetting) },
+                openDiceImitation = { navController.navigate(DiceImitation) },
+                completeGame = { navController.navigate(End) },
+            )
         )
     }
     composable<GameSetting> { entry ->

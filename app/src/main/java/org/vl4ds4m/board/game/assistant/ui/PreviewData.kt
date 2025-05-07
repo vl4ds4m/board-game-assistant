@@ -23,40 +23,23 @@ val detailedGameSessionPreview = GameSession(
     name = "Party 93",
     players = listOf(
         145 to Player(
-            user = null,
             name = "Abc",
             state = PlayerState(120, mapOf())
         ),
         22 to Player(
-            user = User(
-                netDevId = "09gkndnl32n",
-                self = false,
-                name = "Definitive"
-            ),
             name = "Def",
             presence = Player.Presence.FROZEN,
             state = PlayerState(36, mapOf())
         ),
         78 to Player(
-            user = User(
-                netDevId = "idjfgsp9dfisd",
-                self = true,
-                name = "Dev 34"
-            ),
             name = "Yummy",
             state = PlayerState(83, mapOf())
         ),
         365 to Player(
-            user = User(
-                netDevId = "n54lisf",
-                self = false,
-                name = "FootPrint"
-            ),
             name = "Foo",
             state = PlayerState(154, mapOf())
         ),
         65 to Player(
-            user = null,
             name = "Abrewsdf",
             presence = Player.Presence.REMOVED,
             state = PlayerState(56567, mapOf())
@@ -64,13 +47,29 @@ val detailedGameSessionPreview = GameSession(
     ) + buildList {
         for ((i, id) in loop.withIndex()) {
             val p = id to Player(
-                user = null,
                 name = "Looper ${i + 1}",
                 state = PlayerState.Empty
             )
             add(p)
         }
     },
+    users = mapOf(
+        22 to User(
+            netDevId = "09gkndnl32n",
+            self = false,
+            name = "Definitive"
+        ),
+        78 to User(
+            netDevId = "idjfgsp9dfisd",
+            self = true,
+            name = "Dev 34"
+        ),
+        365 to User(
+            netDevId = "n54lisf",
+            self = false,
+            name = "FootPrint"
+        )
+    ),
     currentPid = 22,
     nextNewPid = 506,
     startTime = initialTime + 40_000 - day,
@@ -113,21 +112,19 @@ val gameSessionsPreview: List<GameSession> = listOf(
         name = "Poker Counts 28",
         players = listOf(
             1 to Player(
-                user = null,
                 name = "Bar",
                 state = PlayerState(1220, mapOf())
             ),
             2 to Player(
-                user = null,
                 name = "Conf",
                 state = PlayerState(376, mapOf())
             ),
             3 to Player(
-                user = null,
                 name = "Leak",
                 state = PlayerState(532, mapOf())
             )
         ),
+        users = mapOf(),
         currentPid = 2,
         nextNewPid = 10,
         startTime = initialTime + 20_000,
@@ -144,29 +141,28 @@ val gameSessionsPreview: List<GameSession> = listOf(
         name = "Fast 65",
         players = listOf(
             1 to Player(
-                user = null,
                 name = "Opd 34",
                 state = PlayerState(12, mapOf())
             ),
             2 to Player(
-                user = null,
                 name = "Noid oi Els",
                 presence = Player.Presence.REMOVED,
                 state = PlayerState(537, mapOf())
             ),
             3 to Player(
-                user = User(
-                    netDevId = "sdf",
-                    self = true,
-                    name = "Tio 89"
-                ),
                 name = "Leak",
                 state = PlayerState(353, mapOf())
             ),
             4 to Player(
-                user = null,
                 name = "Ao sdf",
                 state = PlayerState(7632, mapOf())
+            )
+        ),
+        users = mapOf(
+            3 to User(
+                netDevId = "sdf",
+                self = true,
+                name = "Tio 89"
             )
         ),
         currentPid = 2,
@@ -186,27 +182,24 @@ val gameSessionsPreview: List<GameSession> = listOf(
         name = "Imaginarium 74",
         players = listOf(
             1 to Player(
-                user = null,
                 name = "Bar",
                 state = PlayerState(12, mapOf())
             ),
             2 to Player(
-                user = null,
                 name = "Conf",
                 presence = Player.Presence.REMOVED,
                 state = PlayerState(37, mapOf())
             ),
             3 to Player(
-                user = null,
                 name = "Leak",
                 state = PlayerState(53, mapOf())
             ),
             4 to Player(
-                user = null,
                 name = "Flick",
                 state = PlayerState(32, mapOf())
             )
         ),
+        users = mapOf(),
         currentPid = 3,
         nextNewPid = 10,
         startTime = initialTime + 30_000 - day,

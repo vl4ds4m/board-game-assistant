@@ -9,6 +9,7 @@ import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 typealias PID = Int // Player identifier
 typealias Players = Map<PID, Player>
 typealias OrderedPlayers = List<Pair<PID, Player>>
+typealias Users = Map<PID, User>
 typealias Actions = List<GameAction>
 
 interface Game {
@@ -19,6 +20,8 @@ interface Game {
     val players: StateFlow<Players>
 
     val orderedPlayers: StateFlow<OrderedPlayers>
+
+    val users: StateFlow<Users>
 
     val currentPid: StateFlow<PID?>
 

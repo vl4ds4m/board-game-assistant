@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RemoteSessionInfo(
     val id: String,
+    // TODO val type: GameType aka String
     val name: String,
     val ip: String,
     val port: Int,

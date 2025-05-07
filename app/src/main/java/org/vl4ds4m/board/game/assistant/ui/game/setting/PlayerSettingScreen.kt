@@ -24,6 +24,7 @@ import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.OrderedPlayers
 import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Player
+import org.vl4ds4m.board.game.assistant.game.Users
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.component.NoPlayersLabel
@@ -36,17 +37,18 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 @Composable
 fun PlayerSettingScreen(modifier: Modifier = Modifier) {
     val viewModel = viewModel<GameViewModel>()
-    val players = viewModel.players.collectAsState()
+    val users = viewModel.users.collectAsState()
     val remotePlayers = viewModel.remotePlayers.collectAsState(listOf())
     val newRemotePlayers = remember {
         derivedStateOf {
             remotePlayers.value.filterNot { remotePlayer ->
-                players.value.any { (_, p) -> p.user?.netDevId == remotePlayer.netDevId }
+                users.value.any { (_, u) -> u.netDevId == remotePlayer.netDevId }
             }
         }
     }
     PlayerSettingScreenContent(
         players = viewModel.orderedPlayers.collectAsState(),
+        users = users,
         remotePlayers = newRemotePlayers,
         currentPid = viewModel.currentPid.collectAsState(),
         addPlayer = viewModel::addPlayer,
@@ -68,6 +70,7 @@ fun PlayerSettingScreen(modifier: Modifier = Modifier) {
 @Composable
 fun PlayerSettingScreenContent(
     players: State<OrderedPlayers>,
+    users: State<Users>,
     remotePlayers: State<List<User>>,
     currentPid: State<PID?>,
     addPlayer: (User?, String) -> Unit,
@@ -96,11 +99,12 @@ fun PlayerSettingScreenContent(
                     items = playersInGame,
                     key = { _, (id, _) -> id }
                 ) { i, (id, player) ->
+                    val user = users.value[id]
                     PlayerSettingCard(
                         id = id,
                         name = player.name,
-                        user = player.user?.self ?: false,
-                        remote = player.user != null,
+                        user = user?.self ?: false,
+                        remote = user != null,
                         frozen = player.frozen,
                         selected = id == currentPid.value,
                         settingActions = playerSettingActions,
@@ -116,7 +120,7 @@ fun PlayerSettingScreenContent(
             NoRemotePlayersLabel(Modifier.weight(1f))
         } else {
             val unboundPlayers = playersInGame
-                .filter { (_, p) -> p.user == null }
+                .filter { (id, _) -> id !in users.value }
                 .map { (id, p) -> id to p.name }
             LazyColumn(
                 modifier = Modifier
@@ -145,9 +149,9 @@ fun PlayerSettingScreenContent(
 @Composable
 private fun PlayerSettingScreenPreview() {
     val players = listOf(
-        1 to Player(null, "Abc", PlayerState(0, mapOf())),
-        2 to Player(User.Empty, "Def", PlayerState(0, mapOf())),
-        3 to Player(null, "Def", Player.Presence.FROZEN, PlayerState(0, mapOf()))
+        1 to Player("Abc", PlayerState.Empty),
+        2 to Player("Def", PlayerState.Empty),
+        3 to Player("Def", Player.Presence.FROZEN, PlayerState.Empty)
     )
     val remotePlayers = listOf(
         User(name = "Tre", netDevId = "fgdfg", self = true),
@@ -156,6 +160,7 @@ private fun PlayerSettingScreenPreview() {
     BoardGameAssistantTheme {
         PlayerSettingScreenContent(
             players = rememberUpdatedState(players),
+            users = rememberUpdatedState(mapOf(2 to User.Empty)),
             remotePlayers = rememberUpdatedState(remotePlayers),
             currentPid = rememberUpdatedState(null),
             addPlayer = { _, _ -> },

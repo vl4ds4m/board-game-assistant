@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.game.Users
 import org.vl4ds4m.board.game.assistant.ui.detailedGameSessionPreview
 import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
@@ -28,6 +29,7 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 @Composable
 fun ObserverGameScreen(
     players: State<Players>,
+    users: State<Users>,
     gameUiFactory: State<GameUI.Factory>,
     currentPid: State<PID?>,
     actions: State<Actions>,
@@ -54,6 +56,7 @@ fun ObserverGameScreen(
                     players.value.filterValues { it.active }
                 }
             },
+            users = users,
             currentPid = currentPid,
             onSelectPlayer = null,
             playerStats = gameUiFactory.value.playerStats,
@@ -82,6 +85,7 @@ private fun ObserverGameScreenPreview() {
         with(detailedGameSessionPreview) {
             ObserverGameScreen(
                 players = rememberUpdatedState(players.toMap()),
+                users = rememberUpdatedState(users),
                 gameUiFactory = rememberUpdatedState(GameUI),
                 currentPid = rememberUpdatedState(null),
                 actions = rememberUpdatedState(actions),

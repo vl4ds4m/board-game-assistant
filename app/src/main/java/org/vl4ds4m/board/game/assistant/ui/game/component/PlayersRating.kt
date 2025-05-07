@@ -15,11 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.game.Users
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 
 @Composable
 fun PlayersRating(
     players: State<Players>,
+    users: State<Users>,
     currentPid: State<PID?>,
     onSelectPlayer: ((PID) -> Unit)?,
     modifier: Modifier = Modifier,
@@ -53,12 +55,13 @@ fun PlayersRating(
             items = rating.value,
             key = { _, (id, _) -> id }
         ) { i, (id, player) ->
+            val user = users.value[id]
             val playerState = rememberUpdatedState(player.state)
             PlayerGameCard(
                 position = i + 1,
                 name = player.name,
-                user = player.user?.self ?: false,
-                remote = player.user != null,
+                user = user?.self ?: false,
+                remote = user != null,
                 frozen = player.frozen,
                 stats = { playerStats(playerState) },
                 selected = id == currentPid.value,

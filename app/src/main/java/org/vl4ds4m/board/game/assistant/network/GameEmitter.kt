@@ -17,7 +17,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.vl4ds4m.board.game.assistant.closeAndLog
 import org.vl4ds4m.board.game.assistant.data.User
-import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.game.Users
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.title
@@ -41,7 +41,7 @@ class GameEmitter(
     private val emitterState = MutableStateFlow(NetworkGameState.REGISTRATION)
 
     private val sessionState = MutableStateFlow<GameSession?>(null)
-    private val players: StateFlow<Players> = gameEnv.players
+    private val users: StateFlow<Users> = gameEnv.users
 
     private val produceGameState: () -> GameSession = gameEnv::save
 
@@ -144,7 +144,7 @@ class GameEmitter(
                 } else {
                     emitState(
                         state, output, input,
-                        players.value.isBound(networkPlayer),
+                        users.value.isBound(networkPlayer),
                     )
                 }
                 delay(1000)
@@ -175,7 +175,7 @@ class GameEmitter(
         output: ObjectOutputStream,
         input: ObjectInputStream
     ) {
-        val bound = session.players.toMap().isBound(networkPlayer)
+        val bound = session.users.isBound(networkPlayer)
         emitState(NetworkGameState.IN_GAME, output, input, bound)
         if (bound) {
             Json.encodeToString(session)
@@ -206,8 +206,8 @@ class GameEmitter(
     }
 }
 
-private fun Players.isBound(networkPlayer: User): Boolean = values.any {
-    it.user?.netDevId == networkPlayer.netDevId
+private fun Users.isBound(networkPlayer: User): Boolean = values.any {
+    it.netDevId == networkPlayer.netDevId
 }
 
 private const val TAG = "GameEmitter"

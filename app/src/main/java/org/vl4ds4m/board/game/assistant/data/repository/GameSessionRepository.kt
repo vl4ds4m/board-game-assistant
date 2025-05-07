@@ -15,6 +15,7 @@ import org.vl4ds4m.board.game.assistant.data.entity.UserEntity
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.OrderedPlayers
 import org.vl4ds4m.board.game.assistant.game.Player
+import org.vl4ds4m.board.game.assistant.game.Users
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
@@ -67,6 +68,7 @@ private val GameSessionData.gameSession
         type = GameType.valueOf(entity.type),
         name = entity.name,
         players = players.gamePlayers,
+        users = players.gameUsers,
         currentPid = entity.currentPid,
         nextNewPid = entity.nextNewPid,
         startTime = entity.startTime,
@@ -82,18 +84,22 @@ private val List<PlayerData>.gamePlayers: OrderedPlayers
     get() = map { data ->
         data.player.let { player ->
             player.id to Player(
-                user = data.user?.let { user ->
-                    User(
-                        netDevId = user.id,
-                        name = user.name,
-                        self = false
-                    )
-                },
                 name = player.name,
                 presence = player.presence,
                 state = PlayerState.fromJson(player.state)
             )
         }
+    }
+
+private val List<PlayerData>.gameUsers: Users
+    get() = mapNotNull { data ->
+        data.user?.let { data.player.id to it }
+    }.associate { (id, user) ->
+        id to User(
+            netDevId = user.id,
+            name = user.name,
+            self = false
+        )
     }
 
 private val List<GameActionEntity>.gameActions: List<GameAction>
@@ -117,21 +123,21 @@ private fun GameSession.asEntity(id: String) = GameSessionEntity(
 
 private fun GameSession.getPlayers(sessionId: String): List<PlayerData> =
     players.mapIndexed { index, (id, p) ->
-        val player = PlayerEntity(
-            sessionId = sessionId,
-            id = id,
-            userId = p.user?.netDevId,
-            name = p.name,
-            presence = p.presence,
-            state = p.state.toJson(),
-            order = index
-        )
-        val user = p.user?.let {
+        val user = users[id]?.let {
             UserEntity(
                 id = it.netDevId,
                 name = it.name,
             )
         }
+        val player = PlayerEntity(
+            sessionId = sessionId,
+            id = id,
+            userId = user?.id,
+            name = p.name,
+            presence = p.presence,
+            state = p.state.toJson(),
+            order = index
+        )
         PlayerData(player = player, user = user)
     }
 

@@ -25,9 +25,10 @@ fun NavGraphBuilder.observerNavigation(
             factory = GameObserverViewModel.createFactory(route)
         )
         val observer = viewModel.observerState.collectAsState()
-        val session = produceState(emptySession) {
+        val startSession = remember { createStartSession(route.name) }
+        val session = produceState(startSession) {
             viewModel.sessionState.collect {
-                value = it ?: emptySession
+                value = it ?: startSession
             }
         }
         val onBackClick: () -> Unit = { navController.navigateUp() }
@@ -40,6 +41,9 @@ fun NavGraphBuilder.observerNavigation(
         )
         val players = remember {
             derivedStateOf { session.value.players.toMap() }
+        }
+        val users = remember {
+            derivedStateOf { session.value.users }
         }
         val gameUiFactory = remember {
             derivedStateOf { session.value.type.uiFactory }
@@ -60,6 +64,7 @@ fun NavGraphBuilder.observerNavigation(
                 }
                 ObserverGameScreen(
                     players = players,
+                    users = users,
                     gameUiFactory = gameUiFactory,
                     currentPid = currentPid,
                     actions = actions,
@@ -68,6 +73,7 @@ fun NavGraphBuilder.observerNavigation(
             }
             NetworkGameState.END_GAME -> ObserverEndScreen(
                 players = players,
+                users = users,
                 gameUiFactory = gameUiFactory
             )
             NetworkGameState.EXIT -> onBackClick()
@@ -75,11 +81,12 @@ fun NavGraphBuilder.observerNavigation(
     }
 }
 
-private val emptySession = GameSession(
+private fun createStartSession(name: String) = GameSession(
     completed = false,
     type = SimpleOrdered,
-    name = "Game",
+    name = name,
     players = listOf(),
+    users = mapOf(),
     currentPid = null,
     nextNewPid = 1,
     startTime = null,

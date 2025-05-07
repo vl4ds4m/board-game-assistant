@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.game.Users
 import org.vl4ds4m.board.game.assistant.ui.detailedGameSessionPreview
 import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
@@ -38,6 +39,7 @@ fun EndGameScreen(
     val viewModel = viewModel<GameViewModel>()
     EndGameScreenContent(
         players = viewModel.players.collectAsState(),
+        users = viewModel.users.collectAsState(),
         playerStats = viewModel.gameUi.playerStats,
         navigateHome = navigateHome,
         modifier = modifier
@@ -47,6 +49,7 @@ fun EndGameScreen(
 @Composable
 fun EndGameScreenContent(
     players: State<Players>,
+    users: State<Users>,
     playerStats: PlayerStats,
     navigateHome: () -> Unit,
     modifier: Modifier = Modifier
@@ -75,6 +78,7 @@ fun EndGameScreenContent(
         HorizontalDivider()
         PlayersRating(
             players = players,
+            users = users,
             currentPid = rememberUpdatedState(null),
             onSelectPlayer = null,
             playerStats = playerStats,
@@ -91,13 +95,14 @@ fun EndGameScreenContent(
 @Composable
 private fun EndGameScreenPreview() {
     BoardGameAssistantTheme {
-        EndGameScreenContent(
-            players = rememberUpdatedState(
-                detailedGameSessionPreview.players.toMap()
-            ),
-            playerStats = GameUI.playerStats,
-            navigateHome = {},
-            modifier = Modifier.fillMaxSize()
-        )
+        with(detailedGameSessionPreview) {
+            EndGameScreenContent(
+                players = rememberUpdatedState(players.toMap()),
+                users = rememberUpdatedState(users),
+                playerStats = GameUI.playerStats,
+                navigateHome = {},
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }

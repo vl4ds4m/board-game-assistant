@@ -31,13 +31,10 @@ class GameObserverViewModel(
     val sessionState: StateFlow<GameSession?> = observer.sessionState
         .combine(userDataRepository.netDevId) { session, netDevId ->
             session?.let {
-                val players = session.players.map { (id, player) ->
-                    val user = player.user?.let {
-                        it.copy(self = it.netDevId == netDevId)
-                    }
-                    id to player.copy(user = user)
+                val users = session.users.mapValues { (_, user) ->
+                    user.copy(self = user.netDevId == netDevId)
                 }
-                session.copy(players = players)
+                session.copy(users = users)
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)

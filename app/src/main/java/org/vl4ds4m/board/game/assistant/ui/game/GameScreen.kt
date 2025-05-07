@@ -36,6 +36,7 @@ import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.game.Users
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
@@ -108,6 +109,7 @@ fun GameScreen(
     val ui = viewModel.gameUi
     GameScreenContent(
         players = viewModel.players.collectAsState(),
+        users = viewModel.users.collectAsState(),
         currentPid = viewModel.currentPid.collectAsState(),
         actions = viewModel.actions.collectAsState(),
         showAction = ui.actionLog,
@@ -122,6 +124,7 @@ fun GameScreen(
 @Composable
 fun GameScreenContent(
     players: State<Players>,
+    users: State<Users>,
     currentPid: State<PID?>,
     actions: State<Actions>,
     showAction: @Composable (GameAction, Players) -> String,
@@ -151,6 +154,7 @@ fun GameScreenContent(
                     players.value.filterValues { it.active }
                 }
             },
+            users = users,
             currentPid = currentPid,
             onSelectPlayer = selectPlayer,
             playerStats = playerStats,
@@ -210,6 +214,7 @@ private fun GameScreenPreview() {
         with(detailedGameSessionPreview) {
             GameScreenContent(
                 players = rememberUpdatedState(players.toMap()),
+                users = rememberUpdatedState(users),
                 currentPid = rememberUpdatedState(currentPid),
                 actions = rememberUpdatedState(actions),
                 showAction = GameUI.actionLog,

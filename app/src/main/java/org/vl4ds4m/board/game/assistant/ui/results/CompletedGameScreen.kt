@@ -32,7 +32,8 @@ import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.GameType
-import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.game.OrderedPlayers
+import org.vl4ds4m.board.game.assistant.game.Users
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.localDateTime
 import org.vl4ds4m.board.game.assistant.prettyTime
@@ -74,7 +75,8 @@ fun CompletedGameScreen(
         }
         CompletedGameScreenContent(
             type = it.type,
-            players = it.players.toMap(),
+            players = it.players,
+            users = it.users,
             startTime = it.startTime,
             stopTime = it.stopTime,
             duration = it.duration,
@@ -94,7 +96,8 @@ fun CompletedGameScreen(
 @Composable
 fun CompletedGameScreenContent(
     type: GameType,
-    players: Players,
+    players: OrderedPlayers,
+    users: Users,
     startTime: Long?,
     stopTime: Long?,
     duration: Long?,
@@ -152,10 +155,11 @@ fun CompletedGameScreenContent(
                     ratingVisible.value = false
                 }
             }
-            val playersState = remember { mutableStateOf(players) }
+            val ps = remember { mutableStateOf(players.toMap()) }
             if (ratingVisible.value) {
                 PlayersRating(
-                    players = playersState,
+                    players = ps,
+                    users = remember { mutableStateOf(users) },
                     currentPid = remember { mutableStateOf(null) },
                     onSelectPlayer = null,
                     playerStats = type.uiFactory.playerStats,
@@ -163,7 +167,7 @@ fun CompletedGameScreenContent(
                 )
             } else {
                 GameHistory(
-                    players = playersState,
+                    players = ps,
                     actions = remember { mutableStateOf(actions) },
                     showAction = type.uiFactory.actionLog,
                     modifier = Modifier.weight(1f)
@@ -257,7 +261,8 @@ private fun CompletedGameScreenPreview() {
         with(detailedGameSessionPreview) {
             CompletedGameScreenContent(
                 type = type,
-                players = players.toMap(),
+                players = players,
+                users = users,
                 startTime = startTime,
                 stopTime = stopTime,
                 duration = duration,

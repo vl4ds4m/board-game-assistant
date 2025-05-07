@@ -27,23 +27,12 @@ interface GameSessionDao {
     @Transaction
     suspend fun insertSession(data: GameSessionData) {
         insertSession(data.entity)
-        deletePlayers(getPlayers(data.entity.id))
         insertPlayersData(data.players)
-        deleteActions(getActions(data.entity.id))
         insertActions(data.actions)
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSession(entity: GameSessionEntity)
-
-    @Query(
-        "SELECT * FROM ${PlayerEntity.TABLE_NAME} " +
-        "WHERE ${PlayerEntity.SESSION_ID} = :sessionId"
-    )
-    suspend fun getPlayers(sessionId: String): List<PlayerEntity>
-
-    @Delete
-    suspend fun deletePlayers(entities: List<PlayerEntity>)
 
     @Transaction
     suspend fun insertPlayersData(data: List<PlayerData>) {
@@ -53,20 +42,11 @@ interface GameSessionDao {
         insertPlayers(players)
     }
 
-    @Insert
-    suspend fun insertPlayers(entities: List<PlayerEntity>)
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUsers(entities: List<UserEntity>)
 
-    @Query(
-        "SELECT * FROM ${GameActionEntity.TABLE_NAME} " +
-        "WHERE ${GameActionEntity.SESSION_ID} = :sessionId"
-    )
-    suspend fun getActions(sessionId: String): List<GameActionEntity>
-
-    @Delete
-    suspend fun deleteActions(entities: List<GameActionEntity>)
+    @Insert
+    suspend fun insertPlayers(entities: List<PlayerEntity>)
 
     @Insert
     suspend fun insertActions(entities: List<GameActionEntity>)

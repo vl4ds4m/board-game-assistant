@@ -52,6 +52,13 @@ class GameSessionRepository(
             }
         }
     }
+
+    fun removeSession(id: String) {
+        val pk = GameSessionEntity.PK(id)
+        coroutineScope.launch {
+            sessionDao.removeSession(pk)
+        }
+    }
 }
 
 private val GameSessionData.gameSession

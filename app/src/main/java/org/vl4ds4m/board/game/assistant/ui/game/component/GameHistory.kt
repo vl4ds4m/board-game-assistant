@@ -12,14 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.Players
-import org.vl4ds4m.board.game.assistant.game.log.GameAction
+import org.vl4ds4m.board.game.assistant.ui.game.ActionLog
 
 @Composable
 fun GameHistory(
     players: State<Players>,
     actions: State<Actions>,
     modifier: Modifier = Modifier,
-    showAction: @Composable (GameAction, Players) -> String
+    showAction: ActionLog
 ) {
     val listState = rememberLazyListState()
     LaunchedEffect(actions.value) {

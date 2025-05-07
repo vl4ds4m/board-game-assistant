@@ -51,6 +51,10 @@
     <string name="game_results_stop_time">Окончание</string>
     <string name="game_results_duration">Продолжительность</string>
     <string name="game_results_rating">Рейтинг</string>
+    <string name="game_results_actions">История ходов</string>
+    <string name="game_results_remove_msg">Вы уверены, что хотите удалить этот результат?</string>
+    <string name="game_results_remove_confirm">Удалить</string>
+    <string name="game_results_remove_cancel">Отмена</string>
     <string name="game_menu_game_settings">Открыть настройки игры</string>
     <string name="game_menu_player_settings">Открыть настройки игроков</string>
     <string name="game_menu_dice_imitation">Бросить кости</string>

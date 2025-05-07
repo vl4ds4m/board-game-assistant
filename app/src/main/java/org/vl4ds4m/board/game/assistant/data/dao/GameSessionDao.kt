@@ -70,4 +70,7 @@ interface GameSessionDao {
 
     @Insert
     suspend fun insertActions(entities: List<GameActionEntity>)
+
+    @Delete(entity = GameSessionEntity::class)
+    suspend fun removeSession(pk: GameSessionEntity.PK)
 }

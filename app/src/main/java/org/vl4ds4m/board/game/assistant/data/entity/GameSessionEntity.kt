@@ -44,6 +44,11 @@ data class GameSessionEntity(
     @ColumnInfo(name = CURRENT_ACTION_POSITION)
     val currentActionPosition: Int,
 ) {
+    data class PK(
+        @ColumnInfo(name = ID)
+        val id: String
+    )
+
     companion object {
         const val TABLE_NAME = "sessions"
         const val ID = "id"

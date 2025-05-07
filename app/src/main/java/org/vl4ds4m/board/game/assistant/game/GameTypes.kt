@@ -29,6 +29,9 @@ sealed interface GameType {
     @get:StringRes
     val localizedStringId: Int
 
+    @get:StringRes
+    val descResId: Int
+
     fun createGameEnv(): GameEnv
 
     val viewModelProducer: GameViewModelProducer<GameViewModel>
@@ -63,6 +66,8 @@ data object Free : GameType {
 
     override val localizedStringId = R.string.game_type_free
 
+    override val descResId = R.string.free_game_description
+
     override fun createGameEnv() = FreeGameEnv()
 
     override val viewModelProducer = FreeGameViewModel
@@ -79,6 +84,8 @@ data object SimpleOrdered : OrderedGameType {
 
     override val localizedStringId = R.string.game_type_simple
 
+    override val descResId = R.string.simple_game_description
+
     override fun createGameEnv() = SimpleOrderedGameEnv()
 
     override val viewModelProducer = SimpleOrderedGameViewModel
@@ -91,6 +98,8 @@ data object Dice : OrderedGameType {
     override val title: String = "Dice"
 
     override val localizedStringId = R.string.game_type_dice
+
+    override val descResId = R.string.dice_game_description
 
     override fun createGameEnv() = DiceGameEnv()
 
@@ -105,6 +114,8 @@ data object Carcassonne : OrderedGameType {
 
     override val localizedStringId = R.string.game_type_carcassonne
 
+    override val descResId = R.string.carcassonne_game_description
+
     override fun createGameEnv() = CarcassonneGameEnv()
 
     override val viewModelProducer = CarcassonneGameViewModel
@@ -117,6 +128,8 @@ data object Monopoly : OrderedGameType {
     override val title: String = "Monopoly"
 
     override val localizedStringId = R.string.game_type_monopoly
+
+    override val descResId = R.string.monopoly_game_description
 
     override fun createGameEnv() = MonopolyGameEnv()
 

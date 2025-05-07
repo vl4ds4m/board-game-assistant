@@ -17,6 +17,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.vl4ds4m.board.game.assistant.closeAndLog
 import org.vl4ds4m.board.game.assistant.data.User
+import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.Users
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
@@ -69,7 +70,7 @@ class GameEmitter(
         }
     }
 
-    fun startEmit(id: String, name: String) {
+    fun startEmit(id: String, type: GameType, name: String) {
         serverSocket?.let {
             Log.e(TAG, "During start emit ServerSocket is still not null")
             closeServerSocket()
@@ -83,7 +84,7 @@ class GameEmitter(
             serverSocket = it
         }
         playerSockets.value = listOf()
-        sessionEmitter.register(id, name, serverSocket.localPort)
+        sessionEmitter.register(id, type, name, serverSocket.localPort)
         scope.launch(Dispatchers.IO) {
             while (true) {
                 val socket: Socket

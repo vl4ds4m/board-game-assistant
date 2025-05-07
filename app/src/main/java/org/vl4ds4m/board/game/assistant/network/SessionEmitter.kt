@@ -3,14 +3,16 @@ package org.vl4ds4m.board.game.assistant.network
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.util.Log
+import org.vl4ds4m.board.game.assistant.game.GameType
 
 class SessionEmitter(private val nsdManager: NsdManager) {
-    fun register(id: String, name: String, port: Int) {
+    fun register(id: String, type: GameType, name: String, port: Int) {
         NsdServiceInfo().apply {
             serviceType = SERVICE_TYPE
             serviceName = SERVICE_NAME
             this.port = port
             setAttribute(RemoteSessionInfo.TXT_ID, id)
+            setAttribute(RemoteSessionInfo.TXT_TYPE, type.title)
             setAttribute(RemoteSessionInfo.TXT_NAME, name)
         }.let {
             nsdManager.registerService(it, PROTOCOL_TYPE, listener)

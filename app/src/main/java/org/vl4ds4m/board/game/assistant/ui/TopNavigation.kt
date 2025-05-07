@@ -5,10 +5,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
-import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
 import org.vl4ds4m.board.game.assistant.ui.game.Game
 import org.vl4ds4m.board.game.assistant.ui.game.NewGameStart
+import org.vl4ds4m.board.game.assistant.ui.game.observer.GameObserver
 import org.vl4ds4m.board.game.assistant.ui.play.PlayScreen
 import org.vl4ds4m.board.game.assistant.ui.play.PlayViewModel
 import org.vl4ds4m.board.game.assistant.ui.profile.ProfileScreen
@@ -39,13 +39,9 @@ fun NavGraphBuilder.topNavigation(
                     navController.navigate(it)
                 }
             },
-            observeGame = { id, title, ip, port ->
-                RemoteSessionInfo(
-                    id = id, name = title,
-                    ip = ip, port = port
-                ).let {
-                    navController.navigate(it)
-                }
+            observeGame = { info ->
+                val route = GameObserver.from(info)
+                navController.navigate(route)
             }
         )
     }

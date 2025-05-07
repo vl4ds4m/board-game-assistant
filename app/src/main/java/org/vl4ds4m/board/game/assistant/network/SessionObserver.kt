@@ -4,8 +4,10 @@ import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo.Companion.TXT_ID
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo.Companion.TXT_NAME
+import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo.Companion.TXT_TYPE
 import org.vl4ds4m.board.game.assistant.updateMap
 
 class SessionObserver(private val nsdManager: NsdManager) {
@@ -76,11 +78,14 @@ private const val TAG = "SessionObserver"
 private val NsdServiceInfo.toRemoteSession: RemoteSessionInfo? get() {
     val id = attributes[TXT_ID]
         ?.let { String(it) } ?: return null
+    val type = attributes[TXT_TYPE]
+        ?.let { String(it) } ?: return null
     val name = attributes[TXT_NAME]
         ?.let { String(it) } ?: return null
     return RemoteSessionInfo(
         id = id,
         name = name,
+        type = GameType.valueOf(type),
         ip = host.canonicalHostName,
         port = port
     )

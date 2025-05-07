@@ -55,7 +55,11 @@ abstract class GameViewModel(
                     ?.let { gameEnv.load(it) }
                     ?: Log.e(TAG, "Can't load game session[id = $id] as it doesn't exist")
             }
-            gameEmitter.startEmit(this@GameViewModel.sessionId, gameEnv.name.value)
+            gameEmitter.startEmit(
+                this@GameViewModel.sessionId,
+                gameEnv.type,
+                gameEnv.name.value
+            )
         }
     }
 

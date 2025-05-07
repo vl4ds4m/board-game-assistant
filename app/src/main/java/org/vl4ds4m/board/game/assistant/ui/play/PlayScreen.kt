@@ -23,7 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
+import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.GameType
+import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.component.GameSessionCard
@@ -35,7 +37,7 @@ fun PlayScreen(
     viewModel: PlayViewModel,
     startNewGame: () -> Unit,
     proceedGame: (String, GameType) -> Unit,
-    observeGame: (String, String, String, Int) -> Unit,
+    observeGame: (RemoteSessionInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     PlayScreenContent(
@@ -54,7 +56,7 @@ fun PlayScreenContent(
     remoteSessions: State<List<RemoteSessionInfo>>,
     clickNewGame: () -> Unit,
     clickSession: (String, GameType) -> Unit,
-    clickRemoteGame: (String, String, String, Int) -> Unit,
+    clickRemoteGame: (RemoteSessionInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -142,10 +144,10 @@ fun PlayScreenContent(
                 ) { index, session ->
                     GameSessionCard(
                         name = "${index + 1}. ${session.name}",
-                        type = "",
+                        type = stringResource(session.type.localizedStringId),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        session.run { clickRemoteGame(id, name, ip, port) }
+                        session.run { clickRemoteGame(session) }
                     }
                 }
             }
@@ -160,8 +162,20 @@ private fun PlayScreenWithSessionsPreview() {
         it.copy(completed = false)
     }
     val remoteSessions = listOf(
-        RemoteSessionInfo("remote_1", "Milki Way", "100.0.0.100", 11234),
-        RemoteSessionInfo("remote_2", "Catch me if you can", "100.0.0.105", 41831)
+        RemoteSessionInfo(
+            id = "remote_1",
+            type = SimpleOrdered,
+            name = "Milki Way",
+            ip = "100.0.0.100",
+            port = 11234
+        ),
+        RemoteSessionInfo(
+            id = "remote_2",
+            type = Free,
+            name = "Catch me if you can",
+            ip = "100.0.0.105",
+            port = 41831
+        )
     )
     PlayScreenPreview(sessionsInfo, remoteSessions)
 }
@@ -183,7 +197,7 @@ private fun PlayScreenPreview(
             remoteSessions = remember { mutableStateOf(remoteSession) },
             clickNewGame = {},
             clickSession = { _, _ -> },
-            clickRemoteGame = { _, _, _, _ -> },
+            clickRemoteGame = {},
             modifier = Modifier.fillMaxSize()
         )
     }

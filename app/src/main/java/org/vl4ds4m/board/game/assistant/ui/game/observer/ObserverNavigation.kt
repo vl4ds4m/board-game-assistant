@@ -9,23 +9,53 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
+import kotlinx.serialization.Serializable
+import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.network.NetworkGameState
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
 
+@Serializable
+data class GameObserver(
+    val sessionId: String,
+    val type: String,
+    val name: String,
+    val address: String,
+    val port: Int
+) {
+    fun toRemoteSessionInfo() = RemoteSessionInfo(
+        id = sessionId,
+        type = GameType.valueOf(type),
+        name = name,
+        ip = address,
+        port = port
+    )
+
+    companion object {
+        fun from(info: RemoteSessionInfo) = GameObserver(
+            sessionId = info.id,
+            type = info.type.title,
+            name = info.name,
+            address = info.ip,
+            port = info.port
+        )
+    }
+}
+
 fun NavGraphBuilder.observerNavigation(
     navController: NavController,
     topBarUiState: TopBarUiState
 ) {
-    composable<RemoteSessionInfo> { entry ->
-        val route = entry.toRoute<RemoteSessionInfo>()
+    composable<GameObserver> { entry ->
+        val sessionInfo = entry.toRoute<GameObserver>().toRemoteSessionInfo()
         val viewModel = viewModel<GameObserverViewModel>(
-            factory = GameObserverViewModel.createFactory(route)
+            factory = GameObserverViewModel.createFactory(sessionInfo)
         )
         val observer = viewModel.observerState.collectAsState()
-        val startSession = remember { createStartSession(route.name) }
+        val startSession = remember {
+            createStartSession(sessionInfo.name, sessionInfo.type)
+        }
         val session = produceState(startSession) {
             viewModel.sessionState.collect {
                 value = it ?: startSession
@@ -81,9 +111,9 @@ fun NavGraphBuilder.observerNavigation(
     }
 }
 
-private fun createStartSession(name: String) = GameSession(
+private fun createStartSession(name: String, type: GameType) = GameSession(
     completed = false,
-    type = SimpleOrdered,
+    type = type,
     name = name,
     players = listOf(),
     users = mapOf(),

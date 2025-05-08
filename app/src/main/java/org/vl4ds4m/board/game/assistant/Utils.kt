@@ -39,12 +39,12 @@ inline fun <T> MutableStateFlow<T>.updateAndGetStates(function: (T) -> T): State
     }
 }
 
-fun Closeable.closeAndLog(tag: String, title: String) {
+fun Closeable.closeAndLog(tag: String, name: String) {
     try {
         close()
-        Log.i(tag, "$title is closed")
+        Log.d(tag, "$name is closed")
     } catch (e: IOException) {
-        Log.w(tag, "Can't close $title: $e")
+        Log.w(tag, "Can't close $name: $e")
     }
 }
 

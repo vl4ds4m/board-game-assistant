@@ -28,7 +28,7 @@ abstract class GameViewModel(
 
     private val gameEmitter = GameEmitter(gameEnv, viewModelScope, app.sessionEmitter)
 
-    val remotePlayers: StateFlow<List<User>> = gameEmitter.remotePlayers
+    val remotePlayers: StateFlow<List<User>> = gameEmitter.users
         .combine(app.userDataRepository.user) { users, user ->
             users.map { it.copy(self = false) } + user
         }
@@ -49,7 +49,7 @@ abstract class GameViewModel(
                     ?.let { gameEnv.load(it) }
                     ?: Log.e(TAG, "Can't load game session[id = $id] as it doesn't exist")
             }
-            gameEmitter.startEmit(
+            gameEmitter.start(
                 this@GameViewModel.sessionId,
                 gameEnv.type,
                 gameEnv.name.value
@@ -66,7 +66,7 @@ abstract class GameViewModel(
             gameEnv.save()
                 .let { sessionRepository.saveSession(it, sessionId) }
         }
-        gameEmitter.stopEmit()
+        gameEmitter.stop()
         super.onCleared()
     }
 

@@ -5,12 +5,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
@@ -18,197 +20,209 @@ import kotlinx.serialization.json.Json
 import org.vl4ds4m.board.game.assistant.closeAndLog
 import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.game.GameType
-import org.vl4ds4m.board.game.assistant.game.Users
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.title
 import org.vl4ds4m.board.game.assistant.updateList
+import java.io.Closeable
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.net.ServerSocket
 import java.net.Socket
 
 class GameEmitter(
-    gameEnv: GameEnv,
+    private val gameEnv: GameEnv,
     private val scope: CoroutineScope,
     private val sessionEmitter: SessionEmitter
 ) {
-    private val mRemotePlayers = MutableStateFlow<List<User>>(listOf())
-    val remotePlayers: StateFlow<List<User>> = mRemotePlayers.asStateFlow()
+    private val mUsers = MutableStateFlow<List<User>>(listOf())
+    val users: StateFlow<List<User>> = mUsers.asStateFlow()
 
-    private var serverSocket: ServerSocket? = null
-    private val playerSockets = MutableStateFlow<List<Socket>?>(null)
+    private var server: Server? = null
+    private val connections = MutableStateFlow<List<Connection>?>(null)
 
-    private val emitterState = MutableStateFlow(NetworkGameState.REGISTRATION)
-
-    private val sessionState = MutableStateFlow<GameSession?>(null)
-    private val users: StateFlow<Users> = gameEnv.users
+    private val networkGameState = MutableStateFlow(NetworkGameState.REGISTRATION)
+    private val gameSessionState = MutableStateFlow<GameSession?>(null)
+    private val gameState: StateFlow<Pair<NetworkGameState, GameSession?>> =
+        networkGameState.combine(gameSessionState) { ns, gs ->
+            ns to gs
+        }.stateIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = networkGameState.value to gameSessionState.value
+        )
 
     private val produceGameState: () -> GameSession = gameEnv::save
 
-    private val lastUpdate = MutableStateFlow(false)
+    fun start(id: String, type: GameType, name: String) {
+        closeSockets()
+        val server = Server().also { server = it }
+        connections.value = listOf()
+        sessionEmitter.register(id, type, name, server.port)
+        launchGameStateUpdate()
+        scope.launch(Dispatchers.IO) {
+            server.use { _ ->
+                while (true) {
+                    val connection = server.accept() ?: break
+                    if (!addAtomically(connection)) break
+                    connection.startExchange()
+                }
+            }
+        }
+    }
 
-    init {
-        gameEnv.initialized.combine(gameEnv.completed) {
-            init, comp -> init to comp
-        }.onEach { (initialized, completed) ->
+    private fun launchGameStateUpdate() {
+        gameEnv.initialized.combine(gameEnv.completed) { initialized, completed ->
             val state = when {
                 !initialized -> NetworkGameState.REGISTRATION
                 completed -> NetworkGameState.END_GAME
                 else -> NetworkGameState.IN_GAME
             }
-            emitterState.value = state
-            lastUpdate.value = state == NetworkGameState.END_GAME
+            if (state == NetworkGameState.END_GAME) {
+                gameSessionState.value = produceGameState()
+            }
+            networkGameState.value = state
         }.launchIn(scope)
         scope.launch {
             while (true) {
-                if (emitterState.value == NetworkGameState.IN_GAME) {
-                    sessionState.value = produceGameState()
+                if (networkGameState.value == NetworkGameState.IN_GAME) {
+                    gameSessionState.value = produceGameState()
                 }
                 delay(1000)
             }
         }
     }
 
-    fun startEmit(id: String, type: GameType, name: String) {
-        serverSocket?.let {
-            Log.e(TAG, "During start emit ServerSocket is still not null")
-            closeServerSocket()
-        }
-        playerSockets.value?.let {
-            Log.e(TAG, "During start emit PlayersSockets already initialized")
-            closePlayerSockets()
-        }
-        val serverSocket = ServerSocket(0).also {
-            Log.i(TAG, "Open ServerSocket(${it.localPort})")
-            serverSocket = it
-        }
-        playerSockets.value = listOf()
-        sessionEmitter.register(id, type, name, serverSocket.localPort)
-        scope.launch(Dispatchers.IO) {
-            while (true) {
-                val socket: Socket
-                try {
-                    socket = serverSocket.accept()
-                } catch (e: Exception) {
-                    Log.i(TAG, "ServerSocket: $e")
-                    break
-                }
-                Log.i(TAG, "Open PlayerSocket(${socket.inetAddress})")
-                if (!addPlayerSocket(socket)) break
-                scope.launch(Dispatchers.IO) {
-                    try {
-                        val input = ObjectInputStream(socket.getInputStream())
-                        val output = ObjectOutputStream(socket.getOutputStream())
-                        emit(input, output)
-                    } catch (e: Exception) {
-                        Log.i(TAG, "PlayerSocket(${socket.inetAddress}): $e")
-                    }
-                }
-            }
-        }
-    }
-
-    private fun addPlayerSocket(socket: Socket): Boolean {
-        val result = playerSockets.value?.let {
-            playerSockets.compareAndSet(it, it + socket)
+    private fun addAtomically(connection: Connection): Boolean {
+        val result = connections.value?.let {
+            connections.compareAndSet(it, it + connection)
         } ?: false
         if (!result) {
-            socket.closeAndLog(TAG, "PlayerSocket(${socket.inetAddress})")
+            connection.close()
         }
         return result
     }
 
-    private suspend fun emit(
-        input: ObjectInputStream,
-        output: ObjectOutputStream
-    ): Unit = withContext(Dispatchers.IO) {
-        val networkPlayer = input.readObject()
-            .let { it as String }
-            .let { Json.decodeFromString<User>(it) }
-            .also {
-                mRemotePlayers.updateList { add(it) }
+    fun stop() {
+        sessionEmitter.unregister()
+        closeSockets()
+    }
+
+    private fun closeSockets() {
+        server?.let {
+            it.close()
+            server = null
+        }
+        connections.getAndUpdate { null }
+            ?.forEach { it.close() }
+    }
+
+    private inner class Server : Closeable {
+        private val serverSocket = ServerSocket(0)
+
+        val port: Int = serverSocket.localPort
+
+        init {
+            Log.i(EMITTER, "Open $SERVER($port)")
+        }
+
+        override fun close() {
+            serverSocket.closeAndLog(EMITTER, SERVER)
+        }
+
+        fun accept(): Connection? {
+            val socket: Socket
+            try {
+                socket = serverSocket.accept()
+            } catch (e: Exception) {
+                Log.i(EMITTER, "$SERVER: $e")
+                return null
             }
-        try {
-            while (true) {
-                val state = emitterState.value
-                if (state == NetworkGameState.END_GAME && lastUpdate.value) {
-                    sessionState.value = produceGameState().also {
-                        emitInGameState(it, networkPlayer, output, input)
-                    }
-                    lastUpdate.value = false
-                }
-                if (state == NetworkGameState.IN_GAME) {
-                    sessionState.value?.let {
-                        emitInGameState(it, networkPlayer, output, input)
-                    }
-                } else {
-                    emitState(
-                        state, output, input,
-                        users.value.isBound(networkPlayer),
-                    )
-                }
-                delay(1000)
-            }
-        } finally {
-            mRemotePlayers.updateList {
-                removeIf { it.netDevId == networkPlayer.netDevId }
-            }
+            return Connection(socket)
         }
     }
 
-    private fun emitState(
-        state: NetworkGameState,
-        output: ObjectOutputStream,
-        input: ObjectInputStream,
-        bound: Boolean
-    ) {
-        val actualState =
-            if (bound) state
-            else NetworkGameState.REGISTRATION
-        output.writeObject(actualState.title)
-        input.readObject()
-    }
+    private inner class Connection(private val socket: Socket) : Closeable {
+        private val address = socket.inetAddress
 
-    private fun emitInGameState(
-        session: GameSession,
-        networkPlayer: User,
-        output: ObjectOutputStream,
-        input: ObjectInputStream
-    ) {
-        val bound = session.users.isBound(networkPlayer)
-        emitState(NetworkGameState.IN_GAME, output, input, bound)
-        if (bound) {
-            Json.encodeToString(session)
+        private lateinit var input: ObjectInputStream
+        private lateinit var output: ObjectOutputStream
+
+        init {
+            Log.i(EMITTER, "Open $CONNECTION($address)")
+        }
+
+        override fun close() {
+            socket.closeAndLog(EMITTER, "$CONNECTION($address)")
+        }
+
+        fun startExchange() {
+            scope.launch(Dispatchers.IO) {
+                socket.use { _ ->
+                    try {
+                        input = ObjectInputStream(socket.getInputStream())
+                        output = ObjectOutputStream(socket.getOutputStream())
+                        run()
+                    } catch (e: Exception) {
+                        Log.i(EMITTER, "$CONNECTION($address): $e")
+                    }
+                }
+            }
+        }
+
+        private suspend fun run(): Unit = withContext(Dispatchers.IO) {
+            val user = input.readObject()
+                .let { it as String }
+                .let { Json.decodeFromString<User>(it) }
+                .also {
+                    mUsers.updateList { add(it) }
+                }
+            try {
+                gameState.collectLatest { (networkState, sessionState) ->
+                    when(networkState) {
+                        NetworkGameState.REGISTRATION, NetworkGameState.EXIT -> {
+                            emitState(networkState)
+                        }
+                        NetworkGameState.END_GAME -> {
+                            if (user.isBound) {
+                                emitGameSession(sessionState)
+                                emitState(networkState)
+                            }
+                        }
+                        NetworkGameState.IN_GAME -> {
+                            if (user.isBound) {
+                                emitGameSession(sessionState)
+                            }
+                        }
+                    }
+                }
+            } finally {
+                mUsers.updateList {
+                    removeIf { it.netDevId == user.netDevId }
+                }
+            }
+        }
+
+        private fun emitState(state: NetworkGameState) {
+            output.writeObject(state.title)
+            input.readObject()
+        }
+
+        private fun emitGameSession(state: GameSession?) {
+            state ?: return
+            emitState(NetworkGameState.IN_GAME)
+            Json.encodeToString(state)
                 .let { output.writeObject(it) }
                 .also { input.readObject() }
         }
-    }
 
-    fun stopEmit() {
-        sessionEmitter.unregister()
-        closeServerSocket()
-        closePlayerSockets()
-    }
-
-    private fun closeServerSocket() {
-        serverSocket?.let {
-            it.closeAndLog(TAG, "ServetSocket")
-            serverSocket = null
-        }
-    }
-
-    private fun closePlayerSockets() {
-        playerSockets.getAndUpdate {
-            null
-        }?.forEach {
-            it.closeAndLog(TAG, "PlayerSocket(${it.inetAddress})")
-        }
+        private val User.isBound: Boolean
+            get() = gameSessionState.value?.users?.values?.any {
+                it.netDevId == this.netDevId
+            } ?: false
     }
 }
 
-private fun Users.isBound(networkPlayer: User): Boolean = values.any {
-    it.netDevId == networkPlayer.netDevId
-}
-
-private const val TAG = "GameEmitter"
+private const val EMITTER = "GameEmitter"
+private const val SERVER = "Server"
+private const val CONNECTION = "Connection"

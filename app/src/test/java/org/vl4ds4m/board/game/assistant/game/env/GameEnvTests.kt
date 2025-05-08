@@ -3,6 +3,7 @@ package org.vl4ds4m.board.game.assistant.game.env
 import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 
 class GameEnvTests {
@@ -15,16 +16,16 @@ class GameEnvTests {
 
     @Test
     fun addPlayers() {
-        gameEnv.addPlayer("1", "Hello")
+        gameEnv.addPlayer(User(netDevId = "1", self = false, name = ""), "Hello")
         gameEnv.addPlayer(null, "Bar")
-        gameEnv.addPlayer("4", "Hello")
-        gameEnv.addPlayer("1fgh", "Foo")
+        gameEnv.addPlayer(User(netDevId = "4", self = false, name = ""), "Hello")
+        gameEnv.addPlayer(User(netDevId = "1fgh", self = false, name = ""), "Foo")
         assertEquals(4, gameEnv.players.value.size)
     }
 
     @Test
     fun checkCurrentPlayerId() {
-        val idState = gameEnv.currentPlayerId
+        val idState = gameEnv.currentPid
         assertEquals(null, idState.value)
         val idA = gameEnv.addPlayer(null, "A")
         assertEquals(idA, idState.value)

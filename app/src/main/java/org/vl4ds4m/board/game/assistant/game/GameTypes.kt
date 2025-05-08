@@ -8,26 +8,35 @@ import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.game.monopoly.MonopolyGameEnv
 import org.vl4ds4m.board.game.assistant.game.simple.FreeGameEnv
 import org.vl4ds4m.board.game.assistant.game.simple.SimpleOrderedGameEnv
-import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.simple.FreeGameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameViewModel
-import org.vl4ds4m.board.game.assistant.ui.game.simple.SimpleOrderedGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModelProducer
-import org.vl4ds4m.board.game.assistant.ui.game.component.GameActionPresenter
-import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameActionPresenter
+import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameUI
+import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameUI
+import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameUI
+import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.simple.FreeGameUI
+import org.vl4ds4m.board.game.assistant.ui.game.simple.FreeGameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.simple.SimpleOrderedGameUI
+import org.vl4ds4m.board.game.assistant.ui.game.simple.SimpleOrderedGameViewModel
 
 @Serializable
 sealed interface GameType {
     val title: String
 
     @get:StringRes
-    val localizedStringId: Int
+    val nameResId: Int
+
+    @get:StringRes
+    val descResId: Int
 
     fun createGameEnv(): GameEnv
 
     val viewModelProducer: GameViewModelProducer<GameViewModel>
+
+    val uiFactory: GameUI.Factory
 
     companion object {
         val entries: List<GameType> = listOf(
@@ -55,11 +64,15 @@ sealed interface GameType {
 data object Free : GameType {
     override val title: String = "Free"
 
-    override val localizedStringId = R.string.game_type_free
+    override val nameResId = R.string.game_type_free
+
+    override val descResId = R.string.free_game_description
 
     override fun createGameEnv() = FreeGameEnv()
 
     override val viewModelProducer = FreeGameViewModel
+
+    override val uiFactory = FreeGameUI
 }
 
 @Serializable
@@ -69,48 +82,58 @@ sealed interface OrderedGameType : GameType
 data object SimpleOrdered : OrderedGameType {
     override val title: String = "Ordered"
 
-    override val localizedStringId = R.string.game_type_simple
+    override val nameResId = R.string.game_type_simple
+
+    override val descResId = R.string.simple_game_description
 
     override fun createGameEnv() = SimpleOrderedGameEnv()
 
     override val viewModelProducer = SimpleOrderedGameViewModel
+
+    override val uiFactory = SimpleOrderedGameUI
 }
 
 @Serializable
 data object Dice : OrderedGameType {
     override val title: String = "Dice"
 
-    override val localizedStringId = R.string.game_type_dice
+    override val nameResId = R.string.game_type_dice
+
+    override val descResId = R.string.dice_game_description
 
     override fun createGameEnv() = DiceGameEnv()
 
     override val viewModelProducer = DiceGameViewModel
+
+    override val uiFactory = DiceGameUI
 }
 
 @Serializable
 data object Carcassonne : OrderedGameType {
     override val title: String = "Carcassonne"
 
-    override val localizedStringId = R.string.game_type_carcassonne
+    override val nameResId = R.string.game_type_carcassonne
+
+    override val descResId = R.string.carcassonne_game_description
 
     override fun createGameEnv() = CarcassonneGameEnv()
 
     override val viewModelProducer = CarcassonneGameViewModel
+
+    override val uiFactory = CarcassonneGameUI
 }
 
 @Serializable
 data object Monopoly : OrderedGameType {
     override val title: String = "Monopoly"
 
-    override val localizedStringId = R.string.game_type_monopoly
+    override val nameResId = R.string.game_type_monopoly
+
+    override val descResId = R.string.monopoly_game_description
 
     override fun createGameEnv() = MonopolyGameEnv()
 
     override val viewModelProducer = MonopolyGameViewModel
-}
 
-val GameType.gameActionPresenter: GameActionPresenter
-    get() = when (this) {
-        Free, SimpleOrdered, Dice, Carcassonne -> GameActionPresenter.Default
-        Monopoly -> MonopolyGameActionPresenter
-    }
+    override val uiFactory = MonopolyGameUI
+}

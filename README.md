@@ -1,3 +1,5 @@
+![app_icon](./app/src/main/res/mipmap-xxxhdpi/ic_launcher_clown_poker.webp)
+
 # Board Game Assistant
 
 Board Game Assistant is a mobile Android application for tracking and managing the progress of board games.

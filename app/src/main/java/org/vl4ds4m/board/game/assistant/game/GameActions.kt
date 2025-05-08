@@ -4,32 +4,32 @@ import org.vl4ds4m.board.game.assistant.States
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
 
-fun currentPlayerChangedAction(ids: States<Long?>) = GameAction(
+fun currentPlayerChangedAction(ids: States<PID?>) = GameAction(
     type = CHANGE_CURRENT_PLAYER,
     data = mapOf(
-        OLD_PLAYER_ID_KEY to ids.prev.let { it ?: -1L }.toString(),
-        NEW_PLAYER_ID_KEY to ids.next.let { it ?: -1L }.toString()
+        OLD_PLAYER_ID_KEY to (ids.prev ?: NIL_ID).toString(),
+        NEW_PLAYER_ID_KEY to (ids.next ?: NIL_ID).toString()
     )
 )
 
 val GameAction.changesCurrentPlayer: Boolean
     get() = type == CHANGE_CURRENT_PLAYER
 
-val GameAction.currentPlayerIds: States<Long?>?
+val GameAction.currentPIDs: States<PID?>?
     get() {
         val prevId = data[OLD_PLAYER_ID_KEY]
-            ?.toLongOrNull()
+            ?.toIntOrNull()
             ?: return null
         val nextId = data[NEW_PLAYER_ID_KEY]
-            ?.toLongOrNull()
+            ?.toIntOrNull()
             ?: return null
         return States(
-            prev = prevId.takeIf { it != -1L },
-            next = nextId.takeIf { it != -1L }
+            prev = prevId.takeIf { it != NIL_ID },
+            next = nextId.takeIf { it != NIL_ID }
         )
     }
 
-fun playerStateChangedAction(id: Long, states: States<PlayerState>) = GameAction(
+fun playerStateChangedAction(id: PID, states: States<PlayerState>) = GameAction(
     type = CHANGE_PLAYER_STATE,
     data = mapOf(
         PLAYER_ID_KEY to id.toString(),
@@ -41,8 +41,8 @@ fun playerStateChangedAction(id: Long, states: States<PlayerState>) = GameAction
 val GameAction.changesPlayerState: Boolean
     get() = type == CHANGE_PLAYER_STATE
 
-val GameAction.playerId: Long?
-    get() = data[PLAYER_ID_KEY]?.toLongOrNull()
+val GameAction.playerId: PID?
+    get() = data[PLAYER_ID_KEY]?.toIntOrNull()
 
 val GameAction.playerStates: States<PlayerState>?
     get() {
@@ -61,6 +61,7 @@ val GameAction.playerStates: States<PlayerState>?
 private const val CHANGE_CURRENT_PLAYER  = "change_current_player"
 private const val OLD_PLAYER_ID_KEY = "old_player_id"
 private const val NEW_PLAYER_ID_KEY = "new_player_id"
+private const val NIL_ID: PID = -1
 
 private const val CHANGE_PLAYER_STATE  = "change_player_state"
 private const val PLAYER_ID_KEY = "player_id"

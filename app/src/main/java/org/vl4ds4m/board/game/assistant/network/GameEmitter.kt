@@ -16,7 +16,9 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.vl4ds4m.board.game.assistant.closeAndLog
-import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.data.User
+import org.vl4ds4m.board.game.assistant.game.GameType
+import org.vl4ds4m.board.game.assistant.game.Users
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.env.GameEnv
 import org.vl4ds4m.board.game.assistant.title
@@ -31,8 +33,8 @@ class GameEmitter(
     private val scope: CoroutineScope,
     private val sessionEmitter: SessionEmitter
 ) {
-    private val mRemotePlayers = MutableStateFlow<List<NetworkPlayer>>(listOf())
-    val remotePlayers: StateFlow<List<NetworkPlayer>> = mRemotePlayers.asStateFlow()
+    private val mRemotePlayers = MutableStateFlow<List<User>>(listOf())
+    val remotePlayers: StateFlow<List<User>> = mRemotePlayers.asStateFlow()
 
     private var serverSocket: ServerSocket? = null
     private val playerSockets = MutableStateFlow<List<Socket>?>(null)
@@ -40,7 +42,7 @@ class GameEmitter(
     private val emitterState = MutableStateFlow(NetworkGameState.REGISTRATION)
 
     private val sessionState = MutableStateFlow<GameSession?>(null)
-    private val players: StateFlow<Players> = gameEnv.players
+    private val users: StateFlow<Users> = gameEnv.users
 
     private val produceGameState: () -> GameSession = gameEnv::save
 
@@ -68,7 +70,7 @@ class GameEmitter(
         }
     }
 
-    fun startEmit(id: String, name: String) {
+    fun startEmit(id: String, type: GameType, name: String) {
         serverSocket?.let {
             Log.e(TAG, "During start emit ServerSocket is still not null")
             closeServerSocket()
@@ -82,7 +84,7 @@ class GameEmitter(
             serverSocket = it
         }
         playerSockets.value = listOf()
-        sessionEmitter.register(id, name, serverSocket.localPort)
+        sessionEmitter.register(id, type, name, serverSocket.localPort)
         scope.launch(Dispatchers.IO) {
             while (true) {
                 val socket: Socket
@@ -123,7 +125,7 @@ class GameEmitter(
     ): Unit = withContext(Dispatchers.IO) {
         val networkPlayer = input.readObject()
             .let { it as String }
-            .let { Json.decodeFromString<NetworkPlayer>(it) }
+            .let { Json.decodeFromString<User>(it) }
             .also {
                 mRemotePlayers.updateList { add(it) }
             }
@@ -143,10 +145,10 @@ class GameEmitter(
                 } else {
                     emitState(
                         state, output, input,
-                        players.value.isBound(networkPlayer),
+                        users.value.isBound(networkPlayer),
                     )
                 }
-                delay(2000)
+                delay(1000)
             }
         } finally {
             mRemotePlayers.updateList {
@@ -170,11 +172,11 @@ class GameEmitter(
 
     private fun emitInGameState(
         session: GameSession,
-        networkPlayer: NetworkPlayer,
+        networkPlayer: User,
         output: ObjectOutputStream,
         input: ObjectInputStream
     ) {
-        val bound = session.players.toMap().isBound(networkPlayer)
+        val bound = session.users.isBound(networkPlayer)
         emitState(NetworkGameState.IN_GAME, output, input, bound)
         if (bound) {
             Json.encodeToString(session)
@@ -205,9 +207,7 @@ class GameEmitter(
     }
 }
 
-private fun Players.isBound(
-    networkPlayer: NetworkPlayer
-): Boolean = values.any {
+private fun Users.isBound(networkPlayer: User): Boolean = values.any {
     it.netDevId == networkPlayer.netDevId
 }
 

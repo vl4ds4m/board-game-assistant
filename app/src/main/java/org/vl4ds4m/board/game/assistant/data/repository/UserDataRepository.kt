@@ -7,8 +7,10 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import org.vl4ds4m.board.game.assistant.data.User
 import java.util.UUID
 
 class UserDataRepository(
@@ -42,6 +44,10 @@ class UserDataRepository(
                 Log.i(TAG, "${NET_DEV_ID.title}: $value")
             }
         }
+    }
+
+    val user: Flow<User> = netDevId.combine(userName) { id, name ->
+        User(netDevId = id, self = true, name = name)
     }
 }
 

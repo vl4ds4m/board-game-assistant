@@ -14,6 +14,8 @@ data class PlayerState(
     fun toJson(): String = Json.encodeToString(this)
 
     companion object {
+        val Empty = PlayerState(score = 0, data = mapOf())
+
         fun fromJson(value: String): PlayerState = Json.decodeFromString(value)
     }
 }

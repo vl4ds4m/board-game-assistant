@@ -64,11 +64,7 @@ class GameObserver(
         output: ObjectOutputStream,
         input: ObjectInputStream
     ): Unit = withContext(Dispatchers.IO) {
-        userDataRepository.run {
-            userName.first() to netDevId.first()
-        }.let { (name, id) ->
-            NetworkPlayer(name, id)
-        }.let {
+        userDataRepository.user.first().let {
             Json.encodeToString(it)
         }.let {
             output.writeObject(it)

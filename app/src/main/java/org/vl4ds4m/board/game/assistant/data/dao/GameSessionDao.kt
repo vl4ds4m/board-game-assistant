@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.Flow
 import org.vl4ds4m.board.game.assistant.data.entity.GameActionEntity
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionData
 import org.vl4ds4m.board.game.assistant.data.entity.GameSessionEntity
+import org.vl4ds4m.board.game.assistant.data.entity.PlayerData
 import org.vl4ds4m.board.game.assistant.data.entity.PlayerEntity
+import org.vl4ds4m.board.game.assistant.data.entity.UserEntity
 import org.vl4ds4m.board.game.assistant.data.view.GameSessionInfoView
 
 @Dao
@@ -25,36 +27,30 @@ interface GameSessionDao {
     @Transaction
     suspend fun insertSession(data: GameSessionData) {
         insertSession(data.entity)
-        deletePlayers(getPlayers(data.entity.id))
-        insertPlayers(data.players)
-        deleteActions(getActions(data.entity.id))
+        insertPlayersData(data.players)
         insertActions(data.actions)
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSession(entity: GameSessionEntity)
 
-    @Query(
-        "SELECT * FROM ${PlayerEntity.TABLE_NAME} " +
-        "WHERE ${PlayerEntity.SESSION_ID} = :sessionId"
-    )
-    suspend fun getPlayers(sessionId: String): List<PlayerEntity>
+    @Transaction
+    suspend fun insertPlayersData(data: List<PlayerData>) {
+        val users = data.mapNotNull { it.user }
+        insertUsers(users)
+        val players = data.map { it.player }
+        insertPlayers(players)
+    }
 
-    @Delete
-    suspend fun deletePlayers(entities: List<PlayerEntity>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertUsers(entities: List<UserEntity>)
 
     @Insert
     suspend fun insertPlayers(entities: List<PlayerEntity>)
 
-    @Query(
-        "SELECT * FROM ${GameActionEntity.TABLE_NAME} " +
-        "WHERE ${GameActionEntity.SESSION_ID} = :sessionId"
-    )
-    suspend fun getActions(sessionId: String): List<GameActionEntity>
-
-    @Delete
-    suspend fun deleteActions(entities: List<GameActionEntity>)
-
     @Insert
     suspend fun insertActions(entities: List<GameActionEntity>)
+
+    @Delete(entity = GameSessionEntity::class)
+    suspend fun removeSession(pk: GameSessionEntity.PK)
 }

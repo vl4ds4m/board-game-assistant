@@ -23,7 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.game.Users
+import org.vl4ds4m.board.game.assistant.ui.detailedGameSessionPreview
+import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.GameViewModel
+import org.vl4ds4m.board.game.assistant.ui.game.PlayerStats
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
@@ -35,6 +39,8 @@ fun EndGameScreen(
     val viewModel = viewModel<GameViewModel>()
     EndGameScreenContent(
         players = viewModel.players.collectAsState(),
+        users = viewModel.users.collectAsState(),
+        playerStats = viewModel.gameUi.playerStats,
         navigateHome = navigateHome,
         modifier = modifier
     )
@@ -43,6 +49,8 @@ fun EndGameScreen(
 @Composable
 fun EndGameScreenContent(
     players: State<Players>,
+    users: State<Users>,
+    playerStats: PlayerStats,
     navigateHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -70,8 +78,10 @@ fun EndGameScreenContent(
         HorizontalDivider()
         PlayersRating(
             players = players,
-            currentPlayerId = rememberUpdatedState(null),
+            users = users,
+            currentPid = rememberUpdatedState(null),
             onSelectPlayer = null,
+            playerStats = playerStats,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp)
@@ -85,35 +95,14 @@ fun EndGameScreenContent(
 @Composable
 private fun EndGameScreenPreview() {
     BoardGameAssistantTheme {
-        EndGameScreenContent(
-            players = rememberUpdatedState(mapOf(
-                1L to org.vl4ds4m.board.game.assistant.game.Player(
-                    null, "ssdf", true,
-                    org.vl4ds4m.board.game.assistant.game.data.PlayerState(
-                        123, mapOf()
-                    )
-                ),
-                2L to org.vl4ds4m.board.game.assistant.game.Player(
-                    null, "n5732h", false,
-                    org.vl4ds4m.board.game.assistant.game.data.PlayerState(
-                        456, mapOf()
-                    )
-                ),
-                3L to org.vl4ds4m.board.game.assistant.game.Player(
-                    null, "fhb", true,
-                    org.vl4ds4m.board.game.assistant.game.data.PlayerState(
-                        5, mapOf()
-                    )
-                ),
-                4L to org.vl4ds4m.board.game.assistant.game.Player(
-                    null, "yt3", false,
-                    org.vl4ds4m.board.game.assistant.game.data.PlayerState(
-                        434, mapOf()
-                    )
-                )
-            )),
-            navigateHome = {},
-            modifier = Modifier.fillMaxSize()
-        )
+        with(detailedGameSessionPreview) {
+            EndGameScreenContent(
+                players = rememberUpdatedState(players.toMap()),
+                users = rememberUpdatedState(users),
+                playerStats = GameUI.playerStats,
+                navigateHome = {},
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }

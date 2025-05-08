@@ -7,7 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,16 +45,22 @@ fun ScoreCounter(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val score = rememberSaveable { mutableIntStateOf(0) }
+        val score = rememberSaveable(saver = Score.Saver) { Score() }
+        val enabled = remember {
+            derivedStateOf {
+                score.points != 0
+                && applyEnabled?.value ?: true
+            }
+        }
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ResetButton { score.intValue = 0 }
-            Spacer(Modifier.size(16.dp))
+            ResetButton(score)
+            Spacer(Modifier.size(8.dp))
             ScoreField(score)
-            Spacer(Modifier.size(24.dp))
-            ApplyButton(applyEnabled) { addPoints(score.intValue) }
+            Spacer(Modifier.size(12.dp))
+            ApplyButton(enabled) { addPoints(score.points) }
         }
         Row(
             horizontalArrangement = Arrangement.spacedBy(24.dp),
@@ -78,7 +85,7 @@ private fun ScoreCounterPreview() {
             addPoints = {},
             applyEnabled = null,
             selectNextPlayer = {},
-            pointsVariants = listOf(1, 2, 120)
+            pointsVariants = listOf(1, 2, 45)
         )
     }
 }

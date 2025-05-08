@@ -3,6 +3,7 @@ package org.vl4ds4m.board.game.assistant.game.carcassonne
 import org.vl4ds4m.board.game.assistant.game.Carcassonne
 import org.vl4ds4m.board.game.assistant.game.OrderedGame
 import org.vl4ds4m.board.game.assistant.game.env.OrderedGameEnv
+import kotlin.math.min
 
 interface CarcassonneGame : OrderedGame {
     fun addPoints(property: CarcassonneProperty, count: Int, final: Boolean)
@@ -10,7 +11,7 @@ interface CarcassonneGame : OrderedGame {
 
 class CarcassonneGameEnv : OrderedGameEnv(Carcassonne), CarcassonneGame {
     override fun addPoints(property: CarcassonneProperty, count: Int, final: Boolean) {
-        if (count <= 0) return
+        if (count !in 1 .. MAX_SCORE) return
         var points = 0
         when (property) {
             CarcassonneProperty.CLOISTER -> if (count <= 9) points = count
@@ -21,10 +22,12 @@ class CarcassonneGameEnv : OrderedGameEnv(Carcassonne), CarcassonneGame {
         if (points > 0) {
             val (_, player) = currentPlayer ?: return
             val score = player.state.run {
-                copy(score = score + points)
+                copy(score = min(score + points, MAX_SCORE))
             }
-            val id = currentPlayerId.value ?: return
+            val id = currentPid.value ?: return
             changePlayerState(id, score)
         }
     }
 }
+
+private const val MAX_SCORE = 999_999

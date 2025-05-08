@@ -10,11 +10,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.game.Actions
+import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.ui.game.ActionLog
 
 @Composable
 fun GameHistory(
-    actions: State<List<String>>,
-    modifier: Modifier = Modifier
+    players: State<Players>,
+    actions: State<Actions>,
+    modifier: Modifier = Modifier,
+    showAction: ActionLog
 ) {
     val listState = rememberLazyListState()
     LaunchedEffect(actions.value) {
@@ -28,10 +33,11 @@ fun GameHistory(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         items(actions.value) { action ->
-            Text(
-                text = action,
-                maxLines = 1
-            )
+            showAction(action, players.value)
+                .split('\n')
+                .forEach {
+                    Text(text = it, maxLines = 1)
+                }
         }
     }
 }

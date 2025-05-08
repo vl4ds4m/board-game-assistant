@@ -12,7 +12,7 @@ class SimpleOrderedGameEnv : OrderedGameEnv(SimpleOrdered), SimpleOrderedGame {
     private val scoreAdder = SimpleScoreAdder(this)
 
     override fun addPoints(points: Int) {
-        val id = currentPlayerId.value ?: return
+        val id = currentPid.value ?: return
         scoreAdder.addPoints(id, points)
     }
 }

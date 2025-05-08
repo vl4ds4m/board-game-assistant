@@ -1,24 +1,35 @@
 package org.vl4ds4m.board.game.assistant.ui.game.setup
 
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
+import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.data.repository.GameEnvRepository
+import org.vl4ds4m.board.game.assistant.data.repository.GameSessionRepository
 import org.vl4ds4m.board.game.assistant.game.GameType
 
 class GameSetupViewModel private constructor(
-    private val gameEnvRepository: GameEnvRepository
+    private val gameEnvRepository: GameEnvRepository,
+    sessionRepository: GameSessionRepository
 ) : ViewModel() {
-    val type = mutableStateOf<GameType?>(null)
-    val name = mutableStateOf("")
+    val type = MutableStateFlow<GameType?>(null)
 
-    fun createGame(type: GameType) {
+    val defaultNameNum: Flow<Int> = sessionRepository.getAllSessions()
+        .combine(type) { sessions, type ->
+            type ?: 0
+            val count = sessions.count { it.type == type }
+            return@combine count + 1
+        }
+
+    fun createGame(type: GameType, name: String) {
         type.createGameEnv()
-            .also { it.name.value = name.value }
+            .also { it.name.value = name}
             .let { gameEnvRepository.put(it) }
     }
 
@@ -26,10 +37,8 @@ class GameSetupViewModel private constructor(
 
     val players: List<NewPlayer> = mPlayers
 
-    fun addPlayer(name: String, netDevId: String?) {
-        mPlayers.add(
-            NewPlayer(name = name, netDevId = netDevId)
-        )
+    fun addPlayer(name: String, user: User?) {
+        mPlayers.add(NewPlayer(name, user))
     }
 
     fun renamePlayer(index: Int, newName: String) {
@@ -42,22 +51,18 @@ class GameSetupViewModel private constructor(
         mPlayers.removeAt(index)
     }
 
-    fun movePlayerUp(index: Int) {
-        if (index !in players.indices || index == 0) return
+    fun changePlayerOrder(index: Int, newPosition: Int) {
+        if (index !in players.indices) return
+        if (newPosition !in players.indices) return
+        if (index == newPosition) return
         val player = mPlayers.removeAt(index)
-        mPlayers.add(index - 1, player)
-    }
-
-    fun movePlayerDown(index: Int) {
-        if (index !in players.indices || index == players.lastIndex) return
-        val player = mPlayers.removeAt(index)
-        mPlayers.add(index + 1, player)
+        mPlayers.add(newPosition, player)
     }
 
     fun startGame() {
         val game = gameEnvRepository.extract()
         players.forEach {
-            game.addPlayer(it.netDevId, it.name)
+            game.addPlayer(it.user, it.name)
         }
         game.initialize()
     }
@@ -66,7 +71,7 @@ class GameSetupViewModel private constructor(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer<GameSetupViewModel> {
                 val app = BoardGameAssistantApp.from(this)
-                GameSetupViewModel(app.gameEnvRepository)
+                GameSetupViewModel(app.gameEnvRepository, app.sessionRepository)
             }
         }
     }

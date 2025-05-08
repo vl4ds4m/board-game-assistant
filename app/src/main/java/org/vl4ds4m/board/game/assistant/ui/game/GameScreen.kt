@@ -1,57 +1,58 @@
 package org.vl4ds4m.board.game.assistant.ui.game
 
+import androidx.activity.addCallback
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleStartEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
-import org.vl4ds4m.board.game.assistant.States
-import org.vl4ds4m.board.game.assistant.game.Carcassonne
-import org.vl4ds4m.board.game.assistant.game.Dice
-import org.vl4ds4m.board.game.assistant.game.Free
+import org.vl4ds4m.board.game.assistant.R
+import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.GameType
-import org.vl4ds4m.board.game.assistant.game.Monopoly
-import org.vl4ds4m.board.game.assistant.game.Player
+import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Players
-import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
-import org.vl4ds4m.board.game.assistant.game.currentPlayerChangedAction
+import org.vl4ds4m.board.game.assistant.game.Users
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
-import org.vl4ds4m.board.game.assistant.game.gameActionPresenter
-import org.vl4ds4m.board.game.assistant.game.playerStateChangedAction
+import org.vl4ds4m.board.game.assistant.game.log.GameAction
+import org.vl4ds4m.board.game.assistant.ui.MainActivity
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
-import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.CarcassonneGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.Timer
+import org.vl4ds4m.board.game.assistant.ui.detailedGameSessionPreview
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistoryManager
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistoryState
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameMenu
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameNavActions
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
-import org.vl4ds4m.board.game.assistant.ui.game.component.StandardCounter
-import org.vl4ds4m.board.game.assistant.ui.game.dice.DiceGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.monopoly.MonopolyGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.simple.FreeGameScreen
-import org.vl4ds4m.board.game.assistant.ui.game.simple.SimpleOrderedGameScreen
+import org.vl4ds4m.board.game.assistant.ui.game.component.Timer
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -68,9 +69,22 @@ fun GameScreen(
             producer = type.viewModelProducer
         )
     )
+    val stopDialogOpened = remember { mutableStateOf(false) }
+    val openStopDialog = { stopDialogOpened.value = true }
+    LocalActivity.current.let {
+        it as MainActivity
+    }.onBackPressedDispatcher.addCallback(
+        owner = LocalLifecycleOwner.current
+    ) {
+        openStopDialog()
+    }
+    StopGameDialog(
+        opened = stopDialogOpened,
+        onConfirm = navActions.navigateBack
+    )
     topBarUiState.update(
         title = viewModel.name.collectAsState().value,
-        navigateBack = navActions.navigateBack
+        navigateBack = openStopDialog
     ) {
         GameHistoryManager(
             GameHistoryState(
@@ -80,11 +94,7 @@ fun GameScreen(
                 repeat = viewModel::repeat
             )
         )
-        GameMenu(
-            navActions.copy(
-                completeGame = viewModel::complete
-            )
-        )
+        GameMenu(navActions, viewModel::complete)
     }
     LifecycleStartEffect(viewModel) {
         viewModel.start()
@@ -92,45 +102,29 @@ fun GameScreen(
             viewModel.stop()
         }
     }
-    LaunchedEffect(viewModel, navActions) {
+    LaunchedEffect(viewModel) {
         viewModel.completed.collect { completed ->
-            if (completed) navActions.completeGame()
+            if (completed) {
+                navActions.completeGame()
+            }
         }
     }
-    when (type) {
-        is Free          -> FreeGameScreen(modifier)
-        is SimpleOrdered -> SimpleOrderedGameScreen(modifier)
-        is Dice          -> DiceGameScreen(modifier)
-        is Carcassonne   -> CarcassonneGameScreen(modifier)
-        is Monopoly      -> MonopolyGameScreen(modifier)
-    }
-}
-
-@Composable
-fun GameScreen(
-    selectPlayer: ((Long) -> Unit)?,
-    modifier: Modifier = Modifier,
-    masterActions: @Composable () -> Unit
-) {
-    val viewModel = viewModel<GameViewModel>()
     val timer = produceState<Int?>(null, viewModel) {
         viewModel.timeout.combine(viewModel.secondsToEnd) { timeout, seconds ->
             value = seconds.takeIf { timeout }
         }.launchIn(this)
     }
-    val presenter = viewModel.type.gameActionPresenter
-    val actions = produceState(listOf()) {
-        viewModel.actions.combine(viewModel.players) { actions, players ->
-            value = actions.map { presenter.showAction(it, players) }
-        }.launchIn(this)
-    }
+    val ui = viewModel.gameUi
     GameScreenContent(
         players = viewModel.players.collectAsState(),
-        currentPlayerId = viewModel.currentPlayerId.collectAsState(),
-        actions = actions,
-        selectPlayer = selectPlayer,
+        users = viewModel.users.collectAsState(),
+        currentPid = viewModel.currentPid.collectAsState(),
+        actions = viewModel.actions.collectAsState(),
+        showAction = ui.actionLog,
+        selectPlayer = ui.onPlayerSelected,
         timer = timer,
-        masterActions = masterActions,
+        playerStats = ui.playerStats,
+        masterActions = ui.masterActions,
         modifier = modifier
     )
 }
@@ -138,10 +132,13 @@ fun GameScreen(
 @Composable
 fun GameScreenContent(
     players: State<Players>,
-    currentPlayerId: State<Long?>,
-    actions: State<List<String>>,
-    selectPlayer: ((Long) -> Unit)?,
+    users: State<Users>,
+    currentPid: State<PID?>,
+    actions: State<Actions>,
+    showAction: @Composable (GameAction, Players) -> String,
+    selectPlayer: ((PID) -> Unit)?,
     timer: State<Int?>,
+    playerStats: @Composable RowScope.(State<PlayerState>) -> Unit,
     masterActions: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -159,22 +156,25 @@ fun GameScreenContent(
             )
         }
         HorizontalDivider()
-        val activePlayers = remember {
-            derivedStateOf {
-                players.value.filterValues { it.active }
-            }
-        }
         PlayersRating(
-            players = activePlayers,
-            currentPlayerId = currentPlayerId,
+            players = remember {
+                derivedStateOf {
+                    players.value.filterValues { it.active }
+                }
+            },
+            users = users,
+            currentPid = currentPid,
             onSelectPlayer = selectPlayer,
+            playerStats = playerStats,
             modifier = Modifier
                 .weight(3f)
                 .padding(horizontal = 16.dp)
         )
         HorizontalDivider()
         GameHistory(
+            players = players,
             actions = actions,
+            showAction = showAction,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp)
@@ -193,60 +193,48 @@ fun GameScreenContent(
     }
 }
 
-@Preview
 @Composable
-private fun GameScreenPreview() {
-    BoardGameAssistantTheme {
-        GameScreenContent(
-            players = rememberUpdatedState(previewPlayers),
-            currentPlayerId = rememberUpdatedState(1),
-            actions = rememberUpdatedState(previewActions),
-            selectPlayer = null,
-            timer = rememberUpdatedState(157),
-            masterActions = {
-                StandardCounter(
-                    addPoints = {},
-                    applyEnabled = null,
-                    selectNextPlayer = {}
-                )
+private fun StopGameDialog(
+    opened: MutableState<Boolean>,
+    onConfirm: () -> Unit
+) {
+    if (opened.value) {
+        AlertDialog(
+            onDismissRequest = { opened.value = false },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        opened.value = false
+                        onConfirm()
+                    }
+                ) {
+                    Text(stringResource(R.string.game_action_exit_confirm))
+                }
             },
-            modifier = Modifier.fillMaxSize()
+            text = {
+                Text(stringResource(R.string.game_action_exit_text))
+            }
         )
     }
 }
 
-val previewPlayers: Players = sequence {
-    yield("Abc" to 123)
-    yield("Def" to 74)
-    yield("Foo" to 92123)
-    yield("Bar" to 986)
-    repeat(10) { yield("Copy" to 111) }
-}.mapIndexed { i, (name, score) ->
-    (i + 1L) to Player(
-        netDevId = null,
-        name = name,
-        active = true,
-        state = PlayerState(score, mapOf())
-    )
-}.toMap()
-
-val previewActions: List<String> = sequence {
-    repeat(10) {
-        playerStateChangedAction(
-            id = 1L,
-            States(
-                prev = PlayerState(123, mapOf()),
-                next = PlayerState(678, mapOf())
+@Preview
+@Composable
+private fun GameScreenPreview() {
+    BoardGameAssistantTheme {
+        with(detailedGameSessionPreview) {
+            GameScreenContent(
+                players = rememberUpdatedState(players.toMap()),
+                users = rememberUpdatedState(users),
+                currentPid = rememberUpdatedState(currentPid),
+                actions = rememberUpdatedState(actions),
+                showAction = GameUI.actionLog,
+                selectPlayer = null,
+                timer = rememberUpdatedState(secondsUntilEnd),
+                playerStats = GameUI.playerStats,
+                masterActions = GameUI.masterActionsPreview,
+                modifier = Modifier.fillMaxSize()
             )
-        ).let { yield(it) }
-        currentPlayerChangedAction(
-            States(
-                prev = 3L,
-                next = 2L
-            )
-        ).let { yield(it) }
+        }
     }
-}.map {
-    SimpleOrdered.gameActionPresenter.showAction(it, previewPlayers)
-}.toList()
-
+}

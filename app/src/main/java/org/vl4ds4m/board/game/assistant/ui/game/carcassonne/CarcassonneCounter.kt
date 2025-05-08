@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,6 +29,7 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.ApplyButton
 import org.vl4ds4m.board.game.assistant.ui.game.component.NextPlayerButton
 import org.vl4ds4m.board.game.assistant.ui.game.component.PointsAppender
 import org.vl4ds4m.board.game.assistant.ui.game.component.ResetButton
+import org.vl4ds4m.board.game.assistant.ui.game.component.Score
 import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreField
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
@@ -44,27 +44,26 @@ fun CarcassonneCounter(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val score = rememberSaveable { mutableIntStateOf(0) }
+        val score = rememberSaveable(saver = Score.Saver) { Score() }
         val property = rememberSaveable {
             mutableStateOf<CarcassonneProperty?>(null)
         }
         val finalStage = rememberSaveable { mutableStateOf(false) }
         val applyEnable = remember {
-            derivedStateOf { score.intValue != 0 && property.value != null }
+            derivedStateOf { score.points > 0 && property.value != null }
         }
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ResetButton { score.intValue = 0 }
+            ResetButton(score)
             Spacer(Modifier.size(16.dp))
             ScoreField(score)
             Spacer(Modifier.size(24.dp))
             ApplyButton(applyEnable) apl@{
                 val prop = property.value ?: return@apl
-                val sc = score.intValue.takeIf { it != 0 }
-                    ?: return@apl
-                addPoints(prop, sc, finalStage.value)
+                val points = score.points
+                addPoints(prop, points, finalStage.value)
             }
         }
         Row(

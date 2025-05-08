@@ -20,13 +20,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.Players
+import org.vl4ds4m.board.game.assistant.game.Users
+import org.vl4ds4m.board.game.assistant.ui.detailedGameSessionPreview
+import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
-import org.vl4ds4m.board.game.assistant.ui.game.previewPlayers
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun ObserverEndScreen(
     players: State<Players>,
+    users: State<Users>,
+    gameUiFactory: State<GameUI.Factory>,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -50,8 +54,10 @@ fun ObserverEndScreen(
         HorizontalDivider()
         PlayersRating(
             players = players,
-            currentPlayerId = rememberUpdatedState(null),
+            users = users,
+            currentPid = rememberUpdatedState(null),
             onSelectPlayer = null,
+            playerStats = gameUiFactory.value.playerStats,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp)
@@ -64,8 +70,12 @@ fun ObserverEndScreen(
 @Composable
 private fun ObserverEndScreenPreview() {
     BoardGameAssistantTheme {
-        ObserverEndScreen(
-            players = rememberUpdatedState(previewPlayers)
-        )
+        with (detailedGameSessionPreview) {
+            ObserverEndScreen(
+                players = rememberUpdatedState(players.toMap()),
+                users = rememberUpdatedState(users),
+                gameUiFactory = rememberUpdatedState(GameUI)
+            )
+        }
     }
 }

@@ -6,7 +6,10 @@
     <string name="profile_title">Your profile</string>
     <string name="profile_name_label">Name</string>
     <string name="results_title">Game results</string>
+    <string name="results_filter_all">All</string>
     <string name="results_empty_list">No completed games</string>
+    <string name="results_date_today">Today</string>
+    <string name="results_date_yesterday">Yesterday</string>
     <string name="game_results_title_prefix">Results</string>
     <string name="play_title">Game sessions</string>
     <string name="play_start_new_game">Start a new game</string>
@@ -48,6 +51,10 @@
     <string name="game_results_stop_time">Stop time</string>
     <string name="game_results_duration">Duration</string>
     <string name="game_results_rating">Players rating</string>
+    <string name="game_results_actions">Actions history</string>
+    <string name="game_results_remove_msg">Are you sure to remove this result?</string>
+    <string name="game_results_remove_confirm">Remove</string>
+    <string name="game_results_remove_cancel">Cancel</string>
     <string name="game_menu_game_settings">Open game settings</string>
     <string name="game_menu_player_settings">Open player settings</string>
     <string name="game_menu_dice_imitation">Open Dice imitation</string>
@@ -56,6 +63,10 @@
     <string name="player_action_move_up">Move up</string>
     <string name="player_action_move_down">Move down</string>
     <string name="player_action_select">Make current</string>
+    <string name="player_action_change_order">Change order</string>
+    <string name="player_action_rename">Rename</string>
+    <string name="player_action_rename_confirm">Apply</string>
+    <string name="player_action_rename_dismiss">Cancel</string>
     <string name="player_action_freeze">Freeze</string>
     <string name="player_action_unfreeze">Unfreeze</string>
     <string name="game_master_apply">Apply</string>
@@ -69,8 +80,15 @@
     <string name="game_monopoly_move_prefix">Move</string>
     <string name="game_monopoly_to_prison">To prison</string>
     <string name="game_monopoly_from_prison">Leave prison</string>
-    <string name="game_monopoly_positioning">To positioning</string>
-    <string name="game_monopoly_accounting">To accounting</string>
+    <string name="game_monopoly_positioning">Position</string>
+    <string name="game_monopoly_leave_prison_msg">How to leave prison?</string>
+    <string name="game_monopoly_leave_prison_free">Free</string>
+    <string name="game_monopoly_leave_prison_fine">Fine</string>
+    <string name="game_monopoly_accounting">Account</string>
+    <string name="game_monopoly_money_label">money, K</string>
+    <string name="game_monopoly_money_k">K</string>
+    <string name="game_monopoly_money_m">M</string>
+    <string name="game_monopoly_transferring">Transfer</string>
     <string name="game_monopoly_pay">Pay</string>
     <string name="game_monopoly_gain">Gain</string>
     <string name="game_monopoly_from_player">From</string>
@@ -82,4 +100,10 @@
     <string name="player_action_unbind">Unbind</string>
     <string name="player_action_bind">Bind to</string>
     <string name="game_player_self_label">It\'s you</string>
+    <string name="game_log_monopoly_to_prison">goes to Prison</string>
+    <string name="game_log_monopoly_from_prison">goes from Prison</string>
+    <string name="game_action_exit_confirm">Confirm</string>
+    <string name="game_action_exit_text">Are you sure to stop the game?</string>
+    <string name="game_settings_apply">Apply</string>
+    <string name="game_master_points_label" translatable="false">point(s)</string>
 </resources>

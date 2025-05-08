@@ -15,19 +15,24 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.vl4ds4m.board.game.assistant.game.Actions
+import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.Players
-import org.vl4ds4m.board.game.assistant.ui.game.carcassonne.Timer
+import org.vl4ds4m.board.game.assistant.game.Users
+import org.vl4ds4m.board.game.assistant.ui.detailedGameSessionPreview
+import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.component.GameHistory
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
-import org.vl4ds4m.board.game.assistant.ui.game.previewActions
-import org.vl4ds4m.board.game.assistant.ui.game.previewPlayers
+import org.vl4ds4m.board.game.assistant.ui.game.component.Timer
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
 fun ObserverGameScreen(
     players: State<Players>,
-    currentPlayerId: State<Long?>,
-    actions: State<List<String>>,
+    users: State<Users>,
+    gameUiFactory: State<GameUI.Factory>,
+    currentPid: State<PID?>,
+    actions: State<Actions>,
     timer: State<Int?>,
     modifier: Modifier = Modifier
 ) {
@@ -45,22 +50,25 @@ fun ObserverGameScreen(
             )
         }
         HorizontalDivider()
-        val activePlayers = remember {
-            derivedStateOf {
-                players.value.filterValues { it.active }
-            }
-        }
         PlayersRating(
-            players = activePlayers,
-            currentPlayerId = currentPlayerId,
+            players = remember {
+                derivedStateOf {
+                    players.value.filterValues { it.active }
+                }
+            },
+            users = users,
+            currentPid = currentPid,
             onSelectPlayer = null,
+            playerStats = gameUiFactory.value.playerStats,
             modifier = Modifier
                 .weight(5f)
                 .padding(horizontal = 16.dp)
         )
         HorizontalDivider()
         GameHistory(
+            players = players,
             actions = actions,
+            showAction = gameUiFactory.value.actionLog,
             modifier = Modifier
                 .weight(3f)
                 .padding(horizontal = 16.dp)
@@ -74,11 +82,15 @@ fun ObserverGameScreen(
 @Composable
 private fun ObserverGameScreenPreview() {
     BoardGameAssistantTheme {
-        ObserverGameScreen(
-            players = rememberUpdatedState(previewPlayers),
-            currentPlayerId = rememberUpdatedState(null),
-            actions = rememberUpdatedState(previewActions),
-            timer = rememberUpdatedState(945)
-        )
+        with(detailedGameSessionPreview) {
+            ObserverGameScreen(
+                players = rememberUpdatedState(players.toMap()),
+                users = rememberUpdatedState(users),
+                gameUiFactory = rememberUpdatedState(GameUI),
+                currentPid = rememberUpdatedState(null),
+                actions = rememberUpdatedState(actions),
+                timer = rememberUpdatedState(945)
+            )
+        }
     }
 }

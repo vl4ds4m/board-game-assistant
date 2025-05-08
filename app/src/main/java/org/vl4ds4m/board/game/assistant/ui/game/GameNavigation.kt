@@ -111,25 +111,19 @@ fun NavGraphBuilder.gameNavigation(
         )
     }
     composable<Game> { entry ->
-        LocalActivity.current.let {
-            it as MainActivity
-        }.run {
-            onBackPressedDispatcher.addCallback(entry) { navigateHome() }
-        }
         val (type, sessionId) = entry.toRoute<Game>()
             .run { GameType.valueOf(type) to sessionId }
-        val navActions = GameNavActions(
-            navigateBack = navigateHome,
-            openGameSetting = { navController.navigate(GameSetting) },
-            openPlayerSetting = { navController.navigate(PlayerSetting) },
-            openDiceImitation = { navController.navigate(DiceImitation) },
-            completeGame = { navController.navigate(End) },
-        )
         GameScreen(
             type = type,
             sessionId = sessionId,
             topBarUiState = topBarUiState,
-            navActions = navActions
+            navActions = GameNavActions(
+                navigateBack = navigateHome,
+                openGameSetting = { navController.navigate(GameSetting) },
+                openPlayerSetting = { navController.navigate(PlayerSetting) },
+                openDiceImitation = { navController.navigate(DiceImitation) },
+                completeGame = { navController.navigate(End) },
+            )
         )
     }
     composable<GameSetting> { entry ->

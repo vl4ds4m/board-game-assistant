@@ -1,6 +1,5 @@
 package org.vl4ds4m.board.game.assistant.ui.play
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,13 +25,11 @@ import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.game.Free
 import org.vl4ds4m.board.game.assistant.game.GameType
-import org.vl4ds4m.board.game.assistant.game.Player
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
-import org.vl4ds4m.board.game.assistant.game.data.GameSession
 import org.vl4ds4m.board.game.assistant.game.data.GameSessionInfo
-import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.component.GameSessionCard
+import org.vl4ds4m.board.game.assistant.ui.sessionsInfoPreview
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
 @Composable
@@ -40,7 +37,7 @@ fun PlayScreen(
     viewModel: PlayViewModel,
     startNewGame: () -> Unit,
     proceedGame: (String, GameType) -> Unit,
-    observeGame: (String, String, String, Int) -> Unit,
+    observeGame: (RemoteSessionInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     PlayScreenContent(
@@ -59,7 +56,7 @@ fun PlayScreenContent(
     remoteSessions: State<List<RemoteSessionInfo>>,
     clickNewGame: () -> Unit,
     clickSession: (String, GameType) -> Unit,
-    clickRemoteGame: (String, String, String, Int) -> Unit,
+    clickRemoteGame: (RemoteSessionInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -110,13 +107,12 @@ fun PlayScreenContent(
                     key = { _, session -> session.id }
                 ) { index, session ->
                     GameSessionCard(
-                        text = "${index + 1}. ${session.name}",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                clickSession(session.id, session.type)
-                            }
-                    )
+                        name = "${index + 1}. ${session.name}",
+                        type = stringResource(session.type.nameResId),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        clickSession(session.id, session.type)
+                    }
                 }
             }
         }
@@ -147,15 +143,12 @@ fun PlayScreenContent(
                     key = { _, session -> session.id }
                 ) { index, session ->
                     GameSessionCard(
-                        text = "${index + 1}. ${session.name}",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                session.run {
-                                    clickRemoteGame(id, name, ip, port)
-                                }
-                            }
-                    )
+                        name = "${index + 1}. ${session.name}",
+                        type = stringResource(session.type.nameResId),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        session.run { clickRemoteGame(session) }
+                    }
                 }
             }
         }
@@ -165,7 +158,26 @@ fun PlayScreenContent(
 @Preview
 @Composable
 private fun PlayScreenWithSessionsPreview() {
-    PlayScreenPreview(sessionsInfoPreview, remoteSessionPreview)
+    val sessionsInfo = sessionsInfoPreview.map {
+        it.copy(completed = false)
+    }
+    val remoteSessions = listOf(
+        RemoteSessionInfo(
+            id = "remote_1",
+            type = SimpleOrdered,
+            name = "Milki Way",
+            ip = "100.0.0.100",
+            port = 11234
+        ),
+        RemoteSessionInfo(
+            id = "remote_2",
+            type = Free,
+            name = "Catch me if you can",
+            ip = "100.0.0.105",
+            port = 41831
+        )
+    )
+    PlayScreenPreview(sessionsInfo, remoteSessions)
 }
 
 @Preview
@@ -185,141 +197,8 @@ private fun PlayScreenPreview(
             remoteSessions = remember { mutableStateOf(remoteSession) },
             clickNewGame = {},
             clickSession = { _, _ -> },
-            clickRemoteGame = { _, _, _, _ -> },
+            clickRemoteGame = {},
             modifier = Modifier.fillMaxSize()
         )
     }
 }
-
-private val initialTime: Long = java.time.Instant
-    .parse("2025-01-24T10:15:34.00Z").toEpochMilli()
-
-
-val gameSessionsPreview: List<GameSession> get() = listOf(
-    GameSession(
-        completed = false,
-        type = SimpleOrdered,
-        name = "Uno 93",
-        players = listOf(
-            1L to Player(
-                netDevId = null,
-                name = "Abc",
-                active = true,
-                state = PlayerState(120, mapOf())
-            ),
-            2L to Player(
-                netDevId = null,
-                name = "Def",
-                active = false,
-                state = PlayerState(36, mapOf())
-            ),
-            3L to Player(
-                netDevId = null,
-                name = "Foo",
-                active = true,
-                state = PlayerState(154, mapOf())
-            )
-        ),
-        currentPlayerId = 1L,
-        nextNewPlayerId = 10L,
-        startTime = initialTime + 40_000,
-        stopTime = initialTime + 45_000,
-        duration = 2_000,
-        timeout = false,
-        secondsUntilEnd = 0,
-        actions = listOf(),
-        currentActionPosition = 0
-    ),
-    GameSession(
-        completed = false,
-        type = Free,
-        name = "Poker Counts 28",
-        players = listOf(
-            1L to Player(
-                netDevId = null,
-                name = "Bar",
-                active = true,
-                state = PlayerState(1220, mapOf())
-            ),
-            2L to Player(
-                netDevId = null,
-                name = "Conf",
-                active = true,
-                state = PlayerState(376, mapOf())
-            ),
-            3L to Player(
-                netDevId = null,
-                name = "Leak",
-                active = true,
-                state = PlayerState(532, mapOf())
-            )
-        ),
-        currentPlayerId = 2L,
-        nextNewPlayerId = 10L,
-        startTime = initialTime + 20_000,
-        stopTime = initialTime + 35_000,
-        duration = 15_000,
-        timeout = false,
-        secondsUntilEnd = 0,
-        actions = listOf(),
-        currentActionPosition = 0
-    ),
-    GameSession(
-        type = SimpleOrdered,
-        completed = true,
-        name = "Imaginarium 74",
-        players = listOf(
-            1L to Player(
-                netDevId = null,
-                name = "Bar",
-                active = true,
-                state = PlayerState(12, mapOf())
-            ),
-            2L to Player(
-                netDevId = null,
-                name = "Conf",
-                active = true,
-                state = PlayerState(37, mapOf())
-            ),
-            3L to Player(
-                netDevId = null,
-                name = "Leak",
-                active = true,
-                state = PlayerState(53, mapOf())
-            ),
-            4L to Player(
-                netDevId = null,
-                name = "Flick",
-                active = true,
-                state = PlayerState(32, mapOf())
-            )
-        ),
-        currentPlayerId = 3L,
-        nextNewPlayerId = 10L,
-        startTime = initialTime + 30_000,
-        stopTime = initialTime + 40_000,
-        duration = 4_000,
-        timeout = false,
-        secondsUntilEnd = 0,
-        actions = listOf(),
-        currentActionPosition = 0
-    )
-)
-
-private val remoteSessionPreview get() = listOf(
-    RemoteSessionInfo("remote_1", "Milki Way", "100.0.0.100", 11234),
-    RemoteSessionInfo("remote_2", "Catch me if you can", "100.0.0.100", 11234)
-)
-
-private val sessionsInfoPreview: List<GameSessionInfo> get() =
-    gameSessionsPreview.filter { !it.completed }
-        .mapIndexed { i, s ->
-            GameSessionInfo(
-                id = i.inc().toString(),
-                completed = s.completed,
-                type = s.type,
-                name = s.name,
-                startTime = s.startTime,
-                stopTime = s.stopTime
-            )
-        }

@@ -9,26 +9,56 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
+import kotlinx.serialization.Serializable
+import org.vl4ds4m.board.game.assistant.game.GameType
 import org.vl4ds4m.board.game.assistant.game.data.GameSession
-import org.vl4ds4m.board.game.assistant.game.gameActionPresenter
 import org.vl4ds4m.board.game.assistant.network.NetworkGameState
 import org.vl4ds4m.board.game.assistant.network.RemoteSessionInfo
 import org.vl4ds4m.board.game.assistant.ui.component.TopBarUiState
+
+@Serializable
+data class GameObserver(
+    val sessionId: String,
+    val type: String,
+    val name: String,
+    val address: String,
+    val port: Int
+) {
+    fun toRemoteSessionInfo() = RemoteSessionInfo(
+        id = sessionId,
+        type = GameType.valueOf(type),
+        name = name,
+        ip = address,
+        port = port
+    )
+
+    companion object {
+        fun from(info: RemoteSessionInfo) = GameObserver(
+            sessionId = info.id,
+            type = info.type.title,
+            name = info.name,
+            address = info.ip,
+            port = info.port
+        )
+    }
+}
 
 fun NavGraphBuilder.observerNavigation(
     navController: NavController,
     topBarUiState: TopBarUiState
 ) {
-    composable<RemoteSessionInfo> { entry ->
-        val route = entry.toRoute<RemoteSessionInfo>()
+    composable<GameObserver> { entry ->
+        val sessionInfo = entry.toRoute<GameObserver>().toRemoteSessionInfo()
         val viewModel = viewModel<GameObserverViewModel>(
-            factory = GameObserverViewModel.createFactory(route)
+            factory = GameObserverViewModel.createFactory(sessionInfo)
         )
         val observer = viewModel.observerState.collectAsState()
-        val session = produceState(emptySession) {
+        val startSession = remember {
+            createStartSession(sessionInfo.name, sessionInfo.type)
+        }
+        val session = produceState(startSession) {
             viewModel.sessionState.collect {
-                value = it ?: emptySession
+                value = it ?: startSession
             }
         }
         val onBackClick: () -> Unit = { navController.navigateUp() }
@@ -42,19 +72,20 @@ fun NavGraphBuilder.observerNavigation(
         val players = remember {
             derivedStateOf { session.value.players.toMap() }
         }
+        val users = remember {
+            derivedStateOf { session.value.users }
+        }
+        val gameUiFactory = remember {
+            derivedStateOf { session.value.type.uiFactory }
+        }
         when (observer.value) {
             NetworkGameState.REGISTRATION -> ObserverStartupScreen()
             NetworkGameState.IN_GAME -> {
-                val currentPlayerId = remember {
-                    derivedStateOf { session.value.currentPlayerId }
+                val currentPid = remember {
+                    derivedStateOf { session.value.currentPid }
                 }
                 val actions = remember {
-                    derivedStateOf {
-                        val presenter = session.value.type.gameActionPresenter
-                        session.value.actions.map {
-                            presenter.showAction(it, players.value)
-                        }
-                    }
+                    derivedStateOf { session.value.actions }
                 }
                 val timer = remember {
                     derivedStateOf {
@@ -63,24 +94,31 @@ fun NavGraphBuilder.observerNavigation(
                 }
                 ObserverGameScreen(
                     players = players,
-                    currentPlayerId = currentPlayerId,
+                    users = users,
+                    gameUiFactory = gameUiFactory,
+                    currentPid = currentPid,
                     actions = actions,
                     timer = timer
                 )
             }
-            NetworkGameState.END_GAME -> ObserverEndScreen(players)
+            NetworkGameState.END_GAME -> ObserverEndScreen(
+                players = players,
+                users = users,
+                gameUiFactory = gameUiFactory
+            )
             NetworkGameState.EXIT -> onBackClick()
         }
     }
 }
 
-private val emptySession = GameSession(
+private fun createStartSession(name: String, type: GameType) = GameSession(
     completed = false,
-    type = SimpleOrdered,
-    name = "Default",
+    type = type,
+    name = name,
     players = listOf(),
-    currentPlayerId = null,
-    nextNewPlayerId = 1L,
+    users = mapOf(),
+    currentPid = null,
+    nextNewPid = 1,
     startTime = null,
     stopTime = null,
     duration = null,

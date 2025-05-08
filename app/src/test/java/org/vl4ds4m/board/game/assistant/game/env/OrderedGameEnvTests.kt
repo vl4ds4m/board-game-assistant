@@ -3,6 +3,7 @@ package org.vl4ds4m.board.game.assistant.game.env
 import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.vl4ds4m.board.game.assistant.game.PID
 import org.vl4ds4m.board.game.assistant.game.SimpleOrdered
 
 class OrderedGameEnvTests {
@@ -15,19 +16,19 @@ class OrderedGameEnvTests {
 
     @Test
     fun changeCurrentPlayer() {
-        val idState = gameEnv.currentPlayerId
+        val idState = gameEnv.currentPid
         val idA = addNewPlayer()
         val idB = addNewPlayer()
         val idC = addNewPlayer()
         assertEquals(idA, idState.value)
-        gameEnv.changeCurrentPlayerId()
+        gameEnv.changeCurrentPid()
         assertEquals(idB, idState.value)
         gameEnv.changePlayerOrder(idB, 0)
-        gameEnv.changeCurrentPlayerId()
+        gameEnv.changeCurrentPid()
         assertEquals(idA, idState.value)
-        gameEnv.changeCurrentPlayerId()
+        gameEnv.changeCurrentPid()
         assertEquals(idC, idState.value)
     }
 
-    private fun addNewPlayer(): Long = gameEnv.addPlayer(null, "A")
+    private fun addNewPlayer(): PID = gameEnv.addPlayer(null, "A")
 }

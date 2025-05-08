@@ -2,10 +2,14 @@ package org.vl4ds4m.board.game.assistant.game
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.vl4ds4m.board.game.assistant.data.User
 import org.vl4ds4m.board.game.assistant.game.log.GameAction
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 
-typealias Players = Map<Long, Player>
+typealias PID = Int // Player identifier
+typealias Players = Map<PID, Player>
+typealias OrderedPlayers = List<Pair<PID, Player>>
+typealias Users = Map<PID, User>
 typealias Actions = List<GameAction>
 
 interface Game {
@@ -15,30 +19,34 @@ interface Game {
 
     val players: StateFlow<Players>
 
-    val currentPlayerId: StateFlow<Long?>
+    val orderedPlayers: StateFlow<OrderedPlayers>
 
-    fun changeCurrentPlayerId(id: Long)
+    val users: StateFlow<Users>
 
-    val currentPlayer: Pair<Long, Player>?
-        get() = currentPlayerId.value?.let { id ->
+    val currentPid: StateFlow<PID?>
+
+    fun changeCurrentPid(id: PID)
+
+    val currentPlayer: Pair<PID, Player>?
+        get() = currentPid.value?.let { id ->
             players.value[id]?.let { player -> id to player }
         }
 
-    fun addPlayer(netDevId: String?, name: String): Long
+    fun addPlayer(user: User?, name: String): PID
 
-    fun removePlayer(id: Long)
+    fun removePlayer(id: PID)
 
-    fun bindPlayer(id: Long, netDevId: String)
+    fun bindPlayer(id: PID, user: User)
 
-    fun unbindPlayer(id: Long)
+    fun unbindPlayer(id: PID)
 
-    fun renamePlayer(id: Long, name: String)
+    fun renamePlayer(id: PID, name: String)
 
-    fun freezePlayer(id: Long)
+    fun freezePlayer(id: PID)
 
-    fun unfreezePlayer(id: Long)
+    fun unfreezePlayer(id: PID)
 
-    fun changePlayerState(id: Long, state: PlayerState)
+    fun changePlayerState(id: PID, state: PlayerState)
 
     val timeout: MutableStateFlow<Boolean>
 
@@ -69,4 +77,12 @@ interface Game {
     fun revert()
 
     fun repeat()
+
+    companion object {
+        fun getOrderedPlayers(ids: List<PID>, players: Players): OrderedPlayers =
+            if (ids.isEmpty()) players.toList()
+            else ids.mapNotNull { id ->
+                players[id]?.let { p -> id to p }
+            }
+    }
 }

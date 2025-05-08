@@ -19,7 +19,7 @@ class DiceGameEnv : OrderedGameEnv(Dice), DiceGame {
     override val addEnabled: StateFlow<Boolean> = mAddEnabled.asStateFlow()
 
     private val addEnabledObserver = Initializable { scope ->
-        currentPlayerId.combine(actions) { id, actions ->
+        currentPid.combine(actions) { id, actions ->
             mAddEnabled.value = actions.takeIf { id != null }
                 ?.takeIf { actions.isNotEmpty() }
                 ?.last()
@@ -34,19 +34,17 @@ class DiceGameEnv : OrderedGameEnv(Dice), DiceGame {
     override val initializables = super.initializables + addEnabledObserver
 
     override fun addPoints(points: Int) {
-        if (points <= 0 || points % 5 != 0) return
+        if ((points !in 1 .. 1000) || points % 5 != 0) return
         val (_, player) = currentPlayer ?: return
         val oldScore = player.state.score
-        if (oldScore == 1000) {
-            return
-        }
+        if (oldScore == 1000) return
         val newScore = (oldScore + points).let {
             if (it > 1000) oldScore - 100
             else it
         }.let {
             player.state.copy(score = it)
         }
-        val id = currentPlayerId.value ?: return
+        val id = currentPid.value ?: return
         changePlayerState(id, newScore)
     }
 }

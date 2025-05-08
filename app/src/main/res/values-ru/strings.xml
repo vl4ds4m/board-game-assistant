@@ -6,7 +6,10 @@
     <string name="profile_title">Ваш профиль</string>
     <string name="profile_name_label">Имя</string>
     <string name="results_title">Результаты игр</string>
+    <string name="results_filter_all">Все</string>
     <string name="results_empty_list">Нет завершенных игр</string>
+    <string name="results_date_today">Сегодня</string>
+    <string name="results_date_yesterday">Вчера</string>
     <string name="game_results_title_prefix">Результаты</string>
     <string name="play_title">Игровые сессии</string>
     <string name="play_start_new_game">Начать новую игру</string>
@@ -48,6 +51,10 @@
     <string name="game_results_stop_time">Окончание</string>
     <string name="game_results_duration">Продолжительность</string>
     <string name="game_results_rating">Рейтинг</string>
+    <string name="game_results_actions">История ходов</string>
+    <string name="game_results_remove_msg">Вы уверены, что хотите удалить этот результат?</string>
+    <string name="game_results_remove_confirm">Удалить</string>
+    <string name="game_results_remove_cancel">Отмена</string>
     <string name="game_menu_game_settings">Открыть настройки игры</string>
     <string name="game_menu_player_settings">Открыть настройки игроков</string>
     <string name="game_menu_dice_imitation">Бросить кости</string>
@@ -56,6 +63,9 @@
     <string name="player_action_move_up">Поставить выше</string>
     <string name="player_action_move_down">Поставить ниже</string>
     <string name="player_action_select">Сделать текущим</string>
+    <string name="player_action_change_order">Изменит порядок</string>
+    <string name="player_action_rename">Переименовать</string>
+    <string name="player_action_rename_dismiss">Отменить</string>
     <string name="player_action_freeze">Заморозить</string>
     <string name="player_action_unfreeze">Разморозить</string>
     <string name="game_master_apply">Применить</string>
@@ -70,7 +80,14 @@
     <string name="game_monopoly_to_prison">В тюрьму</string>
     <string name="game_monopoly_from_prison">Из тюрьмы</string>
     <string name="game_monopoly_positioning">Перемещение</string>
+    <string name="game_monopoly_leave_prison_msg">Как покинуть тюрьму?</string>
+    <string name="game_monopoly_leave_prison_free">Бесплатно</string>
+    <string name="game_monopoly_leave_prison_fine">Штраф</string>
     <string name="game_monopoly_accounting">Подсчет</string>
+    <string name="game_monopoly_money_label">деньги, K y.e.</string>
+    <string name="game_monopoly_money_k">K y.e.</string>
+    <string name="game_monopoly_money_m">M y.e.</string>
+    <string name="game_monopoly_transferring">Перевод</string>
     <string name="game_monopoly_pay">Снять</string>
     <string name="game_monopoly_gain">Получить</string>
     <string name="game_monopoly_from_player">От кого</string>
@@ -82,4 +99,10 @@
     <string name="player_action_unbind">Отвязать</string>
     <string name="player_action_bind">Привязать к</string>
     <string name="game_player_self_label">Это Вы</string>
+    <string name="player_action_rename_confirm">Применить</string>
+    <string name="game_log_monopoly_to_prison">отправляется в Тюрьму</string>
+    <string name="game_log_monopoly_from_prison">выходит из Тюрьмы</string>
+    <string name="game_action_exit_confirm">Подтвердить</string>
+    <string name="game_action_exit_text">Вы уверены, что хотите приостановить игру?</string>
+    <string name="game_settings_apply">Применить</string>
 </resources>

@@ -3,6 +3,7 @@ package org.vl4ds4m.board.game.assistant.data.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import org.vl4ds4m.board.game.assistant.game.PID
 
 @Entity(tableName = GameSessionEntity.TABLE_NAME)
 data class GameSessionEntity(
@@ -20,10 +21,10 @@ data class GameSessionEntity(
     val name: String,
 
     @ColumnInfo(name = CURRENT_PLAYER_ID)
-    val currentPlayerId: Long?,
+    val currentPid: PID?,
 
     @ColumnInfo(name = NEXT_NEW_PLAYER_ID)
-    val nextNewPlayerId: Long,
+    val nextNewPid: PID,
 
     @ColumnInfo(name = START_TIME)
     val startTime: Long?,
@@ -43,6 +44,11 @@ data class GameSessionEntity(
     @ColumnInfo(name = CURRENT_ACTION_POSITION)
     val currentActionPosition: Int,
 ) {
+    data class PK(
+        @ColumnInfo(name = ID)
+        val id: String
+    )
+
     companion object {
         const val TABLE_NAME = "sessions"
         const val ID = "id"

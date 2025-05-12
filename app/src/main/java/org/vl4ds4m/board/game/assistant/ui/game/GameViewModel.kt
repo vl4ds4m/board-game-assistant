@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
@@ -46,6 +47,10 @@ abstract class GameViewModel(
         viewModelScope.launch {
             sessionId?.let { id ->
                 sessionRepository.loadSession(id)
+                    ?.let {
+                        val user = app.userDataRepository.user.first()
+                        it.changeCurrentUser(user.netDevId)
+                    }
                     ?.let { gameEnv.load(it) }
                     ?: Log.e(TAG, "Can't load game session[id = $id] as it doesn't exist")
             }

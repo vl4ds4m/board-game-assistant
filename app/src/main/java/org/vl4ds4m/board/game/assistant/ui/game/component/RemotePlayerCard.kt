@@ -16,6 +16,9 @@ import org.vl4ds4m.board.game.assistant.ui.component.PlayerIcon
 import org.vl4ds4m.board.game.assistant.ui.component.PlayerName
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * Displays a card of remote player with his name and action button.
+ */
 @Composable
 fun RemotePlayerCard(
     name: String,

@@ -44,6 +44,9 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.gameName
 import org.vl4ds4m.board.game.assistant.ui.game.component.isValidGameName
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * Displays a start screen to setup a new game.
+ */
 @Composable
 fun NewGameStartScreen(
     viewModel: GameSetupViewModel,

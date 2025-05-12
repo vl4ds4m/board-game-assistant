@@ -35,6 +35,10 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.isValidGameName
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 import java.util.Locale
 
+/**
+ * Displays a game settings. Contains a text field to change
+ * the game name and options to set/unset a timer.
+ */
 @Composable
 fun GameSettingScreen(modifier: Modifier = Modifier) {
     val viewModel = viewModel<GameViewModel>()

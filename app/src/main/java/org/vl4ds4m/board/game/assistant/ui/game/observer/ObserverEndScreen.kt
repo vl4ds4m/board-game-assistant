@@ -26,6 +26,9 @@ import org.vl4ds4m.board.game.assistant.ui.game.GameUI
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * Displays information about end of the game.
+ */
 @Composable
 fun ObserverEndScreen(
     players: State<Players>,

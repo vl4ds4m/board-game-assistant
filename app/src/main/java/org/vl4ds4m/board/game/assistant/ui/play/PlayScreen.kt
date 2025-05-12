@@ -32,6 +32,10 @@ import org.vl4ds4m.board.game.assistant.ui.component.GameSessionCard
 import org.vl4ds4m.board.game.assistant.ui.sessionsInfoPreview
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * Represents a start point for initializing game process. Contains stopped
+ * and remote game sessions, a button to start a new one.
+ */
 @Composable
 fun PlayScreen(
     viewModel: PlayViewModel,

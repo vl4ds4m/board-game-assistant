@@ -32,6 +32,9 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.RemotePlayerCard
 import org.vl4ds4m.board.game.assistant.ui.game.component.RemotePlayersHead
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * Displays a screen to setup players for a new game.
+ */
 @Composable
 fun NewGamePlayersScreen(
     viewModel: GameSetupViewModel,

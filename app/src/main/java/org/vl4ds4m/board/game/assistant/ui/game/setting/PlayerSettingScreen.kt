@@ -34,6 +34,10 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.RemotePlayerCard
 import org.vl4ds4m.board.game.assistant.ui.game.component.RemotePlayersHead
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * Displays lists of players, remote users and buttons to change
+ * a current set of the players and their data.
+ */
 @Composable
 fun PlayerSettingScreen(modifier: Modifier = Modifier) {
     val viewModel = viewModel<GameViewModel>()

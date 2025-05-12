@@ -14,6 +14,9 @@ import org.vl4ds4m.board.game.assistant.game.Actions
 import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.ui.game.ActionLog
 
+/**
+ * Displays a list of game actions that a game master has done.
+ */
 @Composable
 fun GameHistory(
     players: State<Players>,

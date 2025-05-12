@@ -17,6 +17,11 @@ import org.vl4ds4m.board.game.assistant.ui.component.PlayerName
 import org.vl4ds4m.board.game.assistant.ui.component.PlayerPosition
 import org.vl4ds4m.board.game.assistant.ui.component.PlayerState
 
+/**
+ * Displays information about a player. Contains a player name,
+ * score and another game data, icons on activity and whether
+ * the player is remote.
+ */
 @Composable
 fun PlayerGameCard(
     position: Int,

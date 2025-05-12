@@ -11,6 +11,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * Displays a message to wait for the game session start.
+ */
 @Composable
 fun ObserverStartupScreen(modifier: Modifier = Modifier) {
     Box(

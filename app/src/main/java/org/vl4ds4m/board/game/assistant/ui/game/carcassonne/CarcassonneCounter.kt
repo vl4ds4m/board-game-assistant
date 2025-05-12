@@ -33,6 +33,9 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.Score
 import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreField
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * A game master panel to manage a carcassonne game process.
+ */
 @Composable
 fun CarcassonneCounter(
     addPoints: (CarcassonneProperty, Int, Boolean) -> Unit,

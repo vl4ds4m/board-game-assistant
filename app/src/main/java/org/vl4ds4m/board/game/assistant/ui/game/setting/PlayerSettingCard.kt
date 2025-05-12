@@ -29,6 +29,11 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.onOrderChangeAction
 import org.vl4ds4m.board.game.assistant.ui.game.component.onRenameAction
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * Displays information about a player on setting screens.
+ * Contains his position in ordered list, name, whether it is remote or frozen,
+ * button with context actions.
+ */
 @Composable
 fun PlayerSettingCard(
     id: PID,

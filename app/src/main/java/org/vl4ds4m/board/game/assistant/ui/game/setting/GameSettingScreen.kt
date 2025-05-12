@@ -104,7 +104,7 @@ fun GameSettingScreenContent(
                 )
             }
             Row {
-                val width = Modifier.width(80.dp)
+                val width = Modifier.width(90.dp)
                 OutlinedTextField(
                     value = newMinutes.value,
                     onValueChange = { value ->

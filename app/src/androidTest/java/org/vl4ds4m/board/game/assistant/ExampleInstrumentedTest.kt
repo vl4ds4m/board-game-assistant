@@ -21,21 +21,4 @@ class ExampleInstrumentedTest {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         assertEquals("org.vl4ds4m.board.game.assistant", appContext.packageName)
     }
-
-    /*fun pre() {
-        GameSessionRepository(db.sessionDao(), coroutineScope).also {
-            // Test usage
-            coroutineScope.launch {
-                db.clearAllTables()
-                prepopulateDatabase(it)
-            }
-        }
-    }
-
-    private fun prepopulateDatabase(repo: GameSessionRepository) {
-        Log.i("AppDatabase", "Prepopulate app-database")
-        defaultGames.forEachIndexed { i, session ->
-            repo.saveSession(session, "local_${i + 1}")
-        }
-    }*/
 }

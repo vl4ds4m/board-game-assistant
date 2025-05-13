@@ -29,3 +29,7 @@ the diagonal must be 6 inches or more to place UI.
 
 If you want to share the game information, it's necessary to all users connect to a common local network,
 e.g. Wi-Fi access point.
+
+## Usage
+
+You can read how to install and use the application in [USAGE.md](./USAGE.md) (on russian).

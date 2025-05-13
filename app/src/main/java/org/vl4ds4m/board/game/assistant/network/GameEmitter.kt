@@ -58,7 +58,7 @@ class GameEmitter(
         closeSockets()
         val server = Server().also { server = it }
         connections.value = listOf()
-        sessionEmitter.register(id, type, name, server.port)
+        sessionEmitter.enable(id, type, name, server.port)
         launchGameStateUpdate()
         scope.launch(Dispatchers.IO) {
             server.use { _ ->
@@ -104,7 +104,7 @@ class GameEmitter(
     }
 
     fun stop() {
-        sessionEmitter.unregister()
+        sessionEmitter.disable()
         closeSockets()
     }
 

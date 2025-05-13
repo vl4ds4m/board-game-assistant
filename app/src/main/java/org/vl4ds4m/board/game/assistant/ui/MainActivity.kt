@@ -10,8 +10,12 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        application.let { it as BoardGameAssistantApp }
-            .initDependencies()
+        val app = application.let {
+            it as BoardGameAssistantApp
+        }.apply {
+            initDependencies()
+        }
+        lifecycle.addObserver(app.sessionEmitter.lifecycleObserver)
         enableEdgeToEdge()
         setContent {
             BoardGameAssistantTheme {

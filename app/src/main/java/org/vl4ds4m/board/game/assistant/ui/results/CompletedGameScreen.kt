@@ -46,6 +46,9 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
+/**
+ * Displays statistics data about the completed game.
+ */
 @Composable
 fun CompletedGameScreen(
     topBarUiState: TopBarUiState,

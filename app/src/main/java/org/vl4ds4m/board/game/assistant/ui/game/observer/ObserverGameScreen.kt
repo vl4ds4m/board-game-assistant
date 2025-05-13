@@ -26,6 +26,11 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.game.component.Timer
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * Displays a game process, as it is presented on
+ * [GameScreen][org.vl4ds4m.board.game.assistant.ui.game.GameScreen]
+ * without elements to manage the game.
+ */
 @Composable
 fun ObserverGameScreen(
     players: State<Players>,

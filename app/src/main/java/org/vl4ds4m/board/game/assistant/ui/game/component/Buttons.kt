@@ -85,7 +85,7 @@ fun ApplyButton(
         onClick = onClick,
         enabled = enabled?.value ?: true,
         contentPadding = PaddingValues(6.dp),
-        modifier = Modifier.width(75.dp)
+        modifier = Modifier.width(85.dp)
     ) {
         Text(
             text = stringResource(R.string.game_master_apply),

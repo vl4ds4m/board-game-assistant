@@ -21,6 +21,9 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.onOrderChangeAction
 import org.vl4ds4m.board.game.assistant.ui.game.component.onRenameAction
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * 
+ */
 @Composable
 fun PlayerSetupCard(
     index: Int,

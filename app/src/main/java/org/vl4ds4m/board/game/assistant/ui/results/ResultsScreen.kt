@@ -44,6 +44,10 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
+/**
+ * Displays a list of completed game sessions, sorted by completion time
+ * and filtered by game types.
+ */
 @Composable
 fun ResultsScreen(
     viewModel: ResultsViewModel,

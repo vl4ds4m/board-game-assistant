@@ -57,6 +57,9 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.ScoreField
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 import kotlin.math.roundToInt
 
+/**
+ * A game master panel to manage a monopoly game process.
+ */
 @Composable
 fun MonopolyCounter(
     players: State<Players>,

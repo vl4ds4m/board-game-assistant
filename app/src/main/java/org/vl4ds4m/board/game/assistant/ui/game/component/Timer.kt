@@ -13,6 +13,9 @@ import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.R
 import org.vl4ds4m.board.game.assistant.prettyTime
 
+/**
+ * Displays a time until game ending.
+ */
 @Composable
 fun Timer(
     state: State<Int?>,

@@ -16,6 +16,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * Displays a default variant of a game master panel.
+ */
 @Composable
 fun StandardCounter(
     addPoints: (Int) -> Unit,
@@ -32,6 +35,9 @@ fun StandardCounter(
     )
 }
 
+/**
+ * Displays a panel to manage players states.
+ */
 @Composable
 fun ScoreCounter(
     addPoints: (Int) -> Unit,

@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.vl4ds4m.board.game.assistant.BoardGameAssistantApp
@@ -28,7 +29,7 @@ abstract class GameViewModel(
 
     private val gameEmitter = GameEmitter(gameEnv, viewModelScope, app.sessionEmitter)
 
-    val remotePlayers: StateFlow<List<User>> = gameEmitter.remotePlayers
+    val remotePlayers: StateFlow<List<User>> = gameEmitter.users
         .combine(app.userDataRepository.user) { users, user ->
             users.map { it.copy(self = false) } + user
         }
@@ -46,10 +47,14 @@ abstract class GameViewModel(
         viewModelScope.launch {
             sessionId?.let { id ->
                 sessionRepository.loadSession(id)
+                    ?.let {
+                        val user = app.userDataRepository.user.first()
+                        it.changeCurrentUser(user.netDevId)
+                    }
                     ?.let { gameEnv.load(it) }
                     ?: Log.e(TAG, "Can't load game session[id = $id] as it doesn't exist")
             }
-            gameEmitter.startEmit(
+            gameEmitter.start(
                 this@GameViewModel.sessionId,
                 gameEnv.type,
                 gameEnv.name.value
@@ -59,14 +64,26 @@ abstract class GameViewModel(
 
     val gameUi: GameUI = gameEnv.type.uiFactory.create(gameEnv)
 
+    fun stopGameProcess() {
+        gameEnv.stop()
+        saveCurrentState(initialized.value)
+    }
+
+    private fun saveCurrentState(initialized: Boolean) {
+        if (initialized) {
+            val state = gameEnv.save()
+            sessionRepository.saveSession(state, sessionId)
+        }
+    }
+
     override fun onCleared() {
-        if (initialized.value) {
+        val initialized = initialized.value
+        if (initialized) {
             Log.d(TAG, "Complete game process")
             gameEnv.initializables.forEach { it.close() }
-            gameEnv.save()
-                .let { sessionRepository.saveSession(it, sessionId) }
         }
-        gameEmitter.stopEmit()
+        saveCurrentState(initialized)
+        gameEmitter.stop()
         super.onCleared()
     }
 

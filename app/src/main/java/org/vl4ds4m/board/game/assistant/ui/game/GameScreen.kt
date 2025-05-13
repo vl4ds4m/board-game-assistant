@@ -55,6 +55,10 @@ import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.game.component.Timer
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * Display a game process, managed by the use. Contains players rating,
+ * actions history, a game master panel, a timer of game ending if applied.
+ */
 @Composable
 fun GameScreen(
     type: GameType,
@@ -99,7 +103,7 @@ fun GameScreen(
     LifecycleStartEffect(viewModel) {
         viewModel.start()
         onStopOrDispose {
-            viewModel.stop()
+            viewModel.stopGameProcess()
         }
     }
     LaunchedEffect(viewModel) {

@@ -21,6 +21,12 @@ import org.vl4ds4m.board.game.assistant.ui.Results
 import org.vl4ds4m.board.game.assistant.ui.TopRoute
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * Displays a bottom navigation bar on main screens:
+ * [PlayScreen][org.vl4ds4m.board.game.assistant.ui.play.PlayScreen],
+ * [ResultsScreen][org.vl4ds4m.board.game.assistant.ui.results.ResultsScreen],
+ * [ProfileScreen][org.vl4ds4m.board.game.assistant.ui.profile.ProfileScreen]
+ */
 @Composable
 fun MainNavBar(
     isRouteSelected: (TopRoute) -> Boolean,

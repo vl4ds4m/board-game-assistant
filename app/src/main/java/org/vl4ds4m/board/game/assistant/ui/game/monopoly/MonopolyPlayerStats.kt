@@ -13,6 +13,9 @@ import org.vl4ds4m.board.game.assistant.game.monopoly.monopolyFields
 import org.vl4ds4m.board.game.assistant.game.monopoly.position
 import java.util.Locale
 
+/**
+ * Displays information about monopoly player's data
+ */
 @Composable
 fun RowScope.MonopolyPlayerStats(state: State<PlayerState>) {
     Spacer(Modifier.weight(1f))

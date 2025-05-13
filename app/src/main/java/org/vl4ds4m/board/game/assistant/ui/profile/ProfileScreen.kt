@@ -28,6 +28,9 @@ import org.vl4ds4m.board.game.assistant.ui.component.isValidPlayerName
 import org.vl4ds4m.board.game.assistant.ui.component.playerName
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * Displays a profile of the application user with the user name text field.
+ */
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,

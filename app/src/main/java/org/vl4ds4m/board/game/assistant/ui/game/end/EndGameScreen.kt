@@ -31,6 +31,9 @@ import org.vl4ds4m.board.game.assistant.ui.game.PlayerStats
 import org.vl4ds4m.board.game.assistant.ui.game.component.PlayersRating
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * Displays a game end screen with players results.
+ */
 @Composable
 fun EndGameScreen(
     navigateHome: () -> Unit,

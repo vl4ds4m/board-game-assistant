@@ -39,6 +39,9 @@ import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 import kotlin.random.Random
 import kotlin.random.nextInt
 
+/**
+ * Displays some game dice and buttons to act with it.
+ */
 @Composable
 fun DiceImitationScreen(modifier: Modifier = Modifier) {
     Column(

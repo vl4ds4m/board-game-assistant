@@ -18,6 +18,9 @@ import org.vl4ds4m.board.game.assistant.game.Players
 import org.vl4ds4m.board.game.assistant.game.Users
 import org.vl4ds4m.board.game.assistant.game.data.PlayerState
 
+/**
+ * Displays a list of players, sorted by their score.
+ */
 @Composable
 fun PlayersRating(
     players: State<Players>,

@@ -4,6 +4,7 @@ import androidx.activity.addCallback
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -156,13 +157,21 @@ fun NavGraphBuilder.gameNavigation(
     composable<End> { entry ->
         val gameEntry = navController.rememberTopmost<Game>(entry)
         val viewModel = viewModel<GameViewModel>(gameEntry)
+        val returnGame = {
+            viewModel.returnGame()
+            navigateUp()
+        }
         topBarUiState.update(
             title = stringResource(R.string.game_end_title),
-            navigateBack = {
-                viewModel.returnGame()
-                navigateUp()
-            }
+            navigateBack = returnGame
         )
+        LocalActivity.current.let {
+            it as MainActivity
+        }.onBackPressedDispatcher.addCallback(
+            owner = LocalLifecycleOwner.current
+        ) {
+            returnGame()
+        }
         CompositionLocalProvider(LocalViewModelStoreOwner provides gameEntry) {
             EndGameScreen(navigateHome)
         }

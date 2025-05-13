@@ -31,6 +31,10 @@ import org.vl4ds4m.board.game.assistant.ui.game.gameNavigation
 import org.vl4ds4m.board.game.assistant.ui.game.observer.observerNavigation
 import org.vl4ds4m.board.game.assistant.ui.theme.BoardGameAssistantTheme
 
+/**
+ * Displays a main screen of the application. Contains a navigation host
+ * area and a main navigation bottom bar or a top navigation bar.
+ */
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()

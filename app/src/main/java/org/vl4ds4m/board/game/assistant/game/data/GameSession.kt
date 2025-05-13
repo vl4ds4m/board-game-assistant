@@ -23,4 +23,10 @@ data class GameSession(
     val secondsUntilEnd: Int,
     val actions: Actions,
     val currentActionPosition: Int
-)
+) {
+    fun changeCurrentUser(netDevId: String): GameSession = copy(
+        users = users.mapValues { (_, u) ->
+            u.copy(self = u.netDevId == netDevId)
+        }
+    )
+}

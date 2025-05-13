@@ -15,8 +15,8 @@ android {
         minSdk = 29
         //noinspection OldTargetApi because a newer version has collisions (e.g. new java collections api <> kotlin extension funtions)
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

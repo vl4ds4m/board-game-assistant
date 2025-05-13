@@ -64,13 +64,25 @@ abstract class GameViewModel(
 
     val gameUi: GameUI = gameEnv.type.uiFactory.create(gameEnv)
 
+    fun stopGameProcess() {
+        gameEnv.stop()
+        saveCurrentState(initialized.value)
+    }
+
+    private fun saveCurrentState(initialized: Boolean) {
+        if (initialized) {
+            val state = gameEnv.save()
+            sessionRepository.saveSession(state, sessionId)
+        }
+    }
+
     override fun onCleared() {
-        if (initialized.value) {
+        val initialized = initialized.value
+        if (initialized) {
             Log.d(TAG, "Complete game process")
             gameEnv.initializables.forEach { it.close() }
-            gameEnv.save()
-                .let { sessionRepository.saveSession(it, sessionId) }
         }
+        saveCurrentState(initialized)
         gameEmitter.stop()
         super.onCleared()
     }

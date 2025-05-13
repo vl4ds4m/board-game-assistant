@@ -103,7 +103,7 @@ fun GameScreen(
     LifecycleStartEffect(viewModel) {
         viewModel.start()
         onStopOrDispose {
-            viewModel.stop()
+            viewModel.stopGameProcess()
         }
     }
     LaunchedEffect(viewModel) {

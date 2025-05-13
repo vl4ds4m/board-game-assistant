@@ -187,11 +187,15 @@ class GameEmitter(
                             if (user.isBound) {
                                 emitGameSession(sessionState)
                                 emitState(networkState)
+                            } else {
+                                emitState(NetworkGameState.REGISTRATION)
                             }
                         }
                         NetworkGameState.IN_GAME -> {
                             if (user.isBound) {
                                 emitGameSession(sessionState)
+                            } else {
+                                emitState(NetworkGameState.REGISTRATION)
                             }
                         }
                     }
